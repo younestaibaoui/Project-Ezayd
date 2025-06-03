@@ -42,6 +42,7 @@ from Ezayd.models import (
     MaterielProfessionnel, MaterielProfessionnelImage,
     InformatiqueElectronique, InformatiqueImage,
     MobilierEquipement
+
 )
 
 # ---------- Admin pour Enchaire ----------
