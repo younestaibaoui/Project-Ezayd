@@ -13,4 +13,5 @@ urlpatterns = [
     path('', views.connexion_view, name='connexion'),
     path('deconnexion/', views.deconnexion_view, name='deconnexion'), 
     path('email-verification/<uuid:token>/', views.email_verification_view, name='email_verification'),
+    
 ]
