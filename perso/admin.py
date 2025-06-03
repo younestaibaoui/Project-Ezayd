@@ -47,8 +47,8 @@ from Ezayd.models import (
 # ---------- Admin pour Enchaire ----------
 @admin.register(Enchaire)
 class EnchaireAdmin(admin.ModelAdmin):
-    list_display = ('lot', 'seller', 'winner', 'etat', 'date_debut', 'date_fin', 'approved', 'is_reserved')
-    list_filter = ('etat', 'approved', 'is_reserved', 'date_debut', 'date_fin')
+    list_display = ('lot', 'seller', 'winner', 'etat', 'date_debut', 'date_fin',  'is_reserved')
+    list_filter = ('etat',  'is_reserved', 'date_debut', 'date_fin')
     search_fields = ('lot__nom', 'seller__username', 'winner__username')
     readonly_fields = ('notified_users',)
     filter_horizontal = ('savers', 'notified_users')

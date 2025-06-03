@@ -53,7 +53,6 @@ class Enchaire(models.Model):
         on_delete=models.CASCADE
     )
 
-    approved = models.BooleanField(default=False)
     is_reserved = models.BooleanField(default=False)
     price_reserved = models.IntegerField(null=True, blank=True)
 
@@ -72,11 +71,6 @@ class Enchaire(models.Model):
     def __str__(self):
         return f"{self.lot}"
 
-    def save(self, *args, **kwargs):
-        created = not self.pk
-        super().save(*args, **kwargs)
-        if created:
-            DemandeEnchaire.objects.create(enchaire=self, user=self.seller, approved=False)
 
     def is_active(self):
         today = timezone.now().date()
@@ -90,7 +84,7 @@ class Enchaire(models.Model):
 
 
 class DemandeEnchaire(models.Model):
-    enchaire = models.OneToOneField(
+    enchaire = models.ForeignKey(
         "Enchaire",
         null=False,
         on_delete=models.CASCADE,
@@ -112,13 +106,6 @@ class DemandeEnchaire(models.Model):
     def __str__(self):
         return f"Demande de l'enchère '{self.enchaire}'"
 
-    def save(self, *args, **kwargs):
-        enchaire = self.enchaire
-        if self.approved:
-            enchaire.approved = True
-            enchaire.save()
-            # Tu peux ajouter une logique de notification ici
-        super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse('demande_enchaire_detail', args=[self.pk])
