@@ -50,11 +50,11 @@ def connexion_view(request):
         email = request.POST.get("email")
         password = request.POST.get("password")
         user = authenticate(request, username=email, password=password)
-
         if user is not None:
             if getattr(user, 'email_verified', False):
                 login(request, user)
                 messages.success(request, f"Bienvenue {user.username} !")
+                return HttpResponse("hey diva")
                 return redirect('accueil')  # Redirige vers la vue 'accueil'
             else:
                 messages.warning(request, "Veuillez vérifier votre adresse email avant de vous connecter.")

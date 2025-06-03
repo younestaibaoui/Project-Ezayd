@@ -1,0 +1,10 @@
+.carousel-track {
+  display: flex;
+  transition: transform 0.3s ease-in-out;
+  overflow: hidden;
+}
+
+.carousel-slide {
+  min-width: 100%; /* ou la largeur que tu veux */
+  /* autres styles */
+}

@@ -6,7 +6,7 @@ from Ezayd.views import accueil
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # path('/', include('Ezayd.urls')),
+    path('', include('Ezayd.urls')),
     # path('perso/', include('perso.urls')),  
     path('accueil/', accueil, name='accueil'),  # accessible via /accueil/
     path('inscription/', views.inscription_view, name='inscription'),

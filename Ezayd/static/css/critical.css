@@ -1,0 +1,249 @@
+/* Critical CSS - Above the fold styles */
+:root {
+  --primary-color: #de0d33;
+  --secondary-color: #b9243f;
+  --background-dark: #111;
+  --background-light: #222;
+  --text-light: #eee;
+  --text-muted: #666;
+  --border-color: #333;
+  --success-color: #28a745;
+  --warning-color: #ffc107;
+  --error-color: #dc3545;
+  --font-family: "Outfit", sans-serif;
+  --transition: all 0.3s ease;
+  --border-radius: 6px;
+  --box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--background-dark);
+  color: var(--text-light);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* Accessibility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: var(--primary-color);
+  color: white;
+  padding: 8px;
+  text-decoration: none;
+  z-index: 1000;
+  border-radius: var(--border-radius);
+}
+
+.skip-link:focus {
+  top: 6px;
+}
+
+/* Header */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background-color: var(--background-dark);
+  border-bottom: 3px solid var(--background-light);
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  height: 4rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+#logo {
+  height: 40px;
+  width: auto;
+  transition: var(--transition);
+}
+
+#logo:hover {
+  transform: scale(1.05);
+}
+
+.nav-list {
+  display: flex;
+  list-style: none;
+  gap: 2rem;
+  align-items: center;
+}
+
+.nav-button,
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  color: var(--text-light);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+}
+
+.nav-button:hover,
+.nav-link:hover {
+  color: var(--primary-color);
+}
+
+.nav-button::after,
+.nav-link::after {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--primary-color);
+  transition: width 0.3s ease;
+}
+
+.nav-button:hover::after,
+.nav-link:hover::after {
+  width: 100%;
+}
+
+/* Search */
+.search-wrapper {
+  flex: 1;
+  max-width: 300px;
+  margin: 0 2rem;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  color: var(--text-light);
+  font-size: 0.9rem;
+  transition: var(--transition);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  transform: scale(1.02);
+}
+
+/* Login Button */
+.login-btn {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.login-btn:hover {
+  background-color: var(--secondary-color);
+  transform: translateY(-2px);
+}
+
+/* Mobile Menu */
+.mobile-menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text-light);
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+/* Main Content */
+.main-content {
+  margin-top: 4rem;
+  min-height: calc(100vh - 4rem);
+}
+
+/* Hero Section */
+.hero-section {
+  padding: 2rem 0;
+}
+
+.carousel-container {
+  position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: var(--box-shadow);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0 1rem;
+  }
+
+  .nav-list {
+    display: none;
+  }
+
+  .mobile-menu-toggle {
+    display: block;
+  }
+
+  .search-wrapper {
+    max-width: 200px;
+    margin: 0 1rem;
+  }
+
+  .login-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar {
+    padding: 0 0.5rem;
+  }
+
+  .search-wrapper {
+    max-width: 150px;
+    margin: 0 0.5rem;
+  }
+}
