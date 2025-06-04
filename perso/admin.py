@@ -1,6 +1,16 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from .models import UserAccount, EmailVerificationToken
+from django.contrib import admin
+from Ezayd.models import (
+    Enchaire, DemandeEnchaire, Lot,
+    Voiture, VoitureImage,
+    Immobilier, ImmobilierImage,
+    MaterielProfessionnel, MaterielProfessionnelImage,
+    InformatiqueElectronique, InformatiqueImage,
+    MobilierEquipement,
+    EnchaireObjet, ParticipationEnchaire,
+)
 
 class UserAccountAdmin(BaseUserAdmin):
     list_display = ('email', 'username', 'is_admin', 'is_active', 'email_verified_display')
@@ -34,33 +44,44 @@ admin.site.register(EmailVerificationToken)
 
 
 
-from django.contrib import admin
-from Ezayd.models import (
-    Enchaire, DemandeEnchaire, Lot,
-    Voiture, VoitureImage,
-    Immobilier, ImmobilierImage,
-    MaterielProfessionnel, MaterielProfessionnelImage,
-    InformatiqueElectronique, InformatiqueImage,
-    MobilierEquipement
 
-)
 
 # ---------- Admin pour Enchaire ----------
 @admin.register(Enchaire)
 class EnchaireAdmin(admin.ModelAdmin):
-    list_display = ('lot', 'seller', 'winner', 'etat', 'date_debut', 'date_fin',  'is_reserved')
-    list_filter = ('etat',  'is_reserved', 'date_debut', 'date_fin')
-    search_fields = ('lot__nom', 'seller__username', 'winner__username')
+    list_display = ('lot', 'seller', 'etat', 'date_debut', 'date_fin', 'is_active_display')
+    list_filter = ('etat', 'date_debut', 'date_fin')
+    search_fields = ('lot__nom', 'seller__username')
     readonly_fields = ('notified_users',)
     filter_horizontal = ('savers', 'notified_users')
+
+    @admin.display(boolean=True, description='Active')
+    def is_active_display(self, obj):
+        return obj.is_active()
+
 
 
 # ---------- Admin pour DemandeEnchaire ----------
 @admin.register(DemandeEnchaire)
 class DemandeEnchaireAdmin(admin.ModelAdmin):
-    list_display = ('enchaire', 'user', 'date', 'approved', 'seen', 'deleted')
-    list_filter = ('approved', 'seen', 'deleted', 'date')
-    search_fields = ('user__username', 'enchaire__lot__nom')
+    list_display = ('enchaire', 'user', 'date_demande', 'approved', 'seen', 'deleted')
+    list_filter = ('approved', 'seen', 'deleted', 'date_demande')
+    search_fields = ('user__username', 'enchaire__lot__nom')  # Make sure 'lot' and 'nom' exist
+
+# ---------- Admin pour EnchaireObjet ----------
+@admin.register(EnchaireObjet)
+class EnchaireObjetAdmin(admin.ModelAdmin):
+    list_display = ('id', 'first_price', 'pas', 'price_reserved', 'winner')
+    list_filter = ('winner',)
+    search_fields = ('winner__username',)
+
+# ---------- Admin pour ParticipationEnchaire ----------
+@admin.register(ParticipationEnchaire)
+class ParticipationEnchaireAdmin(admin.ModelAdmin):
+    list_display = ('enchaireObjet', 'user', 'montant', 'date_participation')
+    list_filter = ('date_participation',)
+    search_fields = ('user__username', 'enchaireObjet__id')
+    ordering = ('-date_participation',)
 
 
 # ---------- Admin pour Lot ----------
