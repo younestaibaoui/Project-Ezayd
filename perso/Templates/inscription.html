@@ -47,7 +47,8 @@
         </br>
           <form method="POST" enctype="multipart/form-data" class="auth-form register-form" autocomplete="off" action="{% url 'inscription' %}">
             {% csrf_token %}
-            {{ form.as_custom }}
+            {{ form.as_custom | safe }}
+            
         </form>
         
           <!-- Email Verification Message (Hidden by default) -->

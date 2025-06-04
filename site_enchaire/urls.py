@@ -10,7 +10,7 @@ urlpatterns = [
     # path('perso/', include('perso.urls')),  
     path('accueil/', accueil, name='accueil'),  # accessible via /accueil/
     path('inscription/', views.inscription_view, name='inscription'),
-    path('', views.connexion_view, name='connexion'),
+    path('connexion/', views.connexion_view, name='connexion'),
     path('deconnexion/', views.deconnexion_view, name='deconnexion'), 
     path('email-verification/<uuid:token>/', views.email_verification_view, name='email_verification'),
     

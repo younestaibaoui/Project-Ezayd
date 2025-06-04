@@ -130,69 +130,68 @@
                 </div>
             </section>
 
-            <!-- Active Auctions Section -->
-            <section class="auctions-section" aria-label="Enchères actives">
-                <header class="section-header">
-                    <h2>Enchères Actives</h2>
-                    <div class="filters-container">
-                        <div class="filter-group">
-                            <label for="year-filter">Année:</label>
-                            <div class="year-filter">
-                                <select id="year-from" aria-label="Année de début">
-                                    <option value="">De</option>
-                                    <option value="2025">2025</option>
-                                    <option value="2024">2024</option>
-                                </select>
-                                <span>à</span>
-                                <select id="year-to" aria-label="Année de fin">
-                                    <option value="">À</option>
-                                    <option value="2025">2025</option>
-                                    <option value="2024">2024</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="filter-group">
-                            <label for="wilaya-filter">Wilaya:</label>
-                            <select id="wilaya-filter" aria-label="Filtrer par wilaya">
-                                <option value="">Toutes</option>
-                                <option value="Adrar">Adrar</option>
-                                <option value="Alger">Alger</option>
-                            </select>
-                        </div>
-                        <div class="sort-buttons" role="group" aria-label="Options de tri">
-                            <button class="sort-btn active" aria-pressed="true">Bientôt fini</button>
-                            <button class="sort-btn" aria-pressed="false">Récemment ajouté</button>
-                            <button class="sort-btn" aria-pressed="false">Enchère en Lot</button>
-                        </div>
-                    </div>
-                </header>
-                <div class="auction-grid" role="list">
-                    <article class="auction-card" role="listitem">
-                        <div class="card-image">
-                            <img src="/images/image_0_yoOAmih.jpg" alt="VOLKSWAGEN PASSAT BUSINESS 2019" loading="lazy" width="300" height="200">
-                            <div class="card-overlay">
-                                <div class="time-remaining">
-                                    <i class="fas fa-clock" aria-hidden="true"></i>
-                                    <span>35 jours restants</span>
-                                </div>
-                            </div>
-                            <button class="bookmark-btn" aria-label="Ajouter aux favoris" aria-pressed="false">
-                                <i class="fas fa-bookmark" aria-hidden="true"></i>
-                            </button>
-                        </div>
-                        <div class="card-content">
-                            <h3 class="card-title">
-                                <a href="/enchere/volkswagen-passat-business-2019">VOLKSWAGEN-PASSAT BUSINESS-2019</a>
-                            </h3>
-                            <p class="card-description">
-                                Make VOLKSWAGEN Model PASSAT BUSINESS Finish PASSAT 1.6 TDI 120 DSG7 BUSINESS...
-                            </p>
-                        </div>
-                    </article>
-                </div>
-            </section>
+
+<section class="auctions-section" aria-label="Enchères actives">
+  <header class="section-header">
+    <h2>Enchères Actives</h2>
+  </header>
+  <div class="auction-grid" role="list">
+    {% for enchere in enchaires %}
+    <article class="auction-card" role="listitem">
+      <div class="card-image">
+
+        <!-- ✅ Badge type de lot -->
+        <div class="lot-type-badge {{ enchere.lot_type|lower }}">
+          {{ enchere.lot_type }}
+        </div>
+
+        {% if enchere.main_image_url %}
+          <img src="{{ enchere.main_image_url }}" alt="{{ enchere.lot.nom }}" loading="lazy" width="300" height="200">
+        {% else %}
+          <img src="/media/images/default-image.jpg" alt="Image par défaut" loading="lazy" width="300" height="200">
+        {% endif %}
+
+        <div class="auction-title">
+          <h3>{{ enchere.lot.nom }}</h3>
+        </div>
+
+        <!-- ✅ Badge type de lot -->
+        <div class="lot-type-badge {{ enchere.lot.type }}">
+          {{ enchere.lot.get_type_display }}
+        </div>
+
+        <div class="card-overlay">
+          <div class="time-remaining">
+            <i class="fas fa-clock" aria-hidden="true"></i>
+            <span>{{ enchere.date_fin|timeuntil }} restantes</span>
+          </div>
+        </div>
+
+        <!-- ✅ Bouton "Save"/"Unsave" avec formulaire -->
+        <form method="post" action="{% url 'toggle_favori' enchere.id %}">
+          {% csrf_token %}
+          <button type="submit" class="bookmark-btn" aria-label="Ajouter aux favoris" aria-pressed="{% if user in enchere.savers.all %}true{% else %}false{% endif %}">
+            <i class="fas fa-bookmark {% if user in enchere.savers.all %}saved{% endif %}"></i>
+          </button>
+        </form>
+
+      </div>
+
+      <div class="card-content">
+        <p class="card-description">
+          {{ enchere.lot.description|truncatewords:20 }}
+        </p>
+      </div>
+    </article>
+    {% empty %}
+    <p>Aucune enchère active disponible pour le moment.</p>
+    {% endfor %}
+  </div>
+</section>
+
         </main>
 
+<!-- ------------------------------------------------------------------------------------------------------------------------------ -->
         <!-- Footer -->
         <footer class="footer" role="contentinfo">
             <div class="footer-container">
@@ -291,3 +290,31 @@
     </script>
 </body>
 </html>
+
+
+<style>
+.lot-type-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 6px 14px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  border-radius: 16px;
+  color: #fff;
+  z-index: 10;
+  background: #555;
+  text-transform: uppercase;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* 🎨 Couleurs par type de lot (selon les valeurs brutes dans models) */
+.lot-type-badge.vehicules                { background: #1e88e5; }
+.lot-type-badge.immobilier               { background: #43a047; }
+.lot-type-badge.materiel_pro            { background: #f4511e; }
+.lot-type-badge.informatique_electronique { background: #5e35b1; }
+.lot-type-badge.mobilier_equipements     { background: #00897b; }
+.lot-type-badge.bijoux_objets_valeur     { background: #fdd835; color: #000; }
+.lot-type-badge.stocks_invendus          { background: #6d4c41; }
+.lot-type-badge.oeuvres_collections      { background: #9e9e9e; }
+</style>

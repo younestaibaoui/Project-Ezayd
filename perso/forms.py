@@ -1,10 +1,11 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from .models import UserAccount
-
 from django import forms
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
+from django.urls import reverse
+
 
 class CustomInputWidget(forms.TextInput):
     def __init__(self, icon_class, placeholder, input_type='text', maxlength=None, autocomplete=None, *args, **kwargs):
@@ -217,7 +218,7 @@ class UserRegistrationForm(forms.ModelForm):
             '</div>'
             '<p class="form-switch">'
             'Already have an account?'
-            '<a class="link-btn" href="{% url \'connexion\' %}"> Login here </a>'
+            f'<a class="link-btn" href="{reverse("connexion")}"> Login here </a>'
             '</p>'
         )
         
