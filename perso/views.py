@@ -45,6 +45,10 @@ def inscription_view(request):
     return render(request, 'inscription.html', {'form': form})
 
 
+from django.contrib.auth import authenticate, login
+from django.contrib import messages
+from django.shortcuts import render, redirect
+
 def connexion_view(request):
     if request.method == "POST":
         email = request.POST.get("email")
@@ -54,7 +58,6 @@ def connexion_view(request):
             if getattr(user, 'email_verified', False):
                 login(request, user)
                 messages.success(request, f"Bienvenue {user.username} !")
-                return HttpResponse("hey diva")
                 return redirect('accueil')  # Redirige vers la vue 'accueil'
             else:
                 messages.warning(request, "Veuillez vérifier votre adresse email avant de vous connecter.")

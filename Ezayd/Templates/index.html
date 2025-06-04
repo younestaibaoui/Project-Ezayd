@@ -2,83 +2,46 @@
 
 <!DOCTYPE html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- SEO Meta Tags -->
-    <title>
-      Ezayd - Plateforme d'Enchères en Ligne | Véhicules et Équipements
-    </title>
-    <meta
-      name="description"
-      content="Découvrez Ezayd, la plateforme d'enchères en ligne pour véhicules, équipements industriels et plus. Participez aux enchères en direct et trouvez les meilleures offres."
-    />
-    <meta
-      name="keywords"
-      content="enchères, véhicules, équipements, vente aux enchères, Algérie, voitures, camions"
-    />
-    <meta name="author" content="Ezayd" />
+    <title>Ezayd - Plateforme d'Enchères en Ligne | Véhicules et Équipements</title>
+    <meta name="description" content="Découvrez Ezayd, la plateforme d'enchères en ligne pour véhicules, équipements industriels et plus. Participez aux enchères en direct et trouvez les meilleures offres.">
+    <meta name="keywords" content="enchères, véhicules, équipements, vente aux enchères, Algérie, voitures, camions">
+    <meta name="author" content="Ezayd">
 
     <!-- Open Graph Meta Tags -->
-    <meta
-      property="og:title"
-      content="Ezayd - Plateforme d'Enchères en Ligne"
-    />
-    <meta
-      property="og:description"
-      content="Participez aux enchères en ligne pour véhicules et équipements. Trouvez les meilleures offres sur Ezayd."
-    />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://ezayd.com" />
-    <meta property="og:image" content="/images/og-image.jpg" />
+    <meta property="og:title" content="Ezayd - Plateforme d'Enchères en Ligne">
+    <meta property="og:description" content="Participez aux enchères en ligne pour véhicules et équipements. Trouvez les meilleures offres sur Ezayd.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://ezayd.com">
+    <meta property="og:image" content="/images/og-image.jpg">
 
     <!-- Twitter Card Meta Tags -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta
-      name="twitter:title"
-      content="Ezayd - Plateforme d'Enchères en Ligne"
-    />
-    <meta
-      name="twitter:description"
-      content="Participez aux enchères en ligne pour véhicules et équipements."
-    />
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Ezayd - Plateforme d'Enchères en Ligne">
+    <meta name="twitter:description" content="Participez aux enchères en ligne pour véhicules et équipements.">
 
     <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="/mini_logo1.png" />
-    <link rel="apple-touch-icon" href="/mini_logo1.png" />
+    <link rel="icon" type="image/svg+xml" href="/mini_logo1.png">
+    <link rel="apple-touch-icon" href="/mini_logo1.png">
 
     <!-- Preload Critical Resources -->
-    <link
-      rel="preload"
-      href="/fonts/outfit.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
-    <link rel="preload" href="{% static 'css/critical.css' %}" as="style" />
-    <link rel="preload" href="{% static 'img/logo-site.svg' %}" as="image" />
+    <link rel="preload" href="/fonts/outfit.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{% static 'css/critical.css' %}" as="style">
+    <link rel="preload" href="{% static 'img/logo-site.svg' %}" as="image">
 
     <!-- Critical CSS -->
-    <link rel="stylesheet" href="{% static 'css/critical.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/critical.css' %}">
 
     <!-- Non-critical CSS (loaded asynchronously) -->
-    <link
-      rel="preload"
-      href="{% static 'css/main.css' %}"
-      as="style"
-      onload="this.onload=null;this.rel='stylesheet'"
-    />
-    <noscript
-      ><link rel="stylesheet" href="{% static 'css/critical.css' %}"
-    /></noscript>
+    <link rel="preload" href="{% static 'css/main.css' %}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="{% static 'css/critical.css' %}"></noscript>
 
     <!-- Font Awesome -->
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-      crossorigin="anonymous"
-    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" crossorigin="anonymous">
 
     <!-- Structured Data -->
     <script type="application/ld+json">
@@ -95,420 +58,220 @@
         }
       }
     </script>
-  </head>
+</head>
 
-  <body>
+<body>
     <!-- Skip to main content for accessibility -->
     <a href="#main-content" class="skip-link">Aller au contenu principal</a>
 
     <div id="root">
-      <!-- Header -->
-      <header class="header">
-        <nav
-          class="navbar"
-          role="navigation"
-          aria-label="Navigation principale"
-        >
-          <img
-            src="{% static 'img/logo-site.svg' %}"
-            alt="Logo Ezayd"
-            id="logo"
-            width="120"
-            height="auto"
-          />
+        <!-- Header -->
+        <header class="header">
+            <nav class="navbar" role="navigation" aria-label="Navigation principale">
+                <img src="{% static 'img/logo-site.svg' %}" alt="Logo Ezayd" id="logo" width="120" height="auto">
 
-          <!-- Search -->
+                <!-- Login Button -->
+                {% if user.is_authenticated %}
+                    <span class="username">Bienvenue, {{ user.username }}</span>
+                    <p><a href="{% url 'deconnexion' %}">Se déconnecter</a></p>
+                {% else %}
+                    <button class="login-btn" aria-label="Se connecter">Connectez-vous</button>
+                {% endif %}
 
-          <!-- Login Button -->
-          <button class="login-btn" aria-label="Se connecter">
-            Connectez-vous
-          </button>
+                <!-- Mobile Menu Toggle -->
+                <button class="mobile-menu-toggle" aria-expanded="false" aria-controls="mobile-menu" aria-label="Menu mobile">
+                    <i class="fas fa-bars" aria-hidden="true"></i>
+                </button>
+            </nav>
+        </header>
 
-          <!-- Mobile Menu Toggle -->
-          <button
-            class="mobile-menu-toggle"
-            aria-expanded="false"
-            aria-controls="mobile-menu"
-            aria-label="Menu mobile"
-          >
-            <i class="fas fa-bars" aria-hidden="true"></i>
-          </button>
-        </nav>
-      </header>
-
-      <!-- Main Content -->
-      <main id="main-content" class="main-content">
-        <!-- Hero Carousel Section -->
-        <section class="hero-section" aria-label="Enchères en vedette">
-          <h1 class="sr-only">Ezayd - Plateforme d'enchères en ligne</h1>
-
-          <div
-            class="carousel-container"
-            role="region"
-            aria-label="Carrousel des enchères en vedette"
-          >
-            <div class="carousel-track" aria-live="polite">
-              <!-- Carousel items -->
-              <article
-                class="carousel-slide"
-                aria-label="Enchère VOLKSWAGEN TIGUAN 2009"
-              >
-                <div class="slide-images">
-                  <img
-                    src="/images/image_0_OyEXuhm.jpg"
-                    alt="VOLKSWAGEN TIGUAN 2009 - Image principale"
-                    class="main-image"
-                    loading="eager"
-                    width="800"
-                    height="600"
-                  />
-
-                  <div class="thumbnail-images">
-                    <img
-                      src="/images/image_2_UMHIYCy.jpg"
-                      alt="VOLKSWAGEN TIGUAN 2009 - Vue 2"
-                      class="thumbnail"
-                      loading="lazy"
-                      width="200"
-                      height="150"
-                    />
-                    <img
-                      src="/images/image_1_alecaFi.jpg"
-                      alt="VOLKSWAGEN TIGUAN 2009 - Vue 3"
-                      class="thumbnail"
-                      loading="lazy"
-                      width="200"
-                      height="150"
-                    />
-                  </div>
-                </div>
-
-                <div class="slide-content">
-                  <h2 class="slide-title">VOLKSWAGEN-TIGUAN-2009</h2>
-                  <div class="slide-info">
-                    <div class="price-info">
-                      <i class="fas fa-star" aria-hidden="true"></i>
-                      <span class="price-label">Offre actuelle</span>
-                      <span class="price-value">225 555 555.00 DA</span>
+        <!-- Main Content -->
+        <main id="main-content" class="main-content">
+            <!-- Hero Carousel Section -->
+            <section class="hero-section" aria-label="Enchères en vedette">
+                <h1 class="sr-only">Ezayd - Plateforme d'enchères en ligne</h1>
+                <div class="carousel-container" role="region" aria-label="Carrousel des enchères en vedette">
+                    <div class="carousel-track" aria-live="polite">
+                        <article class="carousel-slide" aria-label="Enchère VOLKSWAGEN TIGUAN 2009">
+                            <div class="slide-images">
+                                <img src="/images/image_0_OyEXuhm.jpg" alt="VOLKSWAGEN TIGUAN 2009 - Image principale" class="main-image" loading="eager" width="800" height="600">
+                                <div class="thumbnail-images">
+                                    <img src="/images/image_2_UMHIYCy.jpg" alt="VOLKSWAGEN TIGUAN 2009 - Vue 2" class="thumbnail" loading="lazy" width="200" height="150">
+                                    <img src="/images/image_1_alecaFi.jpg" alt="VOLKSWAGEN TIGUAN 2009 - Vue 3" class="thumbnail" loading="lazy" width="200" height="150">
+                                </div>
+                            </div>
+                            <div class="slide-content">
+                                <h2 class="slide-title">VOLKSWAGEN-TIGUAN-2009</h2>
+                                <div class="slide-info">
+                                    <div class="price-info">
+                                        <i class="fas fa-star" aria-hidden="true"></i>
+                                        <span class="price-label">Offre actuelle</span>
+                                        <span class="price-value">225 555 555.00 DA</span>
+                                    </div>
+                                    <div class="time-info">
+                                        <i class="fas fa-clock" aria-hidden="true"></i>
+                                        <span class="time-remaining">35 jours restants</span>
+                                    </div>
+                                </div>
+                                <div class="badge top-auction">
+                                    <i class="fas fa-crown" aria-hidden="true"></i>
+                                    <span>Top Enchère</span>
+                                </div>
+                            </div>
+                        </article>
                     </div>
-                    <div class="time-info">
-                      <i class="fas fa-clock" aria-hidden="true"></i>
-                      <span class="time-remaining">35 jours restants</span>
+                    <button class="carousel-btn carousel-prev" aria-label="Enchère précédente"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>
+                    <button class="carousel-btn carousel-next" aria-label="Enchère suivante"><i class="fas fa-chevron-right" aria-hidden="true"></i></button>
+                    <div class="carousel-indicators" role="tablist" aria-label="Indicateurs du carrousel">
+                        <button class="indicator active" role="tab" aria-selected="true" aria-label="Aller à l'enchère 1"></button>
+                        <button class="indicator" role="tab" aria-selected="false" aria-label="Aller à l'enchère 2"></button>
+                        <button class="indicator" role="tab" aria-selected="false" aria-label="Aller à l'enchère 3"></button>
                     </div>
-                  </div>
-                  <div class="badge top-auction">
-                    <i class="fas fa-crown" aria-hidden="true"></i>
-                    <span>Top Enchère</span>
-                  </div>
                 </div>
-              </article>
+            </section>
 
-              <!-- Plus de slides... -->
-            </div>
-
-            <!-- Carousel Controls -->
-            <button
-              class="carousel-btn carousel-prev"
-              aria-label="Enchère précédente"
-            >
-              <i class="fas fa-chevron-left" aria-hidden="true"></i>
-            </button>
-            <button
-              class="carousel-btn carousel-next"
-              aria-label="Enchère suivante"
-            >
-              <i class="fas fa-chevron-right" aria-hidden="true"></i>
-            </button>
-
-            <!-- Carousel Indicators -->
-            <div
-              class="carousel-indicators"
-              role="tablist"
-              aria-label="Indicateurs du carrousel"
-            >
-              <button
-                class="indicator active"
-                role="tab"
-                aria-selected="true"
-                aria-label="Aller à l'enchère 1"
-              ></button>
-              <button
-                class="indicator"
-                role="tab"
-                aria-selected="false"
-                aria-label="Aller à l'enchère 2"
-              ></button>
-              <button
-                class="indicator"
-                role="tab"
-                aria-selected="false"
-                aria-label="Aller à l'enchère 3"
-              ></button>
-            </div>
-          </div>
-        </section>
-
-        <!-- Active Auctions Section -->
-        <section class="auctions-section" aria-label="Enchères actives">
-          <header class="section-header">
-            <h2>Enchères Actives</h2>
-
-            <!-- Filters -->
-            <div class="filters-container">
-              <div class="filter-group">
-                <label for="year-filter">Année:</label>
-                <div class="year-filter">
-                  <select id="year-from" aria-label="Année de début">
-                    <option value="">De</option>
-                    <option value="2025">2025</option>
-                    <option value="2024">2024</option>
-                    <!-- Plus d'options... -->
-                  </select>
-                  <span>à</span>
-                  <select id="year-to" aria-label="Année de fin">
-                    <option value="">À</option>
-                    <option value="2025">2025</option>
-                    <option value="2024">2024</option>
-                    <!-- Plus d'options... -->
-                  </select>
+            <!-- Active Auctions Section -->
+            <section class="auctions-section" aria-label="Enchères actives">
+                <header class="section-header">
+                    <h2>Enchères Actives</h2>
+                    <div class="filters-container">
+                        <div class="filter-group">
+                            <label for="year-filter">Année:</label>
+                            <div class="year-filter">
+                                <select id="year-from" aria-label="Année de début">
+                                    <option value="">De</option>
+                                    <option value="2025">2025</option>
+                                    <option value="2024">2024</option>
+                                </select>
+                                <span>à</span>
+                                <select id="year-to" aria-label="Année de fin">
+                                    <option value="">À</option>
+                                    <option value="2025">2025</option>
+                                    <option value="2024">2024</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="filter-group">
+                            <label for="wilaya-filter">Wilaya:</label>
+                            <select id="wilaya-filter" aria-label="Filtrer par wilaya">
+                                <option value="">Toutes</option>
+                                <option value="Adrar">Adrar</option>
+                                <option value="Alger">Alger</option>
+                            </select>
+                        </div>
+                        <div class="sort-buttons" role="group" aria-label="Options de tri">
+                            <button class="sort-btn active" aria-pressed="true">Bientôt fini</button>
+                            <button class="sort-btn" aria-pressed="false">Récemment ajouté</button>
+                            <button class="sort-btn" aria-pressed="false">Enchère en Lot</button>
+                        </div>
+                    </div>
+                </header>
+                <div class="auction-grid" role="list">
+                    <article class="auction-card" role="listitem">
+                        <div class="card-image">
+                            <img src="/images/image_0_yoOAmih.jpg" alt="VOLKSWAGEN PASSAT BUSINESS 2019" loading="lazy" width="300" height="200">
+                            <div class="card-overlay">
+                                <div class="time-remaining">
+                                    <i class="fas fa-clock" aria-hidden="true"></i>
+                                    <span>35 jours restants</span>
+                                </div>
+                            </div>
+                            <button class="bookmark-btn" aria-label="Ajouter aux favoris" aria-pressed="false">
+                                <i class="fas fa-bookmark" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        <div class="card-content">
+                            <h3 class="card-title">
+                                <a href="/enchere/volkswagen-passat-business-2019">VOLKSWAGEN-PASSAT BUSINESS-2019</a>
+                            </h3>
+                            <p class="card-description">
+                                Make VOLKSWAGEN Model PASSAT BUSINESS Finish PASSAT 1.6 TDI 120 DSG7 BUSINESS...
+                            </p>
+                        </div>
+                    </article>
                 </div>
-              </div>
+            </section>
+        </main>
 
-              <div class="filter-group">
-                <label for="wilaya-filter">Wilaya:</label>
-                <select id="wilaya-filter" aria-label="Filtrer par wilaya">
-                  <option value="">Toutes</option>
-                  <option value="Adrar">Adrar</option>
-                  <option value="Alger">Alger</option>
-                  <!-- Plus d'options... -->
-                </select>
-              </div>
-
-              <div
-                class="sort-buttons"
-                role="group"
-                aria-label="Options de tri"
-              >
-                <button class="sort-btn active" aria-pressed="true">
-                  Bientôt fini
-                </button>
-                <button class="sort-btn" aria-pressed="false">
-                  Récemment ajouté
-                </button>
-                <button class="sort-btn" aria-pressed="false">
-                  Enchère en Lot
-                </button>
-              </div>
-            </div>
-          </header>
-
-          <!-- Auction Cards Grid -->
-          <div class="auction-grid" role="list">
-            <article class="auction-card" role="listitem">
-              <div class="card-image">
-                <img
-                  src="/images/image_0_yoOAmih.jpg"
-                  alt="VOLKSWAGEN PASSAT BUSINESS 2019"
-                  loading="lazy"
-                  width="300"
-                  height="200"
-                />
-
-                <div class="card-overlay">
-                  <div class="time-remaining">
-                    <i class="fas fa-clock" aria-hidden="true"></i>
-                    <span>35 jours restants</span>
-                  </div>
+        <!-- Footer -->
+        <footer class="footer" role="contentinfo">
+            <div class="footer-container">
+                <div class="footer-grid">
+                    <div class="footer-column">
+                        <h3>Entreprise</h3>
+                        <ul>
+                            <li><a href="/a-propos">À Propos de Nous</a></li>
+                            <li><a href="/services">Nos Services</a></li>
+                            <li><a href="/confidentialite">Politique de Confidentialité</a></li>
+                            <li><a href="/affiliation">Programme d'Affiliation</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h3>Obtenir de l'Aide</h3>
+                        <ul>
+                            <li><a href="/faq">FAQ</a></li>
+                            <li><a href="/support">Signaler un Problème</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h3>Regarder les Enchères</h3>
+                        <ul>
+                            <li><a href="/encheres-actives">Enchères en Direct</a></li>
+                            <li><a href="/encheres-terminees">Enchères Terminées</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h3>Suivez-nous</h3>
+                        <div class="social-links">
+                            <a href="#" aria-label="Facebook" rel="noopener noreferrer" target="_blank"><i class="fab fa-facebook-f" aria-hidden="true"></i></a>
+                            <a href="#" aria-label="Twitter" rel="noopener noreferrer" target="_blank"><i class="fab fa-twitter" aria-hidden="true"></i></a>
+                            <a href="#" aria-label="Instagram" rel="noopener noreferrer" target="_blank"><i class="fab fa-instagram" aria-hidden="true"></i></a>
+                            <a href="#" aria-label="LinkedIn" rel="noopener noreferrer" target="_blank"><i class="fab fa-linkedin-in" aria-hidden="true"></i></a>
+                        </div>
+                    </div>
                 </div>
-
-                <button
-                  class="bookmark-btn"
-                  aria-label="Ajouter aux favoris"
-                  aria-pressed="false"
-                >
-                  <i class="fas fa-bookmark" aria-hidden="true"></i>
-                </button>
-              </div>
-
-              <div class="card-content">
-                <h3 class="card-title">
-                  <a href="/enchere/volkswagen-passat-business-2019">
-                    VOLKSWAGEN-PASSAT BUSINESS-2019
-                  </a>
-                </h3>
-                <p class="card-description">
-                  Make VOLKSWAGEN Model PASSAT BUSINESS Finish PASSAT 1.6 TDI
-                  120 DSG7 BUSINESS...
-                </p>
-              </div>
-            </article>
-
-            <!-- Plus de cartes d'enchères... -->
-          </div>
-        </section>
-      </main>
-
-      <!-- Footer -->
-      <footer class="footer" role="contentinfo">
-        <div class="footer-container">
-          <div class="footer-grid">
-            <div class="footer-column">
-              <h3>Entreprise</h3>
-              <ul>
-                <li><a href="/a-propos">À Propos de Nous</a></li>
-                <li><a href="/services">Nos Services</a></li>
-                <li>
-                  <a href="/confidentialite">Politique de Confidentialité</a>
-                </li>
-                <li><a href="/affiliation">Programme d'Affiliation</a></li>
-              </ul>
             </div>
+        </footer>
 
-            <div class="footer-column">
-              <h3>Obtenir de l'Aide</h3>
-              <ul>
-                <li><a href="/faq">FAQ</a></li>
-                <li><a href="/support">Signaler un Problème</a></li>
-              </ul>
+        <!-- Login Modal -->
+        <div class="modal" id="login-modal" role="dialog" aria-labelledby="login-title" aria-hidden="true">
+            <div class="modal-content">
+                <button class="modal-close" aria-label="Fermer la modal">×</button>
+                <div class="modal-header">
+                    <img src="{% static 'img/mini_logo.png' %}" alt="Logo Ezayd" class="modal-logo" width="60" height="60">
+                    <h2 id="login-title">Connexion</h2>
+                </div>
+                {% if messages %}
+                    <ul class="errorlist">
+                        {% for message in messages %}
+                            <li class="{{ message.tags }}">{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                <form class="login-form" method="post" action="{% url 'connexion' %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="email" class="sr-only">Email</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-user input-icon" aria-hidden="true"></i>
+                            <input type="email" id="email" name="email" class="form-input" placeholder="Nom d'utilisateur / Email" required autocomplete="username">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="password" class="sr-only">Mot de passe</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-lock input-icon" aria-hidden="true"></i>
+                            <input type="password" id="password" name="password" class="form-input" placeholder="Mot de passe" required autocomplete="current-password">
+                        </div>
+                    </div>
+                    <button type="submit" class="submit-btn">Se connecter</button>
+               
+                </form>
+                <div class="signup-link">
+                    <p>Pas de compte ? <a href="{% url 'inscription' %}">Créer un compte</a></p>
+                </div>
             </div>
-
-            <div class="footer-column">
-              <h3>Regarder les Enchères</h3>
-              <ul>
-                <li><a href="/encheres-actives">Enchères en Direct</a></li>
-                <li><a href="/encheres-terminees">Enchères Terminées</a></li>
-              </ul>
-            </div>
-
-            <div class="footer-column">
-              <h3>Suivez-nous</h3>
-              <div class="social-links">
-                <a
-                  href="#"
-                  aria-label="Facebook"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  <i class="fab fa-facebook-f" aria-hidden="true"></i>
-                </a>
-                <a
-                  href="#"
-                  aria-label="Twitter"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  <i class="fab fa-twitter" aria-hidden="true"></i>
-                </a>
-                <a
-                  href="#"
-                  aria-label="Instagram"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  <i class="fab fa-instagram" aria-hidden="true"></i>
-                </a>
-                <a
-                  href="#"
-                  aria-label="LinkedIn"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  <i class="fab fa-linkedin-in" aria-hidden="true"></i>
-                </a>
-              </div>
-            </div>
-          </div>
         </div>
-      </footer>
-
-      <!-- Login Modal -->
-      <div
-        class="modal"
-        id="login-modal"
-        role="dialog"
-        aria-labelledby="login-title"
-        aria-hidden="true"
-      >
-        <div class="modal-content">
-          <button class="modal-close" aria-label="Fermer la modal">×</button>
-
-          <div class="modal-header">
-            <img
-              src="{% static 'img/mini_logo.png' %}"
-              alt="Logo Ezayd"
-              class="modal-logo"
-              width="60"
-              height="60"
-            />
-            <h2 id="login-title">Connexion</h2>
-          </div>
-
-          <form
-            class="login-form"
-            method="post"
-            action="{% url 'connexion' %}"
-            novalidate
-          >
-            {% csrf_token %}
-
-            <div class="form-group">
-              <label for="username" class="sr-only"
-                >email</label
-              >
-              <div class="input-wrapper">
-                <i class="fas fa-user input-icon" aria-hidden="true"></i>
-                <input
-                  type="text"
-                  id="username"
-                  name="email"
-                  class="form-input"
-                  placeholder="Nom d'utilisateur / Email"
-                  required
-                  autocomplete="username"
-                />
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label for="password" class="sr-only">Mot de passe</label>
-              <div class="input-wrapper">
-                <i class="fas fa-lock input-icon" aria-hidden="true"></i>
-                <input
-                  type="password"
-                  id="password"
-                  name="password"
-                  class="form-input"
-                  placeholder="Mot de passe"
-                  required
-                  autocomplete="current-password"
-                />
-              </div>
-            </div>
-
-            <button type="submit" class="submit-btn">Se connecter</button>
-
-            <div class="form-links">
-              {% comment %} <a href="{% url 'password_reset' %}">Mot de passe oublié ?</a> {% endcomment %}
-            </div>
-          </form>
-
-          <div class="divider">
-            <span>ou</span>
-          </div>
-
-          <button
-            class="google-signin-btn"
-            aria-label="Se connecter avec Google"
-          >
-            <i class="fab fa-google" aria-hidden="true"></i>
-            <span>Continuer avec Google</span>
-          </button>
-
-          <div class="signup-link">
-            <p>Pas de compte ? <a href="/inscription">Créer un compte</a></p>
-          </div>
-        </div>
-      </div>
     </div>
 
     <!-- Scripts -->
@@ -517,17 +280,12 @@
     <script src="{% static 'js/modal.js' %}" defer></script>
 
     <!-- Google Analytics (example) -->
-    <script
-      async
-      src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"
-    ></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-      gtag("js", new Date());
-      gtag("config", "GA_MEASUREMENT_ID");
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag("js", new Date());
+        gtag("config", "GA_MEASUREMENT_ID");
     </script>
-  </body>
+</body>
 </html>
