@@ -1,35 +1,70 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8" />
-    <title>Inscription</title>
-    <style>
-        body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
-        form { background: #fff; padding: 20px; border-radius: 8px; max-width: 400px; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1);}
-        h2 { text-align: center; color: #333; }
-        button { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
-        button:hover { background: #0056b3; }
-        p { text-align: center; }
-        a { color: #007bff; text-decoration: none; }
-        a:hover { text-decoration: underline; }
-        .errorlist { color: red; list-style-type: none; padding-left: 0; }
-    </style>
-</head>
-<body>
-    <h2>Créer un compte</h2>
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">S’inscrire</button>
-    </form>
-    {% if messages %}
-  <ul class="messages">
-    {% for message in messages %}
-      <li class="{{ message.tags }}">{{ message }}</li>
-    {% endfor %}
-  </ul>
-{% endif %}
+{% load static %}
 
-    <p>Déjà un compte ? <a href="{% url 'connexion' %}">Connectez-vous ici</a>.</p>
-</body>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ezayd - Authentication</title>
+    <link rel="stylesheet" href="{% static 'css/inscription.css' %}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="root">
+      <div class="all-container">
+        <!-- Registration Form -->
+        <div class="form-container form-container-register active">
+
+          <div class="form-header">
+            <img
+              class="logo"
+              src="{% static 'img/mini_logo.png' %}"
+              alt="Ezayd Logo"
+            />
+            <h1 class="title">Sign Up</h1>
+            <p class="description">
+              Buyer information is mandatory, including business registration
+              and national ID number.
+            </p>
+          </div>
+
+          {% comment %} ------------------------------------------------------------------ {% endcomment %}
+
+          {% if messages %}
+          <ul class="messages description" style="list-style-type: none;">
+            {% for message in messages %}
+            <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        </br>
+          <form method="POST" enctype="multipart/form-data" class="auth-form register-form" autocomplete="off" action="{% url 'inscription' %}">
+            {% csrf_token %}
+            {{ form.as_custom }}
+        </form>
+        
+          <!-- Email Verification Message (Hidden by default) -->
+          <div class="verification-message hidden">
+            <i class="fas fa-envelope email-icon"></i>
+            <h2>Verification Link Sent</h2>
+            <p>
+              A verification link has been sent to your email. You cannot access
+              your account without verification.
+            </p>
+          </div>
+        </div>
+
+        <!-- Background Animation -->
+        <div class="background-animation"></div>
+      </div>
+    </div>
+
+  </body>
 </html>

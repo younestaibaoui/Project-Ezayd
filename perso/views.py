@@ -16,6 +16,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 
 def inscription_view(request):
+
     # Si l'utilisateur est déjà connecté, on le redirige vers l'accueil
     if request.user.is_authenticated:
         return redirect('accueil')
@@ -76,7 +77,6 @@ def deconnexion_view(request):
     logout(request)
     messages.info(request, "Vous avez été déconnecté.")
     return redirect('connexion')
-
 
 def email_verification_view(request, token):
     token_obj = get_object_or_404(EmailVerificationToken, token=token)

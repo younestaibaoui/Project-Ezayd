@@ -72,8 +72,8 @@
 
                 <!-- Login Button -->
                 {% if user.is_authenticated %}
-                    <span class="username">Bienvenue, {{ user.username }}</span>
-                    <p><a href="{% url 'deconnexion' %}">Se déconnecter</a></p>
+                    <span class="username"><h3>Bienvenue, {{ user.username }}</h3></span>
+                    <a href="{% url 'deconnexion' %}"><button class="login-btn" aria-label="Se connecter">Se déconnecter</button></a>
                 {% else %}
                     <button class="login-btn" aria-label="Se connecter">Connectez-vous</button>
                 {% endif %}
@@ -271,6 +271,8 @@
                     <p>Pas de compte ? <a href="{% url 'inscription' %}">Créer un compte</a></p>
                 </div>
             </div>
+
+            
         </div>
     </div>
 
