@@ -7,6 +7,10 @@ from django.utils import timezone
 from .models import Enchaire
 from django.shortcuts import render
 from django.utils import timezone
+from django.shortcuts import redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
+from .models import Enchaire
 
 import random
 
@@ -77,12 +81,6 @@ def accueil(request):
 
     return render(request, 'accueil.html', {'enchaires': enchaires})
 
-
-
-from django.shortcuts import redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_POST
-from .models import Enchaire
 
 @require_POST
 @login_required

@@ -130,72 +130,11 @@
                 </div>
             </section>
 
-<section class="auctions-section" aria-label="Enchères actives">
-  <header class="section-header">
-    <h2>Enchères Actives</h2>
-  </header>
-  <div class="auction-grid" role="list">
-    {% for enchere in enchaires %}
-    <article class="auction-card {% if user in enchere.savers.all %}bookmarked{% endif %}" role="listitem">
-      <div class="card-image">
-
-        <!-- Badge type de lot -->
-        <div class="lot-type-badge {{ enchere.lot_type|lower }}">
-          {{ enchere.lot_type }}
-        </div>
-
-        {% if enchere.main_image_url %}
-          <img src="{{ enchere.main_image_url }}" alt="{{ enchere.lot.nom }}" loading="lazy" width="300" height="200">
-        {% else %}
-          <img src="/media/images/default-image.jpg" alt="Image par défaut" loading="lazy" width="300" height="200">
-        {% endif %}
-
-        <div class="auction-title">
-          <h3>{{ enchere.lot.nom }}</h3>
-        </div>
-
-        <!-- Badge type de lot -->
-        <div class="lot-type-badge {{ enchere.lot.type }}">
-          {{ enchere.lot.get_type_display }}
-        </div>
-
-        <div class="card-overlay">
-          <div class="time-remaining">
-            <i class="fas fa-clock" aria-hidden="true"></i>
-            <span>{{ enchere.date_fin|timeuntil }} restantes</span>
-          </div>
-        </div>
-
-        <!-- Bouton "Save"/"Unsave" avec formulaire -->
-        <form method="post" action="{% url 'toggle_favori' enchere.id %}">
-          {% csrf_token %}
-          <button
-            type="submit"
-            class="bookmark-btn"
-            aria-label="{% if user in enchere.savers.all %}Retirer des favoris{% else %}Ajouter aux favoris{% endif %}"
-            aria-pressed="{% if user in enchere.savers.all %}true{% else %}false{% endif %}"
-          >
-            <i class="fas fa-bookmark {% if user in enchere.savers.all %}saved{% endif %}"></i>
-          </button>
-        </form>
-
-      </div>
-
-      <div class="card-content">
-        <p class="card-description">
-          {{ enchere.lot.description|truncatewords:20 }}
-        </p>
-      </div>
-    </article>
-    {% empty %}
-    <p>Aucune enchère active disponible pour le moment.</p>
-    {% endfor %}
-  </div>
-</section>
-
+            {% comment %} -------------------------------------------- {% endcomment %}
+{% include './enchaires.html' %}
+{% comment %} -------------------------------------------- {% endcomment %}
         </main>
 
-<!-- ------------------------------------------------------------------------------------------------------------------------------ -->
         <!-- Footer -->
         <footer class="footer" role="contentinfo">
             <div class="footer-container">

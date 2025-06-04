@@ -135,3 +135,6 @@ EMAIL_USE_TLS = True                   # TLS activé
 EMAIL_HOST_USER = 'ezayd1515@gmail.com'       # ton email Gmail
 EMAIL_HOST_PASSWORD = 'rknf vlpx roog fdse'  # mot de passe d’application Google (pas le mot de passe normal)
 DEFAULT_FROM_EMAIL = 'noreply@tonsite.com'    # email expéditeur
+
+LOGIN_URL = '/connexion/'
+LOGIN_REDIRECT_URL = '/'  # redirection après connexion
