@@ -93,3 +93,5 @@ def toggle_favori(request, enchere_id):
     else:
         enchere.savers.add(request.user)
     return redirect('accueil')  # Redirige vers la page principale
+
+
