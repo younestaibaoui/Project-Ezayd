@@ -22,7 +22,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
-
+LOGIN_URL = '/connexion/'
+LOGIN_REDIRECT_URL = '/'  # redirection après connexion
 # Application definition
 
 INSTALLED_APPS = [
