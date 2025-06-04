@@ -8,9 +8,18 @@ from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from .forms import UserRegistrationForm
-
+from django.contrib.auth import authenticate, login
+from django.contrib import messages
+from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
 
 def inscription_view(request):
+    # Si l'utilisateur est déjà connecté, on le redirige vers l'accueil
+    if request.user.is_authenticated:
+        return redirect('accueil')
+
     if request.method == "POST":
         form = UserRegistrationForm(request.POST, request.FILES)
         if form.is_valid():
@@ -19,12 +28,10 @@ def inscription_view(request):
             # Créer un token de vérification
             token = EmailVerificationToken.objects.create(user=user)
 
-            # Construire l'URL de confirmation
             verification_url = request.build_absolute_uri(
                 reverse('email_verification', args=[str(token.token)])
             )
 
-            # Envoyer l'email de confirmation
             send_mail(
                 'Confirmez votre adresse email',
                 f'Bonjour {user.username},\n\nMerci de confirmer votre adresse email en cliquant sur ce lien :\n{verification_url}',
@@ -45,11 +52,11 @@ def inscription_view(request):
     return render(request, 'inscription.html', {'form': form})
 
 
-from django.contrib.auth import authenticate, login
-from django.contrib import messages
-from django.shortcuts import render, redirect
-
 def connexion_view(request):
+    # Si l'utilisateur est déjà connecté, on le redirige vers l'accueil
+    if request.user.is_authenticated:
+        return redirect('accueil')
+
     if request.method == "POST":
         email = request.POST.get("email")
         password = request.POST.get("password")
@@ -58,14 +65,12 @@ def connexion_view(request):
             if getattr(user, 'email_verified', False):
                 login(request, user)
                 messages.success(request, f"Bienvenue {user.username} !")
-                return redirect('accueil')  # Redirige vers la vue 'accueil'
+                return redirect('accueil')
             else:
                 messages.warning(request, "Veuillez vérifier votre adresse email avant de vous connecter.")
         else:
             messages.error(request, "Email ou mot de passe invalide.")
     return render(request, "connexion.html")
-
-
 
 def deconnexion_view(request):
     logout(request)
