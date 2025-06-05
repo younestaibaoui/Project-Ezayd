@@ -49,13 +49,6 @@ class Enchaire(models.Model):
         default='upcoming'
     )
 
-    lot = models.OneToOneField(
-        "Lot",
-        related_name="enchaire",
-        null=False,
-        on_delete=models.CASCADE
-    )
-
     savers = models.ManyToManyField(
         "perso.UserAccount",
         related_name='enchaires_saved',
@@ -148,6 +141,12 @@ class Lot(models.Model):
     type = models.CharField(max_length=30, choices=TYPE_CHOICES)
     description = models.TextField(null=True, blank=True)
     date_ajout = models.DateTimeField(auto_now_add=True)
+    enchaire = models.OneToOneField(
+        "Enchaire",
+        related_name="lot",
+        null=False,
+        on_delete=models.CASCADE
+    )
 
     def __str__(self):
         return self.nom
