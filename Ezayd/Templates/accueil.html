@@ -17,47 +17,46 @@
     <meta property="og:description" content="Participez aux enchères en ligne pour véhicules et équipements. Trouvez les meilleures offres sur Ezayd.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://ezayd.com">
-    <meta property="og:image" content="{% static 'img/og-image.jpg' %}">
+    <meta property="og:image" content="/images/og-image.jpg">
 
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Ezayd - Plateforme d'Enchères en Ligne">
     <meta name="twitter:description" content="Participez aux enchères en ligne pour véhicules et équipements.">
-    <meta name="twitter:image" content="{% static 'img/og-image.jpg' %}">
 
     <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="{% static 'img/mini_logo1.png' %}">
-    <link rel="apple-touch-icon" href="{% static 'img/mini_logo1.png' %}">
+    <link rel="icon" type="image/svg+xml" href="/mini_logo1.png">
+    <link rel="apple-touch-icon" href="/mini_logo1.png">
 
     <!-- Preload Critical Resources -->
-    <link rel="preload" href="{% static 'fonts/outfit.woff2' %}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/fonts/outfit.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="{% static 'css/critical.css' %}" as="style">
-    <link rel="preload" href="{% static 'img/logo-site.png' %}" as="image">
+    <link rel="preload" href="{% static 'img/logo-site.svg' %}" as="image">
 
     <!-- Critical CSS -->
     <link rel="stylesheet" href="{% static 'css/critical.css' %}">
 
     <!-- Non-critical CSS (loaded asynchronously) -->
     <link rel="preload" href="{% static 'css/main.css' %}" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="{% static 'css/main.css' %}"></noscript>
+    <noscript><link rel="stylesheet" href="{% static 'css/critical.css' %}"></noscript>
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" crossorigin="anonymous">
 
     <!-- Structured Data -->
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "Ezayd",
-      "description": "Plateforme d'enchères en ligne pour véhicules et équipements",
-      "url": "https://ezayd.com",
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": "https://ezayd.com/search?q={search_term_string}",
-        "query-input": "required name=search_term_string"
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Ezayd",
+        "description": "Plateforme d'enchères en ligne pour véhicules et équipements",
+        "url": "https://ezayd.com",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://ezayd.com/search?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
       }
-    }
     </script>
 </head>
 
@@ -66,185 +65,25 @@
     <a href="#main-content" class="skip-link">Aller au contenu principal</a>
 
     <div id="root">
+        <!-- Header -->
+        <header class="header">
+            <nav class="navbar" role="navigation" aria-label="Navigation principale">
+                <img src="{% static 'img/logo-site.svg' %}" alt="Logo Ezayd" id="logo" width="120" height="auto">
 
+                <!-- Login Button -->
+                {% if user.is_authenticated %}
+                    <span class="username"><h3>Bienvenue, {{ user.username }}</h3></span>
+                    <a href="{% url 'deconnexion' %}"><button class="login-btn" aria-label="Se connecter">Se déconnecter</button></a>
+                {% else %}
+                    <button class="login-btn" aria-label="Se connecter">Connectez-vous</button>
+                {% endif %}
 
-<!-- --------------------------------------------- nav bar ------------------------------------------------ -->
-<header class="header" style="width: 100%; background: #000000; color: #fff;">
-  <nav class="navbar" style="max-width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 2rem; gap: 1rem;">
-
-    <!-- Logo -->
-    <div style="flex: 0 0 auto;">
-      <img src="{% static 'img/logo-site.png' %}" alt="Logo Ezayd" style="height: 80px; transition: transform 0.2s ease;">
-    </div>
-
-    <!-- Barre de recherche -->
-    <div style="flex: 1; display: flex; justify-content: center;">
-      <form method="get" action="{% url 'search' %}" role="search" style="position: relative; width: 100%; max-width: 600px;">
-        <input type="text" name="q" placeholder="Rechercher un véhicule ou un équipement..."
-               style="width: 100%; padding: 0.75rem 2.5rem 0.75rem 1rem; background: #333; color: white; border: 1px solid #555; border-radius: 20px; transition: all 0.3s ease; font-size: 14px;"
-               onfocus="this.style.borderColor='#777'; this.style.boxShadow='0 0 0 2px rgba(255,255,255,0.1)'"
-               onblur="this.style.borderColor='#555'; this.style.boxShadow='none'">
-        <button type="submit" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #fff; cursor: pointer; transition: color 0.2s ease;"
-                onmouseover="this.style.color='#ccc'" onmouseout="this.style.color='#fff'">
-          <i class="fas fa-search"></i>
-        </button>
-      </form>
-    </div>
-
-    <!-- Icônes à droite -->
-    <div style="display: flex; align-items: center; gap: 20px; flex-shrink: 0;">
-      
- 
-
-<!-- Notification -->
-{% if user.is_authenticated %}
-  <a href="{% url 'notifications' %}" style="position: relative; color: #fff; transition: color 0.2s ease;"
-     onmouseover="this.style.color='#ccc'" onmouseout="this.style.color='#fff'">
-    <i class="fas fa-bell" style="font-size: 20px;"></i>
-    <span style="position: absolute; top: -5px; right: -5px; background: #ff4444; color: white; font-size: 10px; padding: 2px 5px; border-radius: 50%; animation: pulse 2s infinite;">3</span>
-  </a>
-{% else %}
-  <a href="{% url 'connexion' %}?next={% url 'notifications' %}" style="position: relative; color: #fff; transition: color 0.2s ease;"
-     onmouseover="this.style.color='#ccc'" onmouseout="this.style.color='#fff'">
-    <i class="fas fa-bell" style="font-size: 20px;"></i>
-    <span style="position: absolute; top: -5px; right: -5px; background: #ff4444; color: white; font-size: 10px; padding: 2px 5px; border-radius: 50%; animation: pulse 2s infinite;">3</span>
-  </a>
-{% endif %}
-
-
-  <!-- Panier -->
-  {% if user.is_authenticated %}
-    <a href="{% url 'panier' %}" style="color: #fff; transition: color 0.2s ease;"
-      onmouseover="this.style.color='#ccc'" onmouseout="this.style.color='#fff'">
-      <i class="fas fa-shopping-cart" style="font-size: 20px;"></i>
-    </a>
-  {% else %}
-    <a href="{% url 'connexion' %}?next={% url 'panier' %}" style="color: #fff; transition: color 0.2s ease;"
-      onmouseover="this.style.color='#ccc'" onmouseout="this.style.color='#fff'">
-      <i class="fas fa-shopping-cart" style="font-size: 20px;"></i>
-    </a>
-  {% endif %}
-
-
-      <!-- Profil utilisateur -->
-      {% if user.is_authenticated %}
-      <div style="position: relative;">
-        <button onclick="toggleDropdown()" style="border: none; background: none; display: flex; align-items: center; gap: 8px; cursor: pointer; color: #fff; padding: 4px; border-radius: 6px; transition: background-color 0.2s ease;"
-                onmouseover="this.style.backgroundColor='rgba(255,255,255,0.1)'" onmouseout="this.style.backgroundColor='transparent'">
-          <img src="{% if user.pfp %}{{ user.pfp.url }}{% else %}{% static 'img/default-avatar.png' %}{% endif %}" 
-               alt="PDP" style="width: 40px; height: 40px; border-radius: 6px; object-fit: cover; border: 2px solid transparent; transition: border-color 0.2s ease;">
-          
-          <!-- Nom d'utilisateur -->
-          <span style="font-size: 14px; font-weight: 500;">{{ user.first_name }} {{ user.last_name|slice:":1" }}.</span>
-          
-          <i class="fas fa-caret-down" style="transition: transform 0.2s ease;"></i>
-        </button>
-
-        <!-- Menu dropdown -->
-        <div id="userDropdown" style="display: none; position: absolute; right: 0; top: 55px; background: #2c2c2c; color: #fff; border: 1px solid #444; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.6); z-index: 100; min-width: 220px; opacity: 0; transform: translateY(-10px); transition: all 0.2s ease;">
-          <!-- En-tête avec nom complet -->
-          <div style="padding: 12px 16px; border-bottom: 1px solid #444;">
-            <div style="font-weight: bold; font-size: 15px;">{{ user.first_name }} {{ user.last_name }}</div>
-            <div style="font-size: 13px; color: #aaa; margin-top: 2px;">{{ user.email }}</div>
-          </div>
-   
-          
-          <a href="{% url 'profil' %}" style="display: flex; align-items: center; padding: 12px 16px; text-decoration: none; color: #fff; transition: background-color 0.2s ease;"
-             onmouseover="this.style.backgroundColor='#404040'" onmouseout="this.style.backgroundColor='transparent'">
-            <i class="fas fa-user" style="margin-right: 8px; width: 16px;"></i>Mon profil
-          </a>
-          
-  
-          
-          <hr style="margin: 0; border: none; border-top: 1px solid #444;">
-          
-          <a href="{% url 'deconnexion' %}" style="display: flex; align-items: center; padding: 12px 16px; text-decoration: none; color: #fff; transition: background-color 0.2s ease; border-radius: 0 0 8px 8px;"
-             onmouseover="this.style.backgroundColor='#404040'" onmouseout="this.style.backgroundColor='transparent'">
-            <i class="fas fa-sign-out-alt" style="margin-right: 8px; width: 16px;"></i>Se déconnecter
-          </a>
-        </div>
-      </div>
-      {% else %}
-        
-          <button class="login-btn" aria-label="Se connecter" style="background: #333; color: white; border: 1px solid #555; padding: 8px 16px; border-radius: 6px; cursor: pointer; transition: all 0.2s ease; font-size: 14px;"
-                  onmouseover="this.style.backgroundColor='#444'; this.style.borderColor='#666'" 
-                  onmouseout="this.style.backgroundColor='#333'; this.style.borderColor='#555'">
-            Connexion
-          </button>
-        
-      {% endif %}
-    </div>
-
-  </nav>
-</header>
-
-<style>
-  @keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-    100% { transform: scale(1); }
-  }
-  
-  /* Amélioration du focus pour l'accessibilité */
-  .login-btn:focus, a:focus {
-    outline: 2px solid #fff;
-    outline-offset: 2px;
-  }
-  
-  /* Animation smooth pour le dropdown */
-  #userDropdown.show {
-    opacity: 1 !important;
-    transform: translateY(0) !important;
-  }
-</style>
-
-<script>
-  function toggleDropdown() {
-    const menu = document.getElementById("userDropdown");
-    const button = event.target.closest('button');
-    const icon = button.querySelector('.fa-caret-down');
-    
-    if (menu.style.display === "block") {
-      // Fermer avec animation
-      menu.style.opacity = "0";
-      menu.style.transform = "translateY(-10px)";
-      setTimeout(() => {
-        menu.style.display = "none";
-      }, 200);
-      icon.style.transform = "rotate(0deg)";
-    } else {
-      // Ouvrir avec animation
-      menu.style.display = "block";
-      setTimeout(() => {
-        menu.style.opacity = "1";
-        menu.style.transform = "translateY(0)";
-      }, 10);
-      icon.style.transform = "rotate(180deg)";
-    }
-  }
-
-  document.addEventListener('click', function(event) {
-    const dropdown = document.getElementById("userDropdown");
-    const button = event.target.closest('button');
-    
-    if (!event.target.closest('#userDropdown') && !button) {
-      // Fermer avec animation
-      if (dropdown && dropdown.style.display === "block") {
-        dropdown.style.opacity = "0";
-        dropdown.style.transform = "translateY(-10px)";
-        setTimeout(() => {
-          dropdown.style.display = "none";
-        }, 200);
-        
-        // Reset icon rotation
-        const icon = document.querySelector('.fa-caret-down');
-        if (icon) icon.style.transform = "rotate(0deg)";
-      }
-    }
-  });
-</script>
-<!-- ------------------------------------------ top ------------------------------------------------------------------------ -->
-
+                <!-- Mobile Menu Toggle -->
+                <button class="mobile-menu-toggle" aria-expanded="false" aria-controls="mobile-menu" aria-label="Menu mobile">
+                    <i class="fas fa-bars" aria-hidden="true"></i>
+                </button>
+            </nav>
+        </header>
 
         <!-- Main Content -->
         <main id="main-content" class="main-content">
@@ -290,19 +129,12 @@
                     </div>
                 </div>
             </section>
-            
 
-
-<!-- ----------------------------------------------------------------------------------------------------------------- -->
-{% comment %} -------------------------------------------- {% endcomment %}
+            {% comment %} -------------------------------------------- {% endcomment %}
 {% include './enchaires.html' %}
 {% comment %} -------------------------------------------- {% endcomment %}
+        </main>
 
-       
-
-<!-- ------------------------------------------------------------------------------------------------------------------------------ -->
-        </main> 
-        
         <!-- Footer -->
         <footer class="footer" role="contentinfo">
             <div class="footer-container">
@@ -390,17 +222,6 @@
     <script src="{% static 'js/main.js' %}" defer></script>
     <script src="{% static 'js/carousel.js' %}" defer></script>
     <script src="{% static 'js/modal.js' %}" defer></script>
-    <script>
-
-    function toggleSidebar() {
-      var sidebar = document.getElementById('sidebar');
-      sidebar.classList.toggle('open');
-    }
-    function untoggleSidebar() {
-      var sidebar = document.getElementById('sidebar');
-      sidebar.classList.toggle('close');
-    }
-  </script>
 
     <!-- Google Analytics (example) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>

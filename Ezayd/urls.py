@@ -13,18 +13,7 @@ urlpatterns = [
     path('', accueil, name='accueil'),
     path("favori/<int:enchere_id>/", views.toggle_favori, name="toggle_favori"),
 
-    # 🔍 Barre de recherche
-    path('search/', views.search_view, name='search'),
-
-    # 🔔 Notifications
-    path('notifications/', views.notifications_view, name='notifications'),
-
-    # 🛒 Panier
-    path('panier/', views.panier_view, name='panier'),
-
-    path('profil/', views.profil_view, name='profil'),
 ]
-
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -7,6 +7,10 @@ from django.utils import timezone
 from .models import Enchaire
 from django.shortcuts import render
 from django.utils import timezone
+from django.shortcuts import redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
+from .models import Enchaire
 
 import random
 
@@ -78,12 +82,6 @@ def accueil(request):
     return render(request, 'accueil.html', {'enchaires': enchaires})
 
 
-
-from django.shortcuts import redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_POST
-from .models import Enchaire
-
 @require_POST
 @login_required
 def toggle_favori(request, enchere_id):
@@ -94,31 +92,4 @@ def toggle_favori(request, enchere_id):
         enchere.savers.add(request.user)
     return redirect('accueil')  # Redirige vers la page principale
 
-
-
-
-# -----------------------------------------------------------------
-
-# views.py
-
-from django.shortcuts import render
-
-def search_view(request):
-    query = request.GET.get('q', '')
-    # Tu peux filtrer tes objets ici selon le modèle (exemple avec un modèle fictif)
-    results = []  # Exemple : Enchere.objects.filter(titre__icontains=query)
-    return render(request, 'search.html', {'query': query, 'results': results})
-
-def notifications_view(request):
-    # Exemple statique ou récupérer des objets Notification
-    notifications = []  # Exemple : Notification.objects.filter(user=request.user)
-    return render(request, 'notifications.html', {'notifications': notifications})
-
-def panier_view(request):
-    # Exemple : récupérer le panier de l'utilisateur
-    panier_items = []  # Exemple : Panier.objects.filter(user=request.user)
-    return render(request, 'panier.html', {'items': panier_items})
-
-def profil_view(request):
-    return render(request, 'profil.html')
 

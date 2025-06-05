@@ -17,29 +17,26 @@ ETAT_ENCHAIRE_CHOICES = (
     ('finis', 'Terminé'),
 )
 
-class EnchaireObjet(models.Model):
-    first_price = models.IntegerField(null=False,validators=[MinValueValidator(0)])
-    pas = models.IntegerField(null=False,validators=[MinValueValidator(0)])
-
-    winner = models.ForeignKey(
-        "perso.UserAccount",
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-    )
-
-    price_reserved = models.IntegerField(null=True, blank=True,validators=[MinValueValidator(0)])
-
 
 class Enchaire(models.Model):
     date_debut = models.DateField(default=timezone.now, null=False)
     date_fin = models.DateField(default=timezone.now, null=False)
+    first_price = models.IntegerField(null=False)
+    pas = models.IntegerField(null=False)
     
     seller = models.ForeignKey(
         "perso.UserAccount",
         null=False,
         on_delete=models.CASCADE,
         related_name="enchaires_proprietes"
+    )
+
+    winner = models.ForeignKey(
+        "perso.UserAccount",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="enchères_gagnées"
     )
 
     text_highlight = models.TextField(null=True, blank=True)
@@ -49,6 +46,16 @@ class Enchaire(models.Model):
         max_length=10,
         default='upcoming'
     )
+
+    lot = models.OneToOneField(
+        "Lot",
+        related_name="enchaire",
+        null=False,
+        on_delete=models.CASCADE
+    )
+
+    is_reserved = models.BooleanField(default=False)
+    price_reserved = models.IntegerField(null=True, blank=True)
 
     savers = models.ManyToManyField(
         "perso.UserAccount",
@@ -97,21 +104,20 @@ class Enchaire(models.Model):
 
 class DemandeEnchaire(models.Model):
     enchaire = models.ForeignKey(
-        "Enchaire",  # <--- modèle cible à ajouter ici
+        "Enchaire",
         null=False,
         on_delete=models.CASCADE,
         related_name="demande"
     )
 
-    user = models.ForeignKey(  # Correction: OneToOneField était probablement une erreur
+    user = models.ForeignKey(
         "perso.UserAccount",
+        null=False,
         on_delete=models.CASCADE,
         related_name="demandes_enchere"
     )
 
-
-    date_demande = models.DateTimeField(default=timezone.now)
-    date_accepte = models.DateTimeField()
+    date = models.DateTimeField(default=timezone.now)
     approved = models.BooleanField(default=False)
     seen = models.BooleanField(default=False)
     deleted = models.BooleanField(default=False)
@@ -122,25 +128,6 @@ class DemandeEnchaire(models.Model):
 
     def get_absolute_url(self):
         return reverse('demande_enchaire_detail', args=[self.pk])
-    
-class ParticipationEnchaire(models.Model):
-    enchaireObjet = models.ForeignKey(
-        "EnchaireObjet",
-        on_delete=models.CASCADE,
-        related_name="participations"
-    )
-
-    user = models.ForeignKey(
-        "perso.UserAccount",
-        on_delete=models.CASCADE,
-        related_name="participations_enchères"
-    )
-
-    date_participation = models.DateTimeField(default=timezone.now)
-    montant = models.IntegerField(validators=[MinValueValidator(0)])
-
-    def __str__(self):
-        return f"Participation de {self.user} à l'enchère {self.enchaire} pour {self.montant} €"
 
 # ----------------------------------------LOTS -----------------------------------------------
 
@@ -160,12 +147,6 @@ class Lot(models.Model):
     type = models.CharField(max_length=30, choices=TYPE_CHOICES)
     description = models.TextField(null=True, blank=True)
     date_ajout = models.DateTimeField(auto_now_add=True)
-    enchaire = models.OneToOneField(
-        "Enchaire",
-        related_name="lot",
-        null=False,
-        on_delete=models.CASCADE
-    )
 
     def __str__(self):
         return self.nom
@@ -189,12 +170,6 @@ class Voiture(models.Model):
     capteurs_stationnement = models.BooleanField(default=False)
     regulateur_vitesse = models.BooleanField(default=False)
     regulateur_vitesse_adaptatif = models.BooleanField(default=False)
-    enchaireObjet = models.OneToOneField(
-        "EnchaireObjet",
-        related_name="voiture",
-        null=False,
-        on_delete=models.CASCADE,
-    )
 
     def clean(self):
         # S'assurer que le lot est de type 'vehicules'
@@ -251,12 +226,6 @@ class Immobilier(models.Model):
     jardin = models.BooleanField(default=False)
     piscine = models.BooleanField(default=False)
     date_construction = models.DateField(null=True, blank=True)
-    enchaireObjet = models.OneToOneField(
-        "EnchaireObjet",
-        related_name="immobilier",
-        null=False,
-        on_delete=models.CASCADE
-    )
 
     def clean(self):
         if self.lot and self.lot.type != 'immobilier':
@@ -305,12 +274,6 @@ class MaterielProfessionnel(models.Model):
     poids = models.FloatField(null=True, blank=True, help_text="Poids en kg")
     description = models.TextField()
     disponibilite = models.BooleanField(default=True)
-    enchaireObjet = models.OneToOneField(
-        "EnchaireObjet",
-        related_name="materielProfessionnel",
-        null=False,
-        on_delete=models.CASCADE
-    )
 
     def clean(self):
         if self.lot and self.lot.type != 'materiel_pro':
@@ -357,12 +320,6 @@ class InformatiqueElectronique(models.Model):
     description = models.TextField()
     etat = models.CharField(max_length=100, null=True, blank=True)
     garantie = models.BooleanField(default=False)
-    enchaireObjet = models.OneToOneField(
-        "EnchaireObjet",
-        related_name="informatiqueElectronique",
-        null=False,
-        on_delete=models.CASCADE
-    )
 
     def clean(self):
         if self.lot.type != 'informatique_electronique':
@@ -390,12 +347,6 @@ class MobilierEquipement(models.Model):
     dimensions = models.CharField(max_length=100, null=True, blank=True)
     description = models.TextField()
     etat = models.CharField(max_length=100, null=True, blank=True)
-    enchaireObjet = models.OneToOneField(
-        "EnchaireObjet",
-        related_name="mobilierEquipement",
-        null=False,
-        on_delete=models.CASCADE
-    )
 
     def clean(self):
         if self.lot.type != 'mobilier_equipements':
@@ -423,12 +374,6 @@ class BijouxObjetValeur(models.Model):
     poids = models.FloatField(help_text="Poids en grammes")
     carats = models.IntegerField(null=True, blank=True)
     description = models.TextField()
-    enchaireObjet = models.OneToOneField(
-        "EnchaireObjet",
-        related_name="bijouxObjetValeur",
-        null=False,
-        on_delete=models.CASCADE
-    )
 
     def clean(self):
         if self.lot.type != 'bijoux_objets_valeur':
@@ -489,12 +434,6 @@ class OeuvreCollection(models.Model):
     dimensions = models.CharField(max_length=100, null=True, blank=True)
     technique = models.CharField(max_length=100, null=True, blank=True)
     description = models.TextField()
-    enchaireObjet = models.OneToOneField(
-        "EnchaireObjet",
-        related_name="oeuvreCollection",
-        null=False,
-        on_delete=models.CASCADE
-    )
 
     def clean(self):
         if self.lot.type != 'oeuvres_collections':
