@@ -110,6 +110,7 @@ class ImmobilierImageInline(admin.TabularInline):
     model = ImmobilierImage
     extra = 1
 
+
 @admin.register(Immobilier)
 class ImmobilierAdmin(admin.ModelAdmin):
     list_display = ('titre', 'ville', 'type_bien', 'surface', 'lot')
