@@ -225,7 +225,6 @@ class Immobilier(models.Model):
     adresse = models.TextField()
     ville = models.CharField(max_length=50)
     code_postal = models.CharField(max_length=10)
-    prix = models.DecimalField(max_digits=12, decimal_places=2,validators=[MinValueValidator(0)])
     description = models.TextField()
     nombre_pieces = models.IntegerField(null=True, blank=True)
     nombre_chambres = models.IntegerField(null=True, blank=True)
@@ -438,7 +437,6 @@ class StockInvendu(models.Model):
     quantite = models.IntegerField()
     unite = models.CharField(max_length=20, default="pièces")
     description = models.TextField()
-    prix_unitaire = models.DecimalField(max_digits=10, decimal_places=2)
     enchaireObjet = models.OneToOneField(
         "EnchaireObjet",
         related_name="stockInvendu",

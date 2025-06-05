@@ -112,7 +112,7 @@ class ImmobilierImageInline(admin.TabularInline):
 
 @admin.register(Immobilier)
 class ImmobilierAdmin(admin.ModelAdmin):
-    list_display = ('titre', 'ville', 'type_bien', 'surface', 'prix', 'lot')
+    list_display = ('titre', 'ville', 'type_bien', 'surface', 'lot')
     search_fields = ('titre', 'ville', 'adresse')
     list_filter = ('type_bien', 'ville', 'garage', 'jardin', 'piscine')
     inlines = [ImmobilierImageInline]
