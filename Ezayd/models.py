@@ -69,7 +69,8 @@ class Enchaire(models.Model):
     )
 
     def __str__(self):
-        return f"{self.lot}"
+        return str(self.lot.nom) if hasattr(self, 'lot') else f"Enchaire #{self.id} (sans lot)"
+
 
 
     def is_active(self):
