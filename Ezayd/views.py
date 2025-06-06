@@ -109,10 +109,6 @@ def search_view(request):
     results = []  # Exemple : Enchere.objects.filter(titre__icontains=query)
     return render(request, 'search.html', {'query': query, 'results': results})
 
-def notifications_view(request):
-    # Exemple statique ou récupérer des objets Notification
-    notifications = []  # Exemple : Notification.objects.filter(user=request.user)
-    return render(request, 'notifications.html', {'notifications': notifications})
 
 def panier_view(request):
     # Exemple : récupérer le panier de l'utilisateur

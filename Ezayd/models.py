@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from datetime import datetime
 from perso.models import UserAccount
-from notification.models import NotificationEnchaire
+from notification.models import NotificationEnchaire,NotificationDemandeEnchaire
 
 
 
@@ -95,34 +95,70 @@ class Enchaire(models.Model):
         ]
 
 
+from django.db import models
+from django.utils import timezone
+from django.urls import reverse
+
 class DemandeEnchaire(models.Model):
+    class State(models.TextChoices):
+        UNREAD = 'unread', 'Non lu'
+        APPROVED = 'Approuvée', 'Approuvée'
+        REJECTED = 'Rejetée', 'Rejetée'
+
     enchaire = models.ForeignKey(
-        "Enchaire",  # <--- modèle cible à ajouter ici
+        "Enchaire",
         null=False,
         on_delete=models.CASCADE,
         related_name="demande"
     )
 
-    user = models.ForeignKey(  # Correction: OneToOneField était probablement une erreur
+    user = models.ForeignKey(
         "perso.UserAccount",
         on_delete=models.CASCADE,
         related_name="demandes_enchere"
     )
 
-
     date_demande = models.DateTimeField(default=timezone.now)
-    date_accepte = models.DateTimeField()
-    approved = models.BooleanField(default=False)
-    seen = models.BooleanField(default=False)
-    deleted = models.BooleanField(default=False)
+    date_accepte = models.DateTimeField(blank=True, null=True)
+    state = models.CharField(
+        max_length=10,
+        choices=State.choices,
+        default=State.UNREAD
+    )
+
+    def save(self, *args, **kwargs):
+        # Detect if etat has changed
+        if self.pk:  # object already exists
+            if self.state != self.State.UNREAD:
+                super().save(*args, **kwargs)  # save first to ensure FK integrity
+                self.notify_user(self.state,self.user,self.enchaire)
+                self.delete_notif(self.user,self.enchaire)
+                 
+        super().save(*args, **kwargs)
+
+    def notify_user(self, new_etat, user ,enchaire):
+        NotificationEnchaire.objects.create(
+            user=user,
+            enchaire=enchaire,
+            message=f"La demande de l'enchaire {enchaire} a ete {new_etat}."
+        )
+    
+    def delete_notif(self, user, enchaire):
+        try:
+            notification = NotificationDemandeEnchaire.objects.get(
+                user=user,
+                enchaire=enchaire,  
+            )
+            notification.delete()
+        except NotificationDemandeEnchaire.DoesNotExist:
+            pass 
 
     def __str__(self):
         return f"Demande de l'enchère '{self.enchaire}'"
 
-
     def get_absolute_url(self):
         return reverse('demande_enchaire_detail', args=[self.pk])
-    
+ 
 class ParticipationEnchaire(models.Model):
     enchaireObjet = models.ForeignKey(
         "EnchaireObjet",

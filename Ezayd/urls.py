@@ -16,9 +16,6 @@ urlpatterns = [
     # 🔍 Barre de recherche
     path('search/', views.search_view, name='search'),
 
-    # 🔔 Notifications
-    path('notifications/', views.notifications_view, name='notifications'),
-
     # 🛒 Panier
     path('panier/', views.panier_view, name='panier'),
 
