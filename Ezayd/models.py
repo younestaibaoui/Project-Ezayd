@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from datetime import datetime
 from perso.models import UserAccount
+from notification.models import NotificationEnchaire
 
 
 
@@ -64,7 +65,24 @@ class Enchaire(models.Model):
     def __str__(self):
         return str(self.lot.nom) if hasattr(self, 'lot') else f"Enchaire #{self.id} (sans lot)"
 
+    def save(self, *args, **kwargs):
+        # Detect if etat has changed
+        if self.pk:  # object already exists
+            old_etat = Enchaire.objects.get(pk=self.pk).etat
+            if old_etat != self.etat:
+                super().save(*args, **kwargs)  # save first to ensure FK integrity
+                self.notify_savers(old_etat, self.etat)
+                return
+        super().save(*args, **kwargs)
 
+    # methode pour notifier les utilisateur de changement d'etat
+    def notify_savers(self, old_etat, new_etat):
+        for user in self.savers.all():
+            NotificationEnchaire.objects.create(
+                user=user,
+                enchaire=self,
+                message=f"L'état de l'enchère a changé de '{old_etat}' à '{new_etat}'."
+            )
 
     def is_active(self):
         today = timezone.now().date()
