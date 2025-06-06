@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'Ezayd',
     'perso', 
+    'notification',
 ]
 
 AUTH_USER_MODEL = 'perso.UserAccount'

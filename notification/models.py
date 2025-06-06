@@ -1,20 +1,15 @@
 from django.db import models
-from Ezayd.models import Enchaire
-from perso.models import(
-    UserAccount,
-    UserAccoundManage,
-)
 
 class NotificationEnchaire(models.Model):
-    user = models.ForeignKey(
-        "perso.UserAccount",
-        on_delete=models.CASCADE,
-        related_name="notifications"
-    )
     enchaire = models.ForeignKey(
-        "Enchaire",
+        'Ezayd.Enchaire',  # app_label.ModelName as a string
         on_delete=models.CASCADE,
-        related_name="notifications"
+        related_name='notifications'
+    )
+    user = models.ForeignKey(
+        'perso.UserAccount',
+        on_delete=models.CASCADE,
+        related_name='notifications'
     )
     message = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
