@@ -1,78 +1,442 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Details enchaire</title>
-</head>
-<body>
-    <a href="{% url 'accueil' %}">Accueil</a>
-    <h1>Details Enchaire</h1>
-    <strong style="color: red;">
-    {% if user.is_authenticated %}
-        {% if user in enchaire.savers.all %}
-            Saved
+{% extends "../base.html" %}
+
+{% load static %}
+
+{% block title %}Ezayd - {{ lot.nom }}{% endblock %}
+{% block content %}
+
+
+
+
+    
+<div style=" min-height: 100vh; padding-top : 40px; color: #fff;">
+    <!-- Breadcrumb Navigation -->
+    <nav style="margin-bottom: 24px;">
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #adb5bd;">
+            <a href="{% url 'accueil' %}" style="color: #ff6b35; text-decoration: none; transition: color 0.2s ease;" onmouseover="this.style.color='#f7931e'" onmouseout="this.style.color='#ff6b35'">
+                <i class="fas fa-home" style="margin-right: 4px;"></i>Accueil
+            </a>
+            <i class="fas fa-chevron-right" style="font-size: 12px; color: #6c757d;"></i>
+            <span>Détails de l'enchère</span>
+        </div>
+    </nav>
+
+    <!-- Header Section -->
+    <div style="background: linear-gradient(135deg, #2d2d2d 0%, #1e1e1e 100%); border-radius: 16px; padding: 24px; margin-bottom: 24px; border: 1px solid #404040; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+            <!-- Title and Badge -->
+            <div style="flex: 1; min-width: 300px;">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
+                    <h1 style="margin: 0; font-size: 28px; font-weight: 700; color: #fff;">{{ lot.nom }}</h1>
+                    <div style="padding: 8px 16px; font-size: 0.75rem; font-weight: 600; border-radius: 20px; color: #fff; background: #555; text-transform: uppercase; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);">
+                        {{ lot.get_type_display }}
+                    </div>
+                </div>
+                
+                <!-- État de l'enchère - Plus visible -->
+                <div style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; border-radius: 25px; font-weight: 700; font-size: 16px; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px; {% if enchaire.etat == 'active' %}background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);{% elif enchaire.etat == 'en_attente' %}background: linear-gradient(135deg, #6f42c1 0%, #8e44ad 100%); color: white; box-shadow: 0 4px 15px rgba(111, 66, 193, 0.4);{% elif enchaire.etat == 'terminee' %}background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white; box-shadow: 0 4px 15px rgba(220, 53, 69, 0.4);{% else %}background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%); color: #000; box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4);{% endif %}">
+                    {% if enchaire.etat == 'active' %}
+                        <i class="fas fa-play-circle" style="font-size: 18px;"></i>
+                        <span>Enchère Active</span>
+                    {% elif enchaire.etat == 'en_attente' %}
+                        <i class="fas fa-hourglass-half" style="font-size: 18px;"></i>
+                        <span>En Attente</span>
+                    {% elif enchaire.etat == 'terminee' %}
+                        <i class="fas fa-flag-checkered" style="font-size: 18px;"></i>
+                        <span>Terminée</span>
+                    {% else %}
+                        <i class="fas fa-info-circle" style="font-size: 18px;"></i>
+                        <span>{{ enchaire.etat }}</span>
+                    {% endif %}
+                </div>
+                
+                <!-- Description -->
+                <p style="color: #e0e0e0; line-height: 1.6; margin: 0; font-size: 16px;">{{ lot.description }}</p>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="display: flex; flex-direction: column; gap: 12px; min-width: 200px;">
+                <!-- Favorite Button -->
+                {% if user.is_authenticated %}
+                <form method="POST" action="{% url 'toggle_favori' enchaire.id %}" style="margin: 0;">
+                    {% csrf_token %}
+                    <button type="submit" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; {% if user in enchaire.savers.all %}background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white;{% else %}background: #333; color: #fff; border: 1px solid #555;{% endif %}"
+                            onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 15px rgba(0,0,0,0.3)'"
+                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                        {% if user in enchaire.savers.all %}
+                            <i class="fas fa-heart" style="color: white;"></i>
+                            <span>Retirer des favoris</span>
+                        {% else %}
+                            <i class="far fa-heart"></i>
+                            <span>Ajouter aux favoris</span>
+                        {% endif %}
+                    </button>
+                </form>
+                {% endif %}
+
+                <!-- Request Status/Button -->
+                {% if user.is_authenticated %}
+                    {% if demande %}
+                        <div style="padding: 12px 20px; border-radius: 8px; text-align: center; font-weight: 600; {% if demande.state == 'Approuvée' %}background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white;{% elif demande.state == 'Rejetée' %}background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white;{% else %}background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%); color: #000;{% endif %}">
+                            {% if demande.state == 'Approuvée' %}
+                                <i class="fas fa-check-circle" style="margin-right: 8px;"></i>Demande approuvée
+                            {% elif demande.state == 'Rejetée' %}
+                                <i class="fas fa-times-circle" style="margin-right: 8px;"></i>Demande rejetée
+                            {% elif demande.state == 'unread' %}
+                                <i class="fas fa-clock" style="margin-right: 8px;"></i>Demande en attente
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <form method="post" action="{% url 'demande' %}" style="margin: 0;">
+                            {% csrf_token %}
+                            <input type="hidden" name="user" value="{{ user.id }}">
+                            <input type="hidden" name="enchaire" value="{{ enchaire.id }}">
+                            <button type="submit" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; border: none; border-radius: 8px; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: white; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 3px 12px rgba(255, 107, 53, 0.3);"
+                                    onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 15px rgba(255, 107, 53, 0.4)'"
+                                    onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 3px 12px rgba(255, 107, 53, 0.3)'">
+                                <i class="fas fa-paper-plane"></i>
+                                <span>Faire une demande</span>
+                            </button>
+                        </form>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Combined Information Section -->
+    <div style="background-color: #2d2d2d; border-radius: 12px; padding: 24px; margin-bottom: 24px; border: 1px solid #404040; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);">
+        <h2 style="margin: 0 0 20px 0; font-size: 20px; font-weight: 600; color: #fff; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-info-circle" style="color: #ff6b35;"></i>
+            Informations complètes
+        </h2>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
+            <!-- Type du lot -->
+            <div style="display: flex; align-items: center; padding: 12px; background-color: #333; border-radius: 8px;">
+                <i class="fas fa-tag" style="width: 20px; margin-right: 12px; color: #ff6b35;"></i>
+                <div>
+                    <span style="color: #adb5bd; font-size: 14px;">Type</span>
+                    <div style="color: #fff; font-weight: 500;">{{ lot.get_type_display }}</div>
+                </div>
+            </div>
+            
+            <!-- Date d'ajout -->
+            <div style="display: flex; align-items: center; padding: 12px; background-color: #333; border-radius: 8px;">
+                <i class="fas fa-calendar-plus" style="width: 20px; margin-right: 12px; color: #ff6b35;"></i>
+                <div>
+                    <span style="color: #adb5bd; font-size: 14px;">Date d'ajout</span>
+                    <div style="color: #fff; font-weight: 500;">{{ lot.date_ajout|date:"d/m/Y à H:i" }}</div>
+                </div>
+            </div>
+            
+            <!-- Date de début -->
+            <div style="display: flex; align-items: center; padding: 12px; background-color: #333; border-radius: 8px;">
+                <i class="fas fa-play" style="width: 20px; margin-right: 12px; color: #28a745;"></i>
+                <div>
+                    <span style="color: #adb5bd; font-size: 14px;">Début</span>
+                    <div style="color: #fff; font-weight: 500;">{{ enchaire.date_debut }}</div>
+                </div>
+            </div>
+            
+            <!-- Date de fin -->
+            <div style="display: flex; align-items: center; padding: 12px; background-color: #333; border-radius: 8px;">
+                <i class="fas fa-stop" style="width: 20px; margin-right: 12px; color: #dc3545;"></i>
+                <div>
+                    <span style="color: #adb5bd; font-size: 14px;">Fin</span>
+                    <div style="color: #fff; font-weight: 500;">{{ enchaire.date_fin }}</div>
+                </div>
+            </div>
+            
+            <!-- Vendeur -->
+            <div style="display: flex; align-items: center; padding: 12px; background-color: #333; border-radius: 8px;">
+                <i class="fas fa-user" style="width: 20px; margin-right: 12px; color: #ff6b35;"></i>
+                <div>
+                    <span style="color: #adb5bd; font-size: 14px;">Vendeur</span>
+                    <div style="color: #fff; font-weight: 500;">{{ enchaire.seller.username }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Objects Section with Carousel -->
+    <div style="background-color: #2d2d2d; border-radius: 12px; padding: 24px; border: 1px solid #404040; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);">
+        <h2 style="margin: 0 0 20px 0; font-size: 20px; font-weight: 600; color: #fff; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-boxes" style="color: #ff6b35;"></i>
+            Objets de l'enchère
+        </h2>
+        
+        <!-- Objects with Enhanced Image Display -->
+        {% if objets %}
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+                {% for objet in objets %}
+                    <div style="background-color: #333; border-radius: 12px; overflow: hidden; transition: all 0.3s ease; border: 1px solid #404040; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+                        <!-- Badge du type -->
+                        <div style="position: absolute; top: 10px; left: 10px; padding: 6px 14px; font-size: 0.7rem; font-weight: 600; border-radius: 16px; color: #fff; z-index: 10; background: #555; text-transform: uppercase; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);">
+                            {{ lot.get_type_display }}
+                        </div>
+                        
+                        <!-- Images avec carrousel -->
+                        <div style="position: relative; height: 250px; overflow: hidden;">
+                            {% for image in objet.get_images %}
+                                <img src="{{ image }}" alt="Image de l'objet" 
+                                     style="width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; opacity: {% if forloop.first %}1{% else %}0{% endif %}; transition: opacity 0.3s ease; cursor: pointer;"
+                                     class="carousel-image-{{ forloop.parentloop.counter0 }}"
+                                     onclick="openImageModal('{{ image }}', {{ forloop.parentloop.counter0 }}, {{ forloop.counter0 }})">
+                            {% empty %}
+                                <div style="width: 100%; height: 100%; background-color: #444; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-image" style="font-size: 48px; color: #666;"></i>
+                                </div>
+                            {% endfor %}
+                            
+                            <!-- Navigation du carrousel si plusieurs images -->
+                            {% if objet.get_images|length > 1 %}
+                                <button onclick="previousImage({{ forloop.counter0 }}, {{ objet.get_images|length }})" 
+                                        style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.7); border: none; color: white; padding: 8px 12px; border-radius: 50%; cursor: pointer; transition: background 0.3s ease;"
+                                        onmouseover="this.style.background='rgba(0,0,0,0.9)'" onmouseout="this.style.background='rgba(0,0,0,0.7)'">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <button onclick="nextImage({{ forloop.counter0 }}, {{ objet.get_images|length }})" 
+                                        style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.7); border: none; color: white; padding: 8px 12px; border-radius: 50%; cursor: pointer; transition: background 0.3s ease;"
+                                        onmouseover="this.style.background='rgba(0,0,0,0.9)'" onmouseout="this.style.background='rgba(0,0,0,0.7)'">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                                
+                                <!-- Indicateurs -->
+                                <div style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px;">
+                                    {% for image in objet.get_images %}
+                                        <div onclick="showImage({{ forloop.parentloop.counter0 }}, {{ forloop.counter0 }})" 
+                                             style="width: 8px; height: 8px; border-radius: 50%; background: {% if forloop.first %}white{% else %}rgba(255,255,255,0.5){% endif %}; cursor: pointer; transition: background 0.3s ease;"
+                                             class="indicator-{{ forloop.parentloop.counter0 }}-{{ forloop.counter0 }}"></div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Contenu -->
+                        <div style="padding: 16px;">
+                            <!-- Titre -->
+                            <a href="{% url 'details_objet' lot.type objet.id %}" style="text-decoration: none; color: #fff;">
+                                <h3 style="margin: 0 0 12px 0; font-size: 18px; font-weight: 600; color: #fff;">
+                                    {% if lot.type == 'vehicules' %}
+                                        {{ objet.nom }} {{ objet.model }}
+                                    {% elif lot.type == 'immobilier' %}
+                                        Bien immobilier à {{ objet.adresse }}
+                                    {% elif lot.type == 'materiel_pro' %}
+                                        {{ objet.nom }}
+                                    {% elif lot.type == 'informatique_electronique' %}
+                                        {{ objet.marque }} {{ objet.type_objet }}
+                                    {% elif lot.type == 'mobilier_equipements' %}
+                                        {{ objet.categorie }}
+                                    {% elif lot.type == 'bijoux_objets_valeur' %}
+                                        {{ objet.type_objet }}
+                                    {% elif lot.type == 'stocks_invendus' %}
+                                        {{ objet.nom_produit }}
+                                    {% elif lot.type == 'oeuvres_collections' %}
+                                        {{ objet.titre }} par {{ objet.artiste }}
+                                    {% else %}
+                                        Objet
+                                    {% endif %}
+                                </h3>
+                            </a>
+                            
+                            <!-- Caractéristiques -->
+                            <div style="color: #e0e0e0; font-size: 14px; margin-bottom: 16px;">
+                                {% if lot.type == 'vehicules' %}
+                                    <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                        <i class="fas fa-car" style="width: 20px; margin-right: 8px; color: #ff6b35;"></i>
+                                        <strong style="margin-right: 5px;">Marque:</strong> {{ objet.nom }}
+                                    </div>
+                                    <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                        <i class="fas fa-tag" style="width: 20px; margin-right: 8px; color: #ff6b35;"></i>
+                                        <strong style="margin-right: 5px;">Modèle:</strong> {{ objet.model }}
+                                    </div>
+                                    <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                        <i class="fas fa-calendar-alt" style="width: 20px; margin-right: 8px; color: #ff6b35;"></i>
+                                        <strong style="margin-right: 5px;">Année:</strong> {{ objet.year }}
+                                    </div>
+                                {% elif lot.type == 'immobilier' %}
+                                    <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                        <i class="fas fa-map-marker-alt" style="width: 20px; margin-right: 8px; color: #ff6b35;"></i>
+                                        <strong style="margin-right: 5px;">Adresse:</strong> {{ objet.adresse }}
+                                    </div>
+                                    <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                        <i class="fas fa-ruler-combined" style="width: 20px; margin-right: 8px; color: #ff6b35;"></i>
+                                        <strong style="margin-right: 5px;">Surface:</strong> {{ objet.surface }} m²
+                                    </div>
+                                    <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                        <i class="fas fa-door-open" style="width: 20px; margin-right: 8px; color: #ff6b35;"></i>
+                                        <strong style="margin-right: 5px;">Nombre de pièces:</strong> {{ objet.nombre_pieces }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Bouton Voir détails -->
+                            <a href="{% url 'details_objet' lot.type objet.id %}" style="display: inline-block; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: white; text-decoration: none; padding: 8px 16px; border-radius: 6px; font-weight: 500; font-size: 14px; transition: all 0.3s ease; box-shadow: 0 3px 12px rgba(255, 107, 53, 0.3);">
+                                <i class="fas fa-eye" style="margin-right: 6px;"></i>Voir détails
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
         {% else %}
-            Not saved
+            <div style="background-color: #333; border-radius: 12px; padding: 30px; text-align: center; color: #e0e0e0; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+                <i class="fas fa-search" style="font-size: 48px; color: #555; margin-bottom: 16px;"></i>
+                <p style="font-size: 18px; margin: 0;">Aucun objet trouvé pour ce lot.</p>
+            </div>
         {% endif %}
-    {% endif %}
-    </strong>
-    <br>
-    <form method="POST" action="{% url 'toggle_favori' enchaire.id %}">
-        {% csrf_token %}
-        <button type="submit">
-            {% if user in enchaire.savers.all %}
-                Unsave
-            {% else %}
-                Save
-            {% endif %}
+    </div>
+</div>
+
+<!-- Modal plein écran pour les images -->
+<div id="imageModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999; justify-content: center; align-items: center;">
+    <div style="position: relative; max-width: 90%; max-height: 90%;">
+        <img id="modalImage" src="/placeholder.svg" alt="Image en plein écran" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+        
+        <!-- Bouton fermer -->
+        <button onclick="closeImageModal()" style="position: absolute; top: -40px; right: 0; background: none; border: none; color: white; font-size: 30px; cursor: pointer; padding: 5px;">
+            <i class="fas fa-times"></i>
         </button>
-    </form>
+        
+        <!-- Navigation -->
+        <button id="modalPrev" onclick="modalPreviousImage()" style="position: absolute; left: -60px; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.2); border: none; color: white; padding: 15px 20px; border-radius: 50%; cursor: pointer; font-size: 20px;">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <button id="modalNext" onclick="modalNextImage()" style="position: absolute; right: -60px; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.2); border: none; color: white; padding: 15px 20px; border-radius: 50%; cursor: pointer; font-size: 20px;">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+    </div>
+</div>
 
-    {% if demande %}
-        {% if demande.state == 'Approuvée' %}
-            <p style="color: green;">Approuvée</p>
-        {% elif demande.state == 'Rejetée' %}
-            <p style="color: red;">Rejetée</p>
-        {% elif demande.state == 'unread' %}
-            <p style="color: yellow;">Demande en attente</p>
-        {% endif %}
-    {% else %}
-            <form method="post" action="{% url 'demande' %}">
-                {% csrf_token %}
-                <input type="hidden" name="user" value="{{ user.id }}">
-                <input type="hidden" name="enchaire" value="{{ enchaire.id }}">
-                <button type="submit">Faire une demande</button>
-            </form>
-    {% endif %}
+</div>
+
+
+<style>
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+
+/* Badge colors pour les types de lots */
+.lot-type-badge.vehicules { background: #1e88e5 !important; }
+.lot-type-badge.immobilier { background: #43a047 !important; }
+.lot-type-badge.materiel_pro { background: #f4511e !important; }
+.lot-type-badge.informatique_electronique { background: #5e35b1 !important; }
+.lot-type-badge.mobilier_equipements { background: #00897b !important; }
+.lot-type-badge.bijoux_objets_valeur { background: #fdd835 !important; color: #000 !important; }
+.lot-type-badge.stocks_invendus { background: #6d4c41 !important; }
+.lot-type-badge.oeuvres_collections { background: #9e9e9e !important; }
+</style>
+
+<script>
+// Variables globales pour le carrousel
+let currentImageIndex = {};
+let allImages = {};
+let currentModalObject = null;
+let currentModalImageIndex = 0;
+
+// Initialiser les images pour chaque objet
+{% for objet in objets %}
+    allImages[{{ forloop.counter0 }}] = [
+        {% for image in objet.get_images %}
+            "{{ image }}"{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+    currentImageIndex[{{ forloop.counter0 }}] = 0;
+{% endfor %}
+
+// Navigation du carrousel
+function nextImage(objectIndex, totalImages) {
+    currentImageIndex[objectIndex] = (currentImageIndex[objectIndex] + 1) % totalImages;
+    showImage(objectIndex, currentImageIndex[objectIndex] + 1);
+}
+
+function previousImage(objectIndex, totalImages) {
+    currentImageIndex[objectIndex] = (currentImageIndex[objectIndex] - 1 + totalImages) % totalImages;
+    showImage(objectIndex, currentImageIndex[objectIndex] + 1);
+}
+
+function showImage(objectIndex, imageIndex) {
+    const images = document.querySelectorAll('.carousel-image-' + objectIndex);
+    const indicators = document.querySelectorAll('[class*="indicator-' + objectIndex + '-"]');
     
-    <br>
+    // Cacher toutes les images
+    images.forEach(img => img.style.opacity = '0');
     
-    <strong>Nom : {{ lot.nom }}</strong>
-    <br>
-    <strong>Type : {{ lot.type }}</strong>
-    <br>
-    <strong>Description : {{ lot.description }}</strong>
-    <br>
-    <strong>Date d'ajout : {{ lot.date_ajout }}</strong>
-    <br>
-    <hr>
-
-    <strong>Date de début : {{ enchaire.date_debut }}</strong>
-    <br>
-    <strong>Date de fin : {{ enchaire.date_fin }}</strong>
-    <br>
-    <strong>Vendeur : {{ enchaire.seller.username }}</strong>
-    <br>
-    <strong>Etat : {{ enchaire.etat }}</strong>
-    <br>
-    <strong>Details : {{ enchaire.text_highlight }}</strong>
-    <br>
-    <hr>
-    <strong>Details des objets : </h2>
-
-    {% include './objets.html' %}
-
+    // Réinitialiser tous les indicateurs
+    indicators.forEach(indicator => indicator.style.background = 'rgba(255,255,255,0.5)');
     
+    // Afficher l'image sélectionnée
+    if (images[imageIndex - 1]) {
+        images[imageIndex - 1].style.opacity = '1';
+        currentImageIndex[objectIndex] = imageIndex - 1;
+    }
+    
+    // Activer l'indicateur correspondant
+    const activeIndicator = document.querySelector('.indicator-' + objectIndex + '-' + imageIndex);
+    if (activeIndicator) {
+        activeIndicator.style.background = 'white';
+    }
+}
 
-</body>
-</html>
+// Modal plein écran
+function openImageModal(imageSrc, objectIndex, imageIndex) {
+    const modal = document.getElementById('imageModal');
+    const modalImage = document.getElementById('modalImage');
+    
+    modalImage.src = imageSrc;
+    modal.style.display = 'flex';
+    
+    currentModalObject = objectIndex;
+    currentModalImageIndex = imageIndex - 1;
+    
+    // Masquer les boutons de navigation s'il n'y a qu'une image
+    const totalImages = allImages[objectIndex] ? allImages[objectIndex].length : 0;
+    document.getElementById('modalPrev').style.display = totalImages > 1 ? 'block' : 'none';
+    document.getElementById('modalNext').style.display = totalImages > 1 ? 'block' : 'none';
+}
+
+function closeImageModal() {
+    document.getElementById('imageModal').style.display = 'none';
+}
+
+function modalNextImage() {
+    if (currentModalObject !== null && allImages[currentModalObject]) {
+        const totalImages = allImages[currentModalObject].length;
+        currentModalImageIndex = (currentModalImageIndex + 1) % totalImages;
+        document.getElementById('modalImage').src = allImages[currentModalObject][currentModalImageIndex];
+    }
+}
+
+function modalPreviousImage() {
+    if (currentModalObject !== null && allImages[currentModalObject]) {
+        const totalImages = allImages[currentModalObject].length;
+        currentModalImageIndex = (currentModalImageIndex - 1 + totalImages) % totalImages;
+        document.getElementById('modalImage').src = allImages[currentModalObject][currentModalImageIndex];
+    }
+}
+
+// Fermer le modal avec Escape
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeImageModal();
+    }
+});
+
+// Navigation avec les flèches du clavier
+document.addEventListener('keydown', function(event) {
+    const modal = document.getElementById('imageModal');
+    if (modal.style.display === 'flex') {
+        if (event.key === 'ArrowRight') {
+            modalNextImage();
+        } else if (event.key === 'ArrowLeft') {
+            modalPreviousImage();
+        }
+    }
+});
+</script>
+
+{% endblock %}

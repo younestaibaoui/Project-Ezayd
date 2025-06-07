@@ -1,10 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Profil Utilisateur</title>
-</head>
-<body>
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}Ezayd - Accueil{% endblock %}
+{% block content %}
+
     <h1>Profil Utilisateur</h1>
 
     {% if user %}
@@ -31,4 +31,7 @@
         <p>Vous devez être connecté pour voir ce profil.</p>
     {% endif %}
 </body>
-</html>
+
+
+
+{% endblock %}

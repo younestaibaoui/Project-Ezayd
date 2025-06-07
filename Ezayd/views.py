@@ -86,16 +86,20 @@ def accueil(request):
         # --- Choisir une image aléatoire comme image principale ---
         enchere.main_image_url = random.choice(all_images) if all_images else None
 
+  
+
+    context = {
+        'enchaires': enchaires,
+    }
+
     notifications = request.user.notifications.all() if request.user.is_authenticated else None
     if notifications:
         unread_count = notifications.filter(is_read=False).count()
     else:
         unread_count = 0
 
-    context = {
-        'enchaires': enchaires,
-        'unread_count':unread_count,
-    }
+    context['unread_count'] = unread_count
+
 
     return render(request, 'accueil/accueil.html', context)
 
@@ -108,6 +112,10 @@ def toggle_favori(request, enchere_id):
     else:
         enchere.savers.add(request.user)
     return redirect(request.META.get('HTTP_REFERER', 'accueil'))
+
+
+
+
 
 def details_view(request, enchere_id):
      
@@ -144,6 +152,14 @@ def details_view(request, enchere_id):
         'lot' : lot,
         'objets' : objets,
     }
+    
+    notifications = request.user.notifications.all() if request.user.is_authenticated else None
+    if notifications:
+        unread_count = notifications.filter(is_read=False).count()
+    else:
+        unread_count = 0
+
+    context['unread_count'] = unread_count
 
     return render(request, 'details_enchaire/details_enchaire.html', context)
 
@@ -175,6 +191,14 @@ def details_objet_view(request, type_objet, objet_id):
         'objet': objet,
         'enchaire_id': enchaire,       
     }
+    
+    notifications = request.user.notifications.all() if request.user.is_authenticated else None
+    if notifications:
+        unread_count = notifications.filter(is_read=False).count()
+    else:
+        unread_count = 0
+
+    context['unread_count'] = unread_count
 
     return render(request, 'details_objet/details_objet.html', context)
 
@@ -221,5 +245,13 @@ def profil_view(request):
         context['user'] = request.user
     else:
         redirect('connexion')  
+    
+    notifications = request.user.notifications.all() if request.user.is_authenticated else None
+    if notifications:
+        unread_count = notifications.filter(is_read=False).count()
+    else:
+        unread_count = 0
+
+    context['unread_count'] = unread_count
 
     return render(request, 'profil.html', context)
