@@ -22,6 +22,8 @@ urlpatterns = [
     path('panier/', panier_view, name='panier'),
 
     path('profil/', profil_view, name='profil'),
+
+    path('participer/', participer, name='participer'),
 ]
 
 

@@ -269,3 +269,31 @@ def profil_view(request):
         context['notifications'] = notifications
 
     return render(request, 'profil.html', context)
+
+
+# # Participer à une enchère
+@require_POST
+@login_required
+def participer(request):
+    user = request.user
+    type_objet = request.POST.get('type_objet')
+    enchaireObjet_id = request.POST.get('enchaire_id')
+    valid = True
+
+    if not enchaireObjet:
+        raise Http404("Enchaire ID is missing.")
+
+    enchaireObjet = get_object_or_404(Enchaire, id=enchaireObjet_id)
+
+    pas = enchaireObjet.pas
+    reserved_price = enchaireObjet.reserved_price if enchaireObjet.reserved_price else enchaireObjet.first_price
+
+    winner = enchaireObjet.winner
+
+    if winner and winner == user:
+        valid = False
+    else:
+        enchaireObjet.participer(user)
+
+    # Redirect to the referring page or fallback to a named route (e.g., 'accueil')
+    return redirect('details_objet', type_objet, objet_id=enchaireObjet.id)

@@ -20,7 +20,7 @@ ETAT_ENCHAIRE_CHOICES = (
 class EnchaireObjet(models.Model):
     first_price = models.IntegerField(null=False,validators=[MinValueValidator(0)])
     pas = models.IntegerField(null=False,validators=[MinValueValidator(0)])
-
+    reserved = models.BooleanField(default=False)
     winner = models.ForeignKey(
         "perso.UserAccount",
         null=True,
@@ -29,6 +29,16 @@ class EnchaireObjet(models.Model):
     )
 
     price_reserved = models.IntegerField(null=True, blank=True,validators=[MinValueValidator(0)])
+
+    def participer(self, user):
+        price_reserved = self.price_reserved if self.reserved else self.first_price
+        self.price_reserved = price_reserved + self.pas
+        self.winner = user
+        ParticipationEnchaire.objects.create(
+            enchaireObjet=self,
+            user=user
+        )
+        self.save()
 
 
 class Enchaire(models.Model):

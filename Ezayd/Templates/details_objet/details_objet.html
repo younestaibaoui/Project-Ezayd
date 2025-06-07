@@ -480,6 +480,101 @@
     .modal-image.loading {
         animation: modalFadeIn 0.3s ease-out;
     }
+
+    /* Bouton de participation */
+    .participate-btn {
+        width: 100%;
+        background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+        color: white;
+        border: none;
+        padding: 16px 20px;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(255, 0, 0, 0.3);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .participate-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 25px rgba(255, 0, 0, 0.4);
+        background: linear-gradient(135deg, #e60000 0%, #b30000 100%);
+    }
+
+    .participate-btn:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 10px rgba(255, 0, 0, 0.3);
+    }
+
+    .participate-btn:disabled {
+        background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+    /* Statut de l'enchère */
+    .auction-status {
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid #404040;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .status-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #adb5bd;
+        font-size: 14px;
+    }
+
+    .status-item i {
+        color: #ff0000;
+        width: 16px;
+        text-align: center;
+    }
+
+    /* Animation pour le prix actuel */
+    .price-value.highlight {
+        animation: pulse-price 2s infinite;
+    }
+
+    @keyframes pulse-price {
+        0%, 100% {
+            color: #ff0000;
+            text-shadow: 0 0 5px rgba(255, 0, 0, 0.3);
+        }
+        50% {
+            color: #ff3333;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+        }
+    }
+
+    /* Responsive pour le bouton */
+    @media (max-width: 768px) {
+        .participate-btn {
+            padding: 14px 16px;
+            font-size: 14px;
+        }
+        
+        .auction-status {
+            gap: 6px;
+        }
+        
+        .status-item {
+            font-size: 13px;
+        }
+    }
 </style>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -1028,7 +1123,7 @@
                     <span class="price-value">{{ enchaireObjet.pas }} DA</span>
                 </div>
                 
-                {% if enchaireObjet.price_reserved %}
+                {% if enchaireObjet.reserved %}
                     <div class="price-item">
                         <span class="price-label">Prix de réserve</span>
                         <span class="price-value">{{ enchaireObjet.price_reserved }} DA</span>
@@ -1045,6 +1140,41 @@
                         Aucun prix de réserve défini
                     </div>
                 {% endif %}
+            </div>
+            <!-- Section Prix Actuel et Participation -->
+            <div class="auction-info">
+                <h3 class="section-title">
+                    <i class="fas fa-chart-line"></i>
+                    Enchère en cours
+                </h3>
+                
+                <div class="price-item">
+                    <span class="price-label">Prix actuel</span>
+                    <span class="price-value highlight">{{ current_price|default:enchaireObjet.first_price }} DA</span>
+                </div>
+                
+                <div class="price-item">
+                    <span class="price-label">Prochaine enchère</span>
+                    <span class="price-value">{{ next_bid_price|default:enchaireObjet.first_price|add:enchaireObjet.pas }} DA</span>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <button class="participate-btn" onclick="participateInAuction()">
+                        <i class="fas fa-gavel"></i>
+                        Participer pour {{ next_bid_price|default:enchaireObjet.first_price|add:enchaireObjet.pas }} DA
+                    </button>
+                </div>
+                
+                <div class="auction-status">
+                    <div class="status-item">
+                        <i class="fas fa-users"></i>
+                        <span>{{ total_bidders|default:0 }} participant{{ total_bidders|default:0|pluralize }}</span>
+                    </div>
+                    <div class="status-item">
+                        <i class="fas fa-clock"></i>
+                        <span>Temps restant: {{ time_remaining|default:"--:--:--" }}</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -1277,6 +1407,26 @@
     // Précharger les images au chargement de la page
     if (images.length > 0) {
         preloadImages();
+    }
+
+    // Fonction de participation à l'enchère
+    function participateInAuction() {
+        // Vérifier si l'utilisateur est connecté
+        {% if user.is_authenticated %}
+            if (confirm('Voulez-vous vraiment participer à cette enchère pour ' + {{ next_bid_price|default:enchaireObjet.first_price|add:enchaireObjet.pas }} + ' DA ?')) {
+                // Rediriger vers la page de participation ou envoyer une requête AJAX
+                
+            }
+        {% else %}
+            alert('Vous devez être connecté pour participer aux enchères.');
+            window.location.href = "{% url 'login' %}";
+        {% endif %}
+    }
+
+    // Mise à jour automatique du temps restant (optionnel)
+    function updateTimeRemaining() {
+        // Cette fonction peut être implémentée pour mettre à jour le temps en temps réel
+        // Exemple avec WebSocket ou requêtes AJAX périodiques
     }
 </script>
 
