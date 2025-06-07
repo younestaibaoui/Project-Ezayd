@@ -104,6 +104,7 @@
     {% if unread_count != 0 %}
       <span style="position: absolute; top: -5px; right: -5px; background: #ff4444; color: white; font-size: 10px; padding: 2px 5px; border-radius: 50%; animation: pulse 2s infinite;">{{ unread_count }}</span>
     {% endif %}
+
   </button>
 
 
@@ -144,6 +145,16 @@
     {% endif %}
   </div>
 </div>
+
+
+{% else %}
+ 
+<button 
+  onclick="window.location.href='/connexion'" 
+  style="background: none; border: none; color: #fff; position: relative; cursor: pointer;">
+  <i class="fas fa-bell" style="font-size: 20px;"></i>
+</button>
+
 {% endif %}
 
 

@@ -92,17 +92,19 @@ def accueil(request):
         'enchaires': enchaires,
     }
 
-    notifications = request.user.notifications.all() if request.user.is_authenticated else None
-    if notifications:
-        unread_count = notifications.filter(is_read=False).count()
-    else:
-        unread_count = 0
+    # Vérifier si l'utilisateur est authentifié et récupérer les notifications
+    if request.user.is_authenticated:
+        notifications = request.user.notifications.all() if request.user.is_authenticated else None
+        if notifications:
+            unread_count = notifications.filter(is_read=False).count()
+        else:
+            unread_count = 0
     
-    # Récupérer les notifications de l'utilisateur connecté
-    notifications = request.user.notifications.all().order_by('-created_at')    
-    context['unread_count'] = unread_count
-    context['notifications'] = notifications
-   
+        # Récupérer les notifications de l'utilisateur connecté
+        notifications = request.user.notifications.all().order_by('-created_at')    
+        context['unread_count'] = unread_count
+        context['notifications'] = notifications
+    
 
 
     return render(request, 'accueil/accueil.html', context)
@@ -196,16 +198,17 @@ def details_objet_view(request, type_objet, objet_id):
         'enchaire_id': enchaire,       
     }
     
-    notifications = request.user.notifications.all() if request.user.is_authenticated else None
-    if notifications:
-        unread_count = notifications.filter(is_read=False).count()
-    else:
-        unread_count = 0
+    if request.user.is_authenticated:
+        notifications = request.user.notifications.all() if request.user.is_authenticated else None
+        if notifications:
+            unread_count = notifications.filter(is_read=False).count()
+        else:
+            unread_count = 0
     
-    # Récupérer les notifications de l'utilisateur connecté
-    notifications = request.user.notifications.all().order_by('-created_at')
-    context['unread_count'] = unread_count
-    context['notifications'] = notifications
+        # Récupérer les notifications de l'utilisateur connecté
+        notifications = request.user.notifications.all().order_by('-created_at')    
+        context['unread_count'] = unread_count
+        context['notifications'] = notifications
 
     return render(request, 'details_objet/details_objet.html', context)
 
@@ -253,15 +256,16 @@ def profil_view(request):
     else:
         redirect('connexion')  
     
-    notifications = request.user.notifications.all() if request.user.is_authenticated else None
-    if notifications:
-        unread_count = notifications.filter(is_read=False).count()
-    else:
-        unread_count = 0
+    if request.user.is_authenticated:
+        notifications = request.user.notifications.all() if request.user.is_authenticated else None
+        if notifications:
+            unread_count = notifications.filter(is_read=False).count()
+        else:
+            unread_count = 0
     
-    # Récupérer les notifications de l'utilisateur connecté
-    notifications = request.user.notifications.all().order_by('-created_at')
-    context['unread_count'] = unread_count
-    context['notifications'] = notifications
+        # Récupérer les notifications de l'utilisateur connecté
+        notifications = request.user.notifications.all().order_by('-created_at')    
+        context['unread_count'] = unread_count
+        context['notifications'] = notifications
 
     return render(request, 'profil.html', context)

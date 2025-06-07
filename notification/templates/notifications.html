@@ -5,10 +5,11 @@
 {% block content %}
 
 <style>
+
     .container {
-        max-width: 1000px;
+        max-width: 1200px;
         margin: 0 auto;
-        padding: 80px 20px 40px;
+        padding: 80px;
     }
 
     .notifications-container {
@@ -28,7 +29,7 @@
         left: 0;
         right: 0;
         height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(255, 107, 53, 0.5), transparent);
+        background: linear-gradient(90deg, transparent, rgba(255, 0, 0, 0.5), transparent);
     }
 
     .notifications-header {
@@ -37,7 +38,7 @@
         justify-content: space-between;
         padding: 30px;
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        background: linear-gradient(135deg, rgba(255, 107, 53, 0.1) 0%, transparent 100%);
+        background: linear-gradient(135deg, rgba(255, 0, 0, 0.1) 0%, transparent 100%);
     }
 
     .header-left h2 {
@@ -51,8 +52,8 @@
     }
 
     .header-left h2 i {
-        color: #ff6b35;
-        filter: drop-shadow(0 0 10px rgba(255, 107, 53, 0.3));
+        color: #ff0000;
+        filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.3));
     }
 
     .header-left p {
@@ -86,7 +87,7 @@
     }
 
     .notification-counter i {
-        color: #ff6b35;
+        color: #ff0000;
     }
 
     .notification-counter.empty {
@@ -95,7 +96,7 @@
     }
 
     .mark-all-read-btn {
-        background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+        background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
         color: white;
         border: none;
         padding: 12px 20px;
@@ -107,13 +108,13 @@
         align-items: center;
         gap: 8px;
         transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+        box-shadow: 0 4px 15px rgba(255, 0, 0, 0.3);
         text-decoration: none;
     }
 
     .mark-all-read-btn:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 25px rgba(255, 107, 53, 0.4);
+        box-shadow: 0 6px 25px rgba(255, 0, 0, 0.4);
     }
 
     .no-notifications {
@@ -164,7 +165,7 @@
     .stat-number {
         font-size: 28px;
         font-weight: 800;
-        color: #ff6b35;
+        color: #ff0000;
         margin-bottom: 4px;
         display: block;
     }
@@ -203,7 +204,6 @@
         box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
     }
 
-    /* Animations */
     @keyframes pulse {
         0%, 100% { opacity: 1; }
         50% { opacity: 0.5; }
@@ -213,45 +213,19 @@
         animation: pulse 2s infinite;
     }
 
-    /* Responsive */
-    @media (max-width: 768px) {
-        .container {
-            padding: 60px 10px 20px;
-        }
-
-        .notifications-header {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 20px;
-            padding: 20px;
-        }
-
-        .header-actions {
-            width: 100%;
-            justify-content: space-between;
-        }
-
-        .header-left h2 {
-            font-size: 24px;
-        }
-
-        .notifications-stats {
-            grid-template-columns: 1fr;
-            padding: 20px;
-        }
-
-        .notifications-content {
-            padding: 20px;
-        }
-
-        .mark-all-read-btn {
-            padding: 10px 16px;
-            font-size: 13px;
-        }
-    }
+    
 </style>
 
-<div class="container">
+       <nav style="margin-bottom: 24px;">
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #adb5bd;">
+            <a href="{% url 'accueil' %}" style="color: #ff6b35; text-decoration: none; transition: color 0.2s ease;" onmouseover="this.style.color='#f7931e'" onmouseout="this.style.color='#ff6b35'">
+                <i class="fas fa-home" style="margin-right: 4px;"></i>Accueil
+            </a>
+            <i class="fas fa-chevron-right" style="font-size: 12px; color: #6c757d;"></i>
+             <i class="fas fa-gavel"></i><span>Détails de l'enchère</span>
+        </div>
+    </nav>
+
     <div class="notifications-container">
         <div class="notifications-header">
             <div class="header-left">
@@ -308,6 +282,6 @@
             </div>
         {% endif %}
     </div>
-</div>
+
 
 {% endblock %}
