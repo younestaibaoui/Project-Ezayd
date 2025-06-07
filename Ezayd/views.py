@@ -1,14 +1,26 @@
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
-from .models import Enchaire
-from django.utils import timezone
-from django.shortcuts import render
-from django.utils import timezone
-from .models import Enchaire, Voiture, Immobilier, MaterielProfessionnel, InformatiqueElectronique, MobilierEquipement, BijouxObjetValeur, StockInvendu, OeuvreCollection
-from django.shortcuts import render
-from django.utils import timezone
-
 import random
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import Http404
+from django.utils import timezone
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
+
+from perso.models import UserAccount
+
+from .models import (
+    Enchaire,
+    Voiture,
+    Immobilier,
+    MaterielProfessionnel,
+    InformatiqueElectronique,
+    MobilierEquipement,
+    BijouxObjetValeur,
+    StockInvendu,
+    OeuvreCollection,
+    DemandeEnchaire
+)
+
 
 def accueil(request):
     enchaires = Enchaire.objects.select_related('lot').all()
@@ -77,13 +89,6 @@ def accueil(request):
 
     return render(request, 'accueil/accueil.html', {'enchaires': enchaires})
 
-
-
-from django.shortcuts import redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_POST
-from .models import Enchaire
-
 @require_POST
 @login_required
 def toggle_favori(request, enchere_id):
@@ -100,7 +105,7 @@ def details_view(request, enchere_id):
     lot = enchaire.lot
 
     if request.user.is_authenticated:
-        demande = enchaire.demande
+        demande = DemandeEnchaire.objects.filter(user=request.user, enchaire=enchaire).first()
 
     lot_type = lot.type
 
@@ -162,11 +167,29 @@ def details_objet_view(request, type_objet, objet_id):
     }
 
     return render(request, 'details_objet/details_objet.html', context)
+
+@require_POST
+def demande(request):
+    user_id = request.POST.get('user')
+    enchaire_id = request.POST.get('enchaire')
+
+    if not user_id or not enchaire_id:
+        raise Http404("User ID or Enchaire ID is missing.")
+
+    user = get_object_or_404(UserAccount, id=user_id)
+    enchaire = get_object_or_404(Enchaire, id=enchaire_id)
+
+    if DemandeEnchaire.objects.filter(user=user, enchaire=enchaire).exists():
+        raise Http404("Demande existante.")  # Properly raise, not return
+
+    # Create and save the new Demande
+    demande = DemandeEnchaire(user=user, enchaire=enchaire)
+    demande.save()
+
+    # Redirect to the referring page or fallback to a named route (e.g., 'accueil')
+    return redirect(request.META.get('HTTP_REFERER', 'accueil'))
+
 # -----------------------------------------------------------------
-
-# views.py
-
-from django.shortcuts import render
 
 def search_view(request):
     query = request.GET.get('q', '')

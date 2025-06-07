@@ -13,6 +13,8 @@ urlpatterns = [
     path("favori/<int:enchere_id>/", toggle_favori, name="toggle_favori"),
     path('details/<int:enchere_id>/', details_view, name='details_enchaire'),
     path('details-objet/<str:type_objet>/<int:objet_id>/', details_objet_view, name='details_objet'),
+    path('demande/', demande, name='demande'),
+
     # 🔍 Barre de recherche
     path('search/', search_view, name='search'),
 
