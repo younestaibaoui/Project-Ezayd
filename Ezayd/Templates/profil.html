@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Profil Utilisateur</title>
+</head>
+<body>
+    <h1>Profil Utilisateur</h1>
+
+    {% if user %}
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Nom d'utilisateur:</strong> {{ user.username }}</p>
+        <p><strong>Prénom:</strong> {{ user.first_name }}</p>
+        <p><strong>Nom:</strong> {{ user.last_name }}</p>
+        <p><strong>Actif:</strong> {{ user.is_active }}</p>
+        <p><strong>Admin:</strong> {{ user.is_admin }}</p>
+        <p><strong>Date d'inscription:</strong> {{ user.date_joined }}</p>
+        <p><strong>Dernière connexion:</strong> {{ user.last_login }}</p>
+        <p><strong>Profil spécial:</strong> {{ user.special_profile }}</p>
+        <p><strong>Email vérifié:</strong> {{ user.email_verified }}</p>
+        <p><strong>Dernière chance utilisée:</strong> {{ user.last_chance_participation_used }}</p>
+        <p><strong>Bio:</strong> {{ user.bio|linebreaksbr }}</p>
+
+        {% if user.pfp %}
+            <p><strong>Photo de profil:</strong><br>
+            <img src="{{ user.pfp.url }}" alt="Photo de profil" width="150"></p>
+        {% else %}
+            <p><strong>Photo de profil:</strong> Aucune</p>
+        {% endif %}
+    {% else %}
+        <p>Vous devez être connecté pour voir ce profil.</p>
+    {% endif %}
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Details enchaire</title>
+</head>
+<body>
+    <a href="{% url 'accueil' %}">Accueil</a>
+    <h1>Details Enchaire</h1>
+    <strong style="color: red;">
+    {% if user.is_authenticated %}
+        {% if user in enchaire.savers.all %}
+            Saved
+        {% else %}
+            Not saved
+        {% endif %}
+    {% endif %}
+    </strong>
+    <br>
+    <form method="POST" action="{% url 'toggle_favori' enchaire.id %}">
+        {% csrf_token %}
+        <button type="submit">
+            {% if user in enchere.savers.all %}
+                Unsave
+            {% else %}
+                Save
+            {% endif %}
+        </button>
+    </form>
+
+    {% if demande %}
+        {% if demande.state == 'Approuvée' %}
+            APPROVED
+        {% elif demande.state == 'Rejetée' %}
+            REJECTED  
+        {% elif demande.state == 'unread' %}
+            unread
+        {% else %}
+            unread
+        {% endif %}
+    {% endif %}
+    
+    <br>
+    
+    <strong>Nom : {{ lot.nom }}</strong>
+    <br>
+    <strong>Type : {{ lot.type }}</strong>
+    <br>
+    <strong>Description : {{ lot.description }}</strong>
+    <br>
+    <strong>Date d'ajout : {{ lot.date_ajout }}</strong>
+    <br>
+    <hr>
+
+    <strong>Date de début : {{ enchaire.date_debut }}</strong>
+    <br>
+    <strong>Date de fin : {{ enchaire.date_fin }}</strong>
+    <br>
+    <strong>Vendeur : {{ enchaire.seller.username }}</strong>
+    <br>
+    <strong>Etat : {{ enchaire.etat }}</strong>
+    <br>
+    <strong>Details : {{ enchaire.text_highlight }}</strong>
+    <br>
+    <hr>
+    <strong>Details des objets : </h2>
+
+    {% include './objets.html' %}
+
+    
+
+</body>
+</html>

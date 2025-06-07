@@ -232,6 +232,9 @@ class Voiture(models.Model):
         on_delete=models.CASCADE,
     )
 
+    def get_images(self):
+        return [img.image.url for img in self.images.all()]
+
     def clean(self):
         # S'assurer que le lot est de type 'vehicules'
         if self.lot and self.lot.type != 'vehicules':
@@ -294,6 +297,9 @@ class Immobilier(models.Model):
         on_delete=models.CASCADE
     )
 
+    def get_images(self):
+        return [img.image.url for img in self.images.all()]
+
     def clean(self):
         if self.lot and self.lot.type != 'immobilier':
             raise ValidationError("Un bien immobilier doit appartenir à un lot de type 'Immobilier'.")
@@ -348,6 +354,9 @@ class MaterielProfessionnel(models.Model):
         on_delete=models.CASCADE
     )
 
+    def get_images(self):
+        return [img.image.url for img in self.images.all()]
+
     def clean(self):
         if self.lot and self.lot.type != 'materiel_pro':
             raise ValidationError("Le matériel professionnel doit appartenir à un lot de type 'Matériel professionnel'.")
@@ -400,6 +409,9 @@ class InformatiqueElectronique(models.Model):
         on_delete=models.CASCADE
     )
 
+    def get_images(self):
+        return [img.image.url for img in self.images.all()]
+
     def clean(self):
         if self.lot.type != 'informatique_electronique':
             raise ValidationError("Ce produit doit appartenir à un lot de type 'Informatique & électronique'.")
@@ -432,6 +444,9 @@ class MobilierEquipement(models.Model):
         null=False,
         on_delete=models.CASCADE
     )
+
+    def get_images(self):
+        return [img.image.url for img in self.images.all()]
 
     def clean(self):
         if self.lot.type != 'mobilier_equipements':
@@ -466,6 +481,9 @@ class BijouxObjetValeur(models.Model):
         on_delete=models.CASCADE
     )
 
+    def get_images(self):
+        return [img.image.url for img in self.images.all()]
+    
     def clean(self):
         if self.lot.type != 'bijoux_objets_valeur':
             raise ValidationError("Cet objet doit appartenir à un lot de type 'Bijoux & objets de valeur'.")
@@ -497,6 +515,9 @@ class StockInvendu(models.Model):
         null=False,
         on_delete=models.CASCADE
     )
+
+    def get_images(self):
+        return [img.image.url for img in self.images.all()]
 
     def clean(self):
         if self.lot.type != 'stocks_invendus':
@@ -531,6 +552,9 @@ class OeuvreCollection(models.Model):
         null=False,
         on_delete=models.CASCADE
     )
+
+    def get_images(self):
+        return [img.image.url for img in self.images.all()]
 
     def clean(self):
         if self.lot.type != 'oeuvres_collections':

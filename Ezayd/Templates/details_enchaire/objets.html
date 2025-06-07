@@ -1,0 +1,56 @@
+{% if objets %}
+    <ul>
+        {% for objet in objets %}
+            <li>
+                <a href="{% url 'details_objet' lot.type objet.id %}">
+                    <strong>
+                        Link
+                    </strong>
+                </a>
+                <br>
+                {% if lot.type == 'vehicules' %}
+                        <strong>Marque:</strong> {{ objet.nom }} <br>
+                        <strong>Modèle:</strong> {{ objet.model }} <br>
+                        <strong>Année:</strong> {{ objet.year }}
+                {% elif lot.type == 'immobilier' %}
+                        <strong>Adresse:</strong> {{ objet.adresse }} <br>
+                        <strong>Surface:</strong> {{ objet.surface }} m² <br>
+                        <strong>Nombre de pieces:</strong> {{ objet.nombre_pieces }} 
+                {% elif lot.type == 'materiel_pro' %}
+                        <strong>Nom:</strong> {{ objet.nom }} <br>
+                        <strong>Catégorie:</strong> {{ objet.type_materiel }} <br>
+                        <strong>Année de fabrication:</strong> {{ objet.annee_fabrication }}
+                {% elif lot.type == 'informatique_electronique' %}
+                        <strong>Marque:</strong> {{ objet.marque }} <br>
+                        <strong>Type:</strong> {{ objet.type_objet }} <br>
+                        <strong>Spécifications:</strong> {{ objet.etat }}
+                {% elif lot.type == 'mobilier_equipements' %}
+                        <strong>Type:</strong> {{ objet.categorie }} <br>
+                        <strong>Description:</strong> {{ objet.description }}
+                {% elif lot.type == 'bijoux_objets_valeur' %}
+                        <strong>Type:</strong> {{ objet.type_objet }} <br>
+                        <strong>Carats:</strong> {{ objet.carats }} <br>
+                        <strong>Description:</strong> {{ objet.description }} 
+                {% elif lot.type == 'stocks_invendus' %}
+                        <strong>Produit:</strong> {{ objet.nom_produit }} <br>
+                        <strong>Quantité:</strong> {{ objet.quantite }} <br>
+                        <strong>Description:</strong> {{ objet.description }} 
+                {% elif lot.type == 'oeuvres_collections' %}
+                        <strong>Artiste:</strong> {{ objet.artiste }} <br>
+                        <strong>Titre:</strong> {{ objet.titre }} <br>
+                        <strong>Année:</strong> {{ objet.annee_creation }}
+                {% else %}
+                    Type de lot inconnu ou non supporté.
+                {% endif %}
+
+                {% for image in objet.get_images %}
+                    <br>
+                    <img src="{{ image }}" alt="Image de l'objet" width="150">
+                {% endfor %}
+            </li>
+        {% endfor %}
+        
+    </ul>
+{% else %}
+    <p>Aucun objet trouvé pour ce lot.</p>
+{% endif %}

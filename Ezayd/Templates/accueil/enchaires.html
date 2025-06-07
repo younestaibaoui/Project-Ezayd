@@ -253,12 +253,11 @@
     <article
       class="auction-card {% if user in enchere.savers.all %}bookmarked{% endif %}"
       role="listitem"
+      data-url="{% url 'details_enchaire' enchere.id %}"
+      onclick="window.location.href = this.getAttribute('data-url')"
+      style="cursor: pointer;"
     >
       <div class="card-image">
-        <div class="lot-type-badge {{ enchere.lot_type|lower }}">
-          {{ enchere.lot_type }}
-        </div>
-
         {% if enchere.main_image_url %}
         <img
           src="{{ enchere.main_image_url }}"

@@ -4,7 +4,7 @@ from .models import Enchaire
 from django.utils import timezone
 from django.shortcuts import render
 from django.utils import timezone
-from .models import Enchaire
+from .models import Enchaire, Voiture, Immobilier, MaterielProfessionnel, InformatiqueElectronique, MobilierEquipement, BijouxObjetValeur, StockInvendu, OeuvreCollection
 from django.shortcuts import render
 from django.utils import timezone
 
@@ -75,7 +75,7 @@ def accueil(request):
         enchere.main_image_url = random.choice(all_images) if all_images else None
 
 
-    return render(request, 'accueil.html', {'enchaires': enchaires})
+    return render(request, 'accueil/accueil.html', {'enchaires': enchaires})
 
 
 
@@ -92,11 +92,76 @@ def toggle_favori(request, enchere_id):
         enchere.savers.remove(request.user)
     else:
         enchere.savers.add(request.user)
-    return redirect('accueil')  # Redirige vers la page principale
+    return redirect(request.META.get('HTTP_REFERER', 'accueil'))
 
+def details_view(request, enchere_id):
+     
+    enchaire = get_object_or_404(Enchaire, id=enchere_id)
+    lot = enchaire.lot
 
+    if request.user.is_authenticated:
+        demande = enchaire.demande
 
+    lot_type = lot.type
 
+    objets = {}
+
+    if lot_type == 'vehicules':
+        objets = lot.voitures.all()
+    elif lot_type == 'immobilier':
+        objets = lot.immobiliers.all()
+    elif lot_type == 'materiel_pro':
+        objets = lot.materiels.all()
+    elif lot_type == 'informatique_electronique':
+        objets = lot.informatique.all()
+    elif lot_type == 'mobilier_equipements':
+        objets = lot.mobilier.all()
+    elif lot_type == 'bijoux_objets_valeur':
+        objets = lot.bijoux.all()
+    elif lot_type == 'stocks_invendus':
+        objets = lot.stocks.all()
+    elif lot_type == 'oeuvres_collections':
+        objets = lot.oeuvres.all()
+
+    context = {
+        'enchaire' : enchaire,
+        'demande' : demande if request.user.is_authenticated else None,
+        'lot' : lot,
+        'objets' : objets,
+    }
+
+    return render(request, 'details_enchaire/details_enchaire.html', context)
+
+def details_objet_view(request, type_objet, objet_id):
+
+    if type_objet == 'vehicules':
+        objet = get_object_or_404(Voiture, id=objet_id)
+    elif type_objet == 'immobilier':
+        objet = get_object_or_404(Immobilier, id=objet_id)
+    elif type_objet == 'materiel_pro':
+        objet = get_object_or_404(MaterielProfessionnel, id=objet_id)
+    elif type_objet == 'informatique_electronique':
+        objet = get_object_or_404(InformatiqueElectronique, id=objet_id)
+    elif type_objet == 'mobilier_equipements':
+        objet = get_object_or_404(MobilierEquipement, id=objet_id)
+    elif type_objet == 'bijoux_objets_valeur':
+        objet = get_object_or_404(BijouxObjetValeur, id=objet_id)
+    elif type_objet == 'stocks_invendus':
+        objet = get_object_or_404(StockInvendu, id=objet_id)
+    elif type_objet == 'oeuvres_collections':
+        objet = get_object_or_404(OeuvreCollection, id=objet_id)
+
+    enchaire = objet.lot.enchaire.id
+    enchaireObjet = objet.enchaireObjet
+
+    context = {
+        'enchaireObjet': enchaireObjet,
+        'type_objet': type_objet,
+        'objet': objet,
+        'enchaire_id': enchaire,       
+    }
+
+    return render(request, 'details_objet/details_objet.html', context)
 # -----------------------------------------------------------------
 
 # views.py
@@ -116,5 +181,11 @@ def panier_view(request):
     return render(request, 'panier.html', {'items': panier_items})
 
 def profil_view(request):
-    return render(request, 'profil.html')
 
+    if request.user.is_authenticated:
+        context = {}
+        context['user'] = request.user
+    else:
+        redirect('connexion')  
+
+    return render(request, 'profil.html', context)

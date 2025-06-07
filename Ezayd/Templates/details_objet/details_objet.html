@@ -1,0 +1,188 @@
+<a href="{% url 'details_enchaire' enchaire_id %}">
+    <h1>
+        Enchaire
+    </h1>
+</a>
+<br>
+<p>First Price: {{ enchaireObjet.first_price }}</p>
+<p>Pas: {{ enchaireObjet.pas }}</p>
+
+{% if enchaireObjet.price_reserved %}
+    <p>Price Reserved: {{ enchaireObjet.price_reserved }}</p>
+    <p>Winner: {{ enchaireObjet.winner }}</p>
+{% else %}
+    <p>No reserve price set.</p>
+{% endif %}
+<br>
+{% if type_objet == 'vehicules' %}
+    <h2>{{ objet.nom }} - {{ objet.model }} ({{ objet.year }})</h2>
+
+    <ul>
+        <li><strong>Chassis Number:</strong> {{ objet.numero_chassis }}</li>
+        <li><strong>État:</strong> {{ objet.etat }}</li>
+        <li><strong>Couleur:</strong> {{ objet.couleur }}</li>
+        <li><strong>Détails:</strong> {{ objet.details }}</li>
+
+        {% if objet.youtube_video %}
+            <li>
+                <strong>Vidéo:</strong> 
+                <a href="{{ objet.youtube_video }}" target="_blank">Voir sur YouTube</a>
+            </li>
+        {% endif %}
+
+        <li><strong>Climatiseur:</strong> {{ objet.climatiseur|yesno:"Oui,Non" }}</li>
+        <li><strong>GPS Navigation:</strong> {{ objet.gps_navigation|yesno:"Oui,Non" }}</li>
+        <li><strong>Toit Ouvrant:</strong> {{ objet.toit_ouvrant|yesno:"Oui,Non" }}</li>
+        <li><strong>Sièges Ventilés:</strong> {{ objet.sieges_ventiles|yesno:"Oui,Non" }}</li>
+        <li><strong>Caméra de Recul:</strong> {{ objet.camera_recul|yesno:"Oui,Non" }}</li>
+        <li><strong>Capteurs de Stationnement:</strong> {{ objet.capteurs_stationnement|yesno:"Oui,Non" }}</li>
+        <li><strong>Régulateur de Vitesse:</strong> {{ objet.regulateur_vitesse|yesno:"Oui,Non" }}</li>
+        <li><strong>Régulateur de Vitesse Adaptatif:</strong> {{ objet.regulateur_vitesse_adaptatif|yesno:"Oui,Non" }}</li>
+    </ul>
+{% elif type_objet == 'immobilier' %}
+    <h2>{{ objet.titre }}</h2>
+    <ul>
+        <li><strong>Type de bien:</strong> {{ objet.type_bien }}</li>
+        <li><strong>Surface:</strong> {{ objet.surface }} m²</li>
+        <li><strong>Adresse:</strong> {{ objet.adresse }}</li>
+        <li><strong>Ville:</strong> {{ objet.ville }}</li>
+        <li><strong>Code Postal:</strong> {{ objet.code_postal }}</li>
+        <li><strong>Description:</strong> {{ objet.description }}</li>
+
+        {% if objet.nombre_pieces %}
+            <li><strong>Nombre de pièces:</strong> {{ objet.nombre_pieces }}</li>
+        {% endif %}
+        {% if objet.nombre_chambres %}
+            <li><strong>Nombre de chambres:</strong> {{ objet.nombre_chambres }}</li>
+        {% endif %}
+        {% if objet.salle_de_bain %}
+            <li><strong>Salle(s) de bain:</strong> {{ objet.salle_de_bain }}</li>
+        {% endif %}
+
+        <li><strong>Garage:</strong> {{ objet.garage|yesno:"Oui,Non" }}</li>
+        <li><strong>Jardin:</strong> {{ objet.jardin|yesno:"Oui,Non" }}</li>
+        <li><strong>Piscine:</strong> {{ objet.piscine|yesno:"Oui,Non" }}</li>
+
+        {% if objet.date_construction %}
+            <li><strong>Année de construction:</strong> {{ objet.date_construction|date:"Y" }}</li>
+        {% endif %}
+    </ul>
+{% elif type_objet == 'materiel_pro' %}
+    <h2>{{ objet.nom }}</h2>
+    <ul>
+        <li><strong>Type de matériel:</strong> {{ objet.type_materiel }}</li>
+        {% if objet.marque %}
+            <li><strong>Marque:</strong> {{ objet.marque }}</li>
+        {% endif %}
+        {% if objet.modele %}
+            <li><strong>Modèle:</strong> {{ objet.modele }}</li>
+        {% endif %}
+        {% if objet.annee_fabrication %}
+            <li><strong>Année de fabrication:</strong> {{ objet.annee_fabrication }}</li>
+        {% endif %}
+        {% if objet.etat %}
+            <li><strong>État:</strong> {{ objet.etat }}</li>
+        {% endif %}
+        {% if objet.puissance %}
+            <li><strong>Puissance:</strong> {{ objet.puissance }}</li>
+        {% endif %}
+        {% if objet.poids %}
+            <li><strong>Poids:</strong> {{ objet.poids }} kg</li>
+        {% endif %}
+
+        <li><strong>Description:</strong> {{ objet.description }}</li>
+        <li><strong>Disponibilité:</strong> {{ objet.disponibilite|yesno:"Disponible,Indisponible" }}</li>
+    </ul>
+{% elif type_objet == 'informatique_electronique' %}
+    <h2>{{ objet.type_objet }}</h2>
+    <ul>
+        {% if objet.marque %}
+            <li><strong>Marque:</strong> {{ objet.marque }}</li>
+        {% endif %}
+
+        {% if objet.modele %}
+            <li><strong>Modèle:</strong> {{ objet.modele }}</li>
+        {% endif %}
+
+        {% if objet.annee %}
+            <li><strong>Année:</strong> {{ objet.annee }}</li>
+        {% endif %}
+
+        <li><strong>Description:</strong> {{ objet.description }}</li>
+
+        {% if objet.etat %}
+            <li><strong>État:</strong> {{ objet.etat }}</li>
+        {% endif %}
+        <li><strong>Garantie:</strong> {{ objet.garantie|yesno:"Oui,Non" }}</li>
+    </ul>
+{% elif type_objet == 'mobilier_equipements' %}
+    <h2>{{ objet.categorie }}</h2>
+    <ul>
+        {% if objet.materiau %}
+            <li><strong>Matériau:</strong> {{ objet.materiau }}</li>
+        {% endif %}
+        
+        {% if objet.couleur %}
+            <li><strong>Couleur:</strong> {{ objet.couleur }}</li>
+        {% endif %}
+
+        {% if objet.dimensions %}
+            <li><strong>Dimensions:</strong> {{ objet.dimensions }}</li>
+        {% endif %}
+
+        <li><strong>Description:</strong> {{ objet.description }}</li>
+
+        {% if objet.etat %}
+            <li><strong>État:</strong> {{ objet.etat }}</li>
+        {% endif %}
+    </ul>
+{% elif type_objet == 'bijoux_objets_valeur' %}
+    <h2>{{ objet.type_objet }}</h2>
+    <ul>
+        <li><strong>Matière:</strong> {{ objet.matiere }}</li>
+        <li><strong>Poids:</strong> {{ objet.poids }} g</li>
+
+        {% if objet.carats %}
+            <li><strong>Carats:</strong> {{ objet.carats }}</li>
+        {% endif %}
+
+        <li><strong>Description:</strong> {{ objet.description }}</li>
+    </ul>
+{% elif type_objet == 'stocks_invendus' %}
+    <h2>{{ objet.nom_produit }}</h2>
+    <ul>
+        <li><strong>Quantité:</strong> {{ objet.quantite }} {{ objet.unite }}</li>
+        <li><strong>Description:</strong> {{ objet.description }}</li>
+    </ul>
+{% elif type_objet == 'oeuvres_collections' %}
+    <h2>{{ objet.titre }}</h2>
+    <ul>
+        {% if objet.artiste %}
+            <li><strong>Artiste:</strong> {{ objet.artiste }}</li>
+        {% endif %}
+
+        {% if objet.annee_creation %}
+            <li><strong>Année de création:</strong> {{ objet.annee_creation }}</li>
+        {% endif %}
+
+        <li><strong>Type d'œuvre:</strong> {{ objet.type_oeuvre }}</li>
+
+        {% if objet.dimensions %}
+            <li><strong>Dimensions:</strong> {{ objet.dimensions }}</li>
+        {% endif %}
+
+        {% if objet.technique %}
+            <li><strong>Technique:</strong> {{ objet.technique }}</li>
+        {% endif %}
+
+        <li><strong>Description:</strong> {{ objet.description }}</li>
+    </ul>
+{% else %}
+    Type de lot inconnu ou non supporté.
+{% endif %}
+
+{% for image in objet.get_images %}
+    <br>
+    <img src="{{ image }}" alt="Image de l'objet" width="150">
+{% endfor %}
+
