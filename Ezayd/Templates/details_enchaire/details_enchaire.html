@@ -4,9 +4,7 @@
 
 {% block title %}Ezayd - {{ lot.nom }}{% endblock %}
 {% block content %}
-
-   
-<div style=" min-height: 100vh; padding-top : 40px; color: #fff;">
+<div style=" min-height: 100vh; padding-top : 80px; color: #fff;">
     <!-- Breadcrumb Navigation -->
     <nav style="margin-bottom: 24px;">
         <div style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #adb5bd;">
@@ -309,25 +307,6 @@
 </div>
 
 
-<style>
-
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-
-/* Badge colors pour les types de lots */
-.lot-type-badge.vehicules { background: #1e88e5 !important; }
-.lot-type-badge.immobilier { background: #43a047 !important; }
-.lot-type-badge.materiel_pro { background: #f4511e !important; }
-.lot-type-badge.informatique_electronique { background: #5e35b1 !important; }
-.lot-type-badge.mobilier_equipements { background: #00897b !important; }
-.lot-type-badge.bijoux_objets_valeur { background: #fdd835 !important; color: #000 !important; }
-.lot-type-badge.stocks_invendus { background: #6d4c41 !important; }
-.lot-type-badge.oeuvres_collections { background: #9e9e9e !important; }
-</style>
-
 <script>
 // Variables globales pour le carrousel
 let currentImageIndex = {};
@@ -435,5 +414,19 @@ document.addEventListener('keydown', function(event) {
     }
 });
 </script>
+
+<style>
+
+/* Badge colors pour les types de lots */
+.lot-type-badge.vehicules { background: #1e88e5 !important; }
+.lot-type-badge.immobilier { background: #43a047 !important; }
+.lot-type-badge.materiel_pro { background: #f4511e !important; }
+.lot-type-badge.informatique_electronique { background: #5e35b1 !important; }
+.lot-type-badge.mobilier_equipements { background: #00897b !important; }
+.lot-type-badge.bijoux_objets_valeur { background: #fdd835 !important; color: #000 !important; }
+.lot-type-badge.stocks_invendus { background: #6d4c41 !important; }
+.lot-type-badge.oeuvres_collections { background: #9e9e9e !important; }
+</style>
+
 
 {% endblock %}

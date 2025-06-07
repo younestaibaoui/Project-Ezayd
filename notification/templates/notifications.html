@@ -1,12 +1,313 @@
-<h2> {{user.username}} </h2>
+{% extends "./base.html" %}
+{% load static %}
 
-{% if unread_count == 0 %}
-    <p>no notifications</p>
-{% else %}
-    <p>Unread notifications: {{ unread_count }}</p>
-    <ul>
-        {% for notification in notifications %}
-            {% include './notification.html' %}
-        {% endfor %}
-    </ul>
-{% endif %}
+{% block title %}Ezayd - Notifications{% endblock %}
+{% block content %}
+
+<style>
+    .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 80px 20px 40px;
+    }
+
+    .notifications-container {
+        background: rgba(45, 45, 45, 0.95);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(20px);
+        overflow: hidden;
+        position: relative;
+    }
+
+    .notifications-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(255, 107, 53, 0.5), transparent);
+    }
+
+    .notifications-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 30px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        background: linear-gradient(135deg, rgba(255, 107, 53, 0.1) 0%, transparent 100%);
+    }
+
+    .header-left h2 {
+        font-size: 32px;
+        font-weight: 800;
+        color: #fff;
+        margin: 0 0 8px 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .header-left h2 i {
+        color: #ff6b35;
+        filter: drop-shadow(0 0 10px rgba(255, 107, 53, 0.3));
+    }
+
+    .header-left p {
+        color: #adb5bd;
+        font-size: 14px;
+        margin: 0;
+    }
+
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .notification-counter {
+        background: linear-gradient(135deg, #333 0%, #404040 100%);
+        padding: 12px 20px;
+        border-radius: 25px;
+        color: #fff;
+        font-size: 14px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: transform 0.3s ease;
+    }
+
+    .notification-counter:hover {
+        transform: translateY(-2px);
+    }
+
+    .notification-counter i {
+        color: #ff6b35;
+    }
+
+    .notification-counter.empty {
+        background: linear-gradient(135deg, #444 0%, #555 100%);
+        color: #adb5bd;
+    }
+
+    .mark-all-read-btn {
+        background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 25px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+        text-decoration: none;
+    }
+
+    .mark-all-read-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 25px rgba(255, 107, 53, 0.4);
+    }
+
+    .no-notifications {
+        background: linear-gradient(135deg, rgba(51, 51, 51, 0.8) 0%, rgba(68, 68, 68, 0.6) 100%);
+        padding: 60px 30px;
+        margin: 30px;
+        border-radius: 16px;
+        text-align: center;
+        color: #adb5bd;
+        border: 1px dashed rgba(255, 255, 255, 0.1);
+    }
+
+    .no-notifications i {
+        font-size: 64px;
+        margin-bottom: 20px;
+        color: #555;
+        display: block;
+    }
+
+    .no-notifications h3 {
+        color: #fff;
+        font-size: 20px;
+        margin-bottom: 8px;
+        font-weight: 600;
+    }
+
+    .notifications-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        padding: 30px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .stat-card {
+        background: linear-gradient(135deg, rgba(51, 51, 51, 0.8) 0%, rgba(68, 68, 68, 0.6) 100%);
+        padding: 20px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        text-align: center;
+        transition: transform 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+    }
+
+    .stat-number {
+        font-size: 28px;
+        font-weight: 800;
+        color: #ff6b35;
+        margin-bottom: 4px;
+        display: block;
+    }
+
+    .stat-label {
+        color: #adb5bd;
+        font-size: 12px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .notifications-content {
+        padding: 30px;
+    }
+
+    .notifications-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    .success-message {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        padding: 16px 24px;
+        border-radius: 12px;
+        margin: 20px 30px;
+        display: none;
+        align-items: center;
+        gap: 12px;
+        font-weight: 600;
+        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+    }
+
+    /* Animations */
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+
+    .notification-counter:not(.empty) i {
+        animation: pulse 2s infinite;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .container {
+            padding: 60px 10px 20px;
+        }
+
+        .notifications-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .header-actions {
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        .header-left h2 {
+            font-size: 24px;
+        }
+
+        .notifications-stats {
+            grid-template-columns: 1fr;
+            padding: 20px;
+        }
+
+        .notifications-content {
+            padding: 20px;
+        }
+
+        .mark-all-read-btn {
+            padding: 10px 16px;
+            font-size: 13px;
+        }
+    }
+</style>
+
+<div class="container">
+    <div class="notifications-container">
+        <div class="notifications-header">
+            <div class="header-left">
+                <h2>
+                    <i class="fas fa-bell"></i>
+                    Notifications
+                </h2>
+                <p>Bonjour {{ user.username }}, voici vos dernières notifications</p>
+            </div>
+            
+            <div class="header-actions">
+                {% if notifications.count == 0 %}
+                    <div class="notification-counter empty">
+                        <i class="fas fa-bell-slash"></i>
+                        Aucune notification
+                    </div>
+                {% else %}
+                    <div class="notification-counter">
+                        <i class="fas fa-bell"></i>
+                        {{ unread_count }} non lue{{ unread_count|pluralize }}
+                    </div>
+                    {% if unread_count > 0 %}
+                        <a href="{% url 'mark_all_as_read' %}" class="mark-all-read-btn">
+                            <i class="fas fa-check-double"></i>
+                            Marquer tout comme lu
+                        </a>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+
+        <div id="successMessage" class="success-message">
+            <i class="fas fa-check-circle"></i>
+            Toutes les notifications ont été marquées comme lues !
+        </div>
+
+        {% if notifications.count == 0 %}
+            <div class="no-notifications">
+                <i class="fas fa-inbox"></i>
+                <h3>Aucune notification</h3>
+                <p>Vous êtes à jour ! Aucune nouvelle notification pour le moment.</p>
+            </div>
+        {% else %}
+        
+
+            <div class="notifications-content">
+                <ul class="notifications-list">
+                    {% for notification in notifications %}
+                        <li>
+                            {% include './notification.html' %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

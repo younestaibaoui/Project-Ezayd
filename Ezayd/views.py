@@ -97,8 +97,12 @@ def accueil(request):
         unread_count = notifications.filter(is_read=False).count()
     else:
         unread_count = 0
-
+    
+    # Récupérer les notifications de l'utilisateur connecté
+    notifications = request.user.notifications.all().order_by('-created_at')    
     context['unread_count'] = unread_count
+    context['notifications'] = notifications
+   
 
 
     return render(request, 'accueil/accueil.html', context)
@@ -112,10 +116,6 @@ def toggle_favori(request, enchere_id):
     else:
         enchere.savers.add(request.user)
     return redirect(request.META.get('HTTP_REFERER', 'accueil'))
-
-
-
-
 
 def details_view(request, enchere_id):
      
@@ -158,8 +158,12 @@ def details_view(request, enchere_id):
         unread_count = notifications.filter(is_read=False).count()
     else:
         unread_count = 0
-
+    
+    
+    # Récupérer les notifications de l'utilisateur connecté
+    notifications = request.user.notifications.all().order_by('-created_at')    
     context['unread_count'] = unread_count
+    context['notifications'] = notifications
 
     return render(request, 'details_enchaire/details_enchaire.html', context)
 
@@ -197,8 +201,11 @@ def details_objet_view(request, type_objet, objet_id):
         unread_count = notifications.filter(is_read=False).count()
     else:
         unread_count = 0
-
+    
+    # Récupérer les notifications de l'utilisateur connecté
+    notifications = request.user.notifications.all().order_by('-created_at')
     context['unread_count'] = unread_count
+    context['notifications'] = notifications
 
     return render(request, 'details_objet/details_objet.html', context)
 
@@ -251,7 +258,10 @@ def profil_view(request):
         unread_count = notifications.filter(is_read=False).count()
     else:
         unread_count = 0
-
+    
+    # Récupérer les notifications de l'utilisateur connecté
+    notifications = request.user.notifications.all().order_by('-created_at')
     context['unread_count'] = unread_count
+    context['notifications'] = notifications
 
     return render(request, 'profil.html', context)

@@ -19,8 +19,17 @@ class NotificationEnchaire(models.Model):
         return f"Notification for {self.user} about Enchaire #{self.enchaire.id}"
 
 class NotificationDemandeEnchaire(models.Model):
-    user = models.ForeignKey('perso.UserAccount', on_delete=models.CASCADE)
-    enchaire = models.ForeignKey('Ezayd.Enchaire', on_delete=models.CASCADE,default=2)
+    user = models.ForeignKey(
+        'perso.UserAccount',
+        on_delete=models.CASCADE,
+        related_name='notifications_demande'  # change this to a more descriptive name
+    )
+    enchaire = models.ForeignKey(
+        'Ezayd.Enchaire',
+        on_delete=models.CASCADE,
+        default=2,
+        related_name='notifications_demande'  # change as needed
+    )
     message = models.CharField(max_length=255)
     link = models.URLField(blank=True, null=True)
     is_read = models.BooleanField(default=False)

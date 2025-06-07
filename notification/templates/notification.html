@@ -1,5 +1,215 @@
+<style>
+    
+    /* Style pour les notifications individuelles */
+    .notification-item {
+        display: block;
+        background: linear-gradient(135deg, rgba(51, 51, 51, 0.9) 0%, rgba(68, 68, 68, 0.7) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 10px;
+        text-decoration: none;
+        color: #fff;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 12px;
+    }
+
+    .notification-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .notification-item:hover {
+        transform: translateX(8px);
+        background: linear-gradient(135deg, rgba(68, 68, 68, 0.9) 0%, rgba(85, 85, 85, 0.7) 100%);
+        border-color: rgba(255, 107, 53, 0.3);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .notification-item:hover::before {
+        opacity: 1;
+    }
+
+    /* Notification non lue */
+    .notification-item.unread {
+        background: linear-gradient(135deg, rgba(255, 107, 53, 0.15) 0%, rgba(51, 51, 51, 0.9) 100%);
+        border-color: rgba(255, 107, 53, 0.2);
+    }
+
+    .notification-item.unread::before {
+        opacity: 1;
+    }
+
+    .notification-item.unread:hover {
+        background: linear-gradient(135deg, rgba(255, 107, 53, 0.25) 0%, rgba(68, 68, 68, 0.9) 100%);
+        border-color: rgba(255, 107, 53, 0.4);
+    }
+
+    /* Contenu de la notification */
+    .notification-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+    }
+
+    .notification-message {
+        flex: 1;
+        font-size: 15px;
+        line-height: 1.5;
+        color: #fff;
+        font-weight: 500;
+    }
+
+    .notification-item.unread .notification-message {
+        font-weight: 600;
+    }
+
+    /* Badge "New" */
+    .notification-new {
+        background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 2px 8px rgba(255, 107, 53, 0.4);
+        animation: pulse-badge 2s infinite;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .notification-new::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        animation: shimmer 2s infinite;
+    }
+
+    /* Icône de notification */
+    .notification-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, rgba(255, 107, 53, 0.2) 0%, rgba(255, 107, 53, 0.1) 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 16px;
+        flex-shrink: 0;
+        border: 1px solid rgba(255, 107, 53, 0.3);
+    }
+
+    .notification-icon i {
+        color: #ff6b35;
+        font-size: 16px;
+    }
+
+    /* Métadonnées de la notification */
+    .notification-meta {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        margin-top: 8px;
+        padding-top: 12px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .notification-time {
+        color: #adb5bd;
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    .notification-type {
+        background: rgba(255, 255, 255, 0.1);
+        color: #adb5bd;
+        padding: 2px 8px;
+        border-radius: 8px;
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Animations */
+    @keyframes pulse-badge {
+        0%, 100% {
+            transform: scale(1);
+            box-shadow: 0 2px 8px rgba(255, 107, 53, 0.4);
+        }
+        50% {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.6);
+        }
+    }
+
+    @keyframes shimmer {
+        0% {
+            left: -100%;
+        }
+        100% {
+            left: 100%;
+        }
+    }
+
+    /* États de lecture */
+    .notification-item.read {
+        opacity: 0.8;
+    }
+
+    .notification-item.read .notification-message {
+        color: #adb5bd;
+    }
+
+    .notification-item.read:hover .notification-message {
+        color: #fff;
+    }
+
+</style>
+
 <li>
-    <a href="{% url 'details_enchaire' notification.enchaire.id %}">
-        {{ notification.message }}
+    <a href="{% url 'mark_as_read' notification.id %}" 
+       class="notification-item {% if not notification.is_read %}unread{% else %}read{% endif %}">
+        
+        <div class="notification-content">
+            <div class="notification-icon">
+                <i class="fas fa-bell"></i>
+            </div>
+            
+            <div style="flex: 1;">
+                <div class="notification-message">
+                    {{ notification.message }}
+                </div>
+                
+                <div class="notification-meta">
+                    <span class="notification-time">
+                        <i class="fas fa-clock"></i>
+                        {{ notification.created_at|timesince }} ago
+                    </span>
+                    <span class="notification-type">
+                        {{ notification.type|default:"Info" }}
+                    </span>
+                </div>
+            </div>
+            
+            {% if not notification.is_read %}
+                <span class="notification-new">New</span>
+            {% endif %}
+        </div>
     </a>
 </li>
