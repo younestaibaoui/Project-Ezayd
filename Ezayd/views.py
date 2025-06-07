@@ -169,6 +169,7 @@ def details_objet_view(request, type_objet, objet_id):
     return render(request, 'details_objet/details_objet.html', context)
 
 @require_POST
+@login_required
 def demande(request):
     user_id = request.POST.get('user')
     enchaire_id = request.POST.get('enchaire')
