@@ -201,29 +201,29 @@ def details_objet_view(request, type_objet, objet_id):
     enchaire = objet.lot.enchaire.id
     enchaireObjet = objet.enchaireObjet
 
-    valid = True
+    is_winner = False
     if request.user.is_authenticated:
         winner = enchaireObjet.winner
 
         if winner and winner == request.user:
-            valid = False 
+            is_winner = True 
 
     demande = DemandeEnchaire.objects.filter(user=request.user, enchaire=enchaire).first() if request.user.is_authenticated else None
     demande_state = demande.state if demande else None
-
    
-    current_price = enchaireObjet.price_reserved or enchaireObjet.first_price
+    participations = enchaireObjet.participations.all().order_by('-date_participation') if enchaireObjet else None
+    participation_count = participations.values('user').distinct().count() if participations else 0
 
 
     context = {
-        'enchaireObjet': enchaireObjet,
+        'enchaire_id': enchaire,
         'type_objet': type_objet,
-        'objet': objet,
-        'enchaire_id': enchaire, 
-        'valid': valid,
-        'demande_state': demande_state,    
-        'participation_count' : enchaireObjet.participations.values('user').distinct().count() if enchaireObjet else 0,
-        'current_price': current_price,
+        'objet': objet, 
+        'enchaireObjet': enchaireObjet,
+        'participations': participations, 
+        'participation_count' : participation_count,
+        'is_winner': is_winner,
+        'demande_state': demande_state,  
     }
     
     if request.user.is_authenticated:
@@ -276,6 +276,7 @@ def panier_view(request):
     panier_items = []  # Exemple : Panier.objects.filter(user=request.user)
     return render(request, 'panier.html', {'items': panier_items})
 
+@login_required
 def profil_view(request):
 
     if request.user.is_authenticated:

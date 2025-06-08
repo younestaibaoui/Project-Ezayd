@@ -20,7 +20,6 @@
         padding: 0x;
     }
 
-
     /* Breadcrumb */
     .breadcrumb {
         margin-bottom: 24px;
@@ -508,6 +507,24 @@
         background: linear-gradient(135deg, #e60000 0%, #b30000 100%);
     }
 
+    .participate-btn-en-tete {
+        width: 100%;
+        background: linear-gradient(135deg, #e60000 0%, #b30000 100%);
+        color: white;
+        border: none;
+        padding: 16px 20px;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
     .participate-btn:active {
         transform: translateY(0);
         box-shadow: 0 2px 10px rgba(255, 0, 0, 0.3);
@@ -575,87 +592,315 @@
             font-size: 13px;
         }
     }
+
+    /* Styles pour la carte des participants */
+    .participants-card {
+        background-color: #2d2d2d;
+        border-radius: 12px;
+        padding: 24px;
+        border: 1px solid #404040;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        margin-top: 0px;
+    }
+
+    .participant-list {
+        margin-top: 16px;
+    }
+
+    .participant-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px;
+        background-color: #333;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        transition: all 0.2s ease;
+    }
+
+    {% comment %} .participant-item:hover {
+        background-color: #3a3a3a;
+        transform: translateX(2px);
+    } {% endcomment %}
+
+    .participant-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .participant-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background-color: #ff6b35;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        flex-shrink: 0;
+    }
+
+    .participant-avatar img {
+        width: 36px;
+        height: 36px;
+        object-fit: cover;   /* Ensures the image fills the square without distortion */
+        border-radius: 50%;  /* Makes it a perfect circle */
+    }
+
+
+    .participant-name {
+        font-weight: 500;
+        color: #fff;
+    }
+
+    .participant-date {
+        font-size: 12px;
+        color: #adb5bd;
+    }
+
+    .participant-amount {
+        font-weight: 700;
+        color: #ff6b35;
+        background-color: rgba(255, 107, 53, 0.1);
+        padding: 6px 12px;
+        border-radius: 20px;
+    }
+
+    .no-participants {
+        text-align: center;
+        padding: 20px;
+        color: #adb5bd;
+        font-style: italic;
+    }
 </style>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
+<!-- Breadcrumb Navigation -->
+<nav class="breadcrumb">
+    <a href="{% url 'accueil' %}">
+        <i class="fas fa-home"></i>Accueil
+    </a>
+    <i class="fas fa-chevron-right separator"></i>
+    <a href="{% url 'details_enchaire' enchaire_id %}">
+        <i class="fas fa-gavel"></i>Détails de l'enchère
+    </a>
+    <i class="fas fa-chevron-right separator"></i>
+    <span>Détails de l'objet</span>
+</nav>
 
-    <!-- Breadcrumb Navigation -->
-    <nav class="breadcrumb">
-        <a href="{% url 'accueil' %}">
-            <i class="fas fa-home"></i>Accueil
-        </a>
-        <i class="fas fa-chevron-right separator"></i>
-        <a href="{% url 'details_enchaire' enchaire_id %}">
-            <i class="fas fa-gavel"></i>Détails de l'enchère
-        </a>
-        <i class="fas fa-chevron-right separator"></i>
-        <span>Détails de l'objet</span>
-    </nav>
-
-    <!-- Header Section -->
-    <div class="header-section">
-        {% if type_objet == 'vehicules' %}
-            <h1 class="object-title">{{ objet.nom }} - {{ objet.model }} ({{ objet.year }})</h1>
-        {% elif type_objet == 'immobilier' %}
-            <h1 class="object-title">{{ objet.titre }}</h1>
-        {% elif type_objet == 'materiel_pro' %}
-            <h1 class="object-title">{{ objet.nom }}</h1>
-        {% elif type_objet == 'informatique_electronique' %}
-            <h1 class="object-title">{{ objet.type_objet }}</h1>
-        {% elif type_objet == 'mobilier_equipements' %}
-            <h1 class="object-title">{{ objet.categorie }}</h1>
-        {% elif type_objet == 'bijoux_objets_valeur' %}
-            <h1 class="object-title">{{ objet.type_objet }}</h1>
-        {% elif type_objet == 'stocks_invendus' %}
-            <h1 class="object-title">{{ objet.nom_produit }}</h1>
-        {% elif type_objet == 'oeuvres_collections' %}
-            <h1 class="object-title">{{ objet.titre }}</h1>
-        {% else %}
-            <h1 class="object-title">Objet</h1>
-        {% endif %}
-
-        
-    <!-- Images Section -->
-    {% if objet.get_images %}
-       
-            <h2 class="section-title">
-                <i class="fas fa-images"></i>
-                Galerie d'images ({{ objet.get_images|length }} image{{ objet.get_images|length|pluralize }})
-            </h2>
-            
-            <div class="images-grid">
-                {% for image in objet.get_images %}
-                    <div class="image-item" onclick="openImageModal({{ forloop.counter0 }})">
-                        <img src="{{ image }}" alt="Image {{ forloop.counter }} de l'objet" loading="lazy">
-                        <div class="image-overlay">
-                            <i class="fas fa-search-plus"></i>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        
+<!-- Header Section -->
+<div class="header-section">
+    {% if type_objet == 'vehicules' %}
+        <h1 class="object-title">{{ objet.nom }} - {{ objet.model }} ({{ objet.year }})</h1>
+    {% elif type_objet == 'immobilier' %}
+        <h1 class="object-title">{{ objet.titre }}</h1>
+    {% elif type_objet == 'materiel_pro' %}
+        <h1 class="object-title">{{ objet.nom }}</h1>
+    {% elif type_objet == 'informatique_electronique' %}
+        <h1 class="object-title">{{ objet.type_objet }}</h1>
+    {% elif type_objet == 'mobilier_equipements' %}
+        <h1 class="object-title">{{ objet.categorie }}</h1>
+    {% elif type_objet == 'bijoux_objets_valeur' %}
+        <h1 class="object-title">{{ objet.type_objet }}</h1>
+    {% elif type_objet == 'stocks_invendus' %}
+        <h1 class="object-title">{{ objet.nom_produit }}</h1>
+    {% elif type_objet == 'oeuvres_collections' %}
+        <h1 class="object-title">{{ objet.titre }}</h1>
+    {% else %}
+        <h1 class="object-title">Objet</h1>
     {% endif %}
-    </div>
 
-    <!-- Main Content Grid -->
-    <div class="content-grid">
-        <!-- Object Details -->
-        <div class="details-section">
-            <h2 class="section-title">
-                <i class="fas fa-info-circle"></i>
-                Détails de l'objet
-            </h2>
-            
-            <div class="details-grid">
-                {% if type_objet == 'vehicules' %}
+    
+<!-- Images Section -->
+{% if objet.get_images %}
+    
+        <h2 class="section-title">
+            <i class="fas fa-images"></i>
+            Galerie d'images ({{ objet.get_images|length }} image{{ objet.get_images|length|pluralize }})
+        </h2>
+        
+        <div class="images-grid">
+            {% for image in objet.get_images %}
+                <div class="image-item" onclick="openImageModal({{ forloop.counter0 }})">
+                    <img src="{{ image }}" alt="Image {{ forloop.counter }} de l'objet" loading="lazy">
+                    <div class="image-overlay">
+                        <i class="fas fa-search-plus"></i>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    
+{% endif %}
+</div>
+
+<!-- Main Content Grid -->
+<div class="content-grid">
+    <!-- Object Details -->
+    <div class="details-section">
+        <h2 class="section-title">
+            <i class="fas fa-info-circle"></i>
+            Détails de l'objet
+        </h2>
+        
+        <div class="details-grid">
+            {% if type_objet == 'vehicules' %}
+                <div class="detail-item">
+                    <i class="fas fa-hashtag"></i>
+                    <div class="detail-content">
+                        <div class="detail-label">Numéro de chassis</div>
+                        <div class="detail-value">{{ objet.numero_chassis }}</div>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-cog"></i>
+                    <div class="detail-content">
+                        <div class="detail-label">État</div>
+                        <div class="detail-value">{{ objet.etat }}</div>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-palette"></i>
+                    <div class="detail-content">
+                        <div class="detail-label">Couleur</div>
+                        <div class="detail-value">{{ objet.couleur }}</div>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-align-left"></i>
+                    <div class="detail-content">
+                        <div class="detail-label">Détails</div>
+                        <div class="detail-value">{{ objet.details }}</div>
+                    </div>
+                </div>
+                {% if objet.youtube_video %}
                     <div class="detail-item">
-                        <i class="fas fa-hashtag"></i>
+                        <i class="fab fa-youtube"></i>
                         <div class="detail-content">
-                            <div class="detail-label">Numéro de chassis</div>
-                            <div class="detail-value">{{ objet.numero_chassis }}</div>
+                            <div class="detail-label">Vidéo</div>
+                            <div class="detail-value">
+                                <a href="{{ objet.youtube_video }}" target="_blank">Voir sur YouTube</a>
+                            </div>
                         </div>
                     </div>
+                {% endif %}
+            {% elif type_objet == 'immobilier' %}
+                <div class="detail-item">
+                    <i class="fas fa-home"></i>
+                    <div class="detail-content">
+                        <div class="detail-label">Type de bien</div>
+                        <div class="detail-value">{{ objet.type_bien }}</div>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-ruler-combined"></i>
+                    <div class="detail-content">
+                        <div class="detail-label">Surface</div>
+                        <div class="detail-value">{{ objet.surface }} m²</div>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <div class="detail-content">
+                        <div class="detail-label">Adresse</div>
+                        <div class="detail-value">{{ objet.adresse }}</div>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-city"></i>
+                    <div class="detail-content">
+                        <div class="detail-label">Ville</div>
+                        <div class="detail-value">{{ objet.ville }}</div>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-mail-bulk"></i>
+                    <div class="detail-content">
+                        <div class="detail-label">Code Postal</div>
+                        <div class="detail-value">{{ objet.code_postal }}</div>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-align-left"></i>
+                    <div class="detail-content">
+                        <div class="detail-label">Description</div>
+                        <div class="detail-value">{{ objet.description }}</div>
+                    </div>
+                </div>
+                {% if objet.nombre_pieces %}
+                    <div class="detail-item">
+                        <i class="fas fa-door-open"></i>
+                        <div class="detail-content">
+                            <div class="detail-label">Nombre de pièces</div>
+                            <div class="detail-value">{{ objet.nombre_pieces }}</div>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if objet.nombre_chambres %}
+                    <div class="detail-item">
+                        <i class="fas fa-bed"></i>
+                        <div class="detail-content">
+                            <div class="detail-label">Nombre de chambres</div>
+                            <div class="detail-value">{{ objet.nombre_chambres }}</div>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if objet.salle_de_bain %}
+                    <div class="detail-item">
+                        <i class="fas fa-bath"></i>
+                        <div class="detail-content">
+                            <div class="detail-label">Salle(s) de bain</div>
+                            <div class="detail-value">{{ objet.salle_de_bain }}</div>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if objet.date_construction %}
+                    <div class="detail-item">
+                        <i class="fas fa-calendar-alt"></i>
+                        <div class="detail-content">
+                            <div class="detail-label">Année de construction</div>
+                            <div class="detail-value">{{ objet.date_construction|date:"Y" }}</div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% elif type_objet == 'materiel_pro' %}
+                <div class="detail-item">
+                    <i class="fas fa-tools"></i>
+                    <div class="detail-content">
+                        <div class="detail-label">Type de matériel</div>
+                        <div class="detail-value">{{ objet.type_materiel }}</div>
+                    </div>
+                </div>
+                {% if objet.marque %}
+                    <div class="detail-item">
+                        <i class="fas fa-tag"></i>
+                        <div class="detail-content">
+                            <div class="detail-label">Marque</div>
+                            <div class="detail-value">{{ objet.marque }}</div>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if objet.modele %}
+                    <div class="detail-item">
+                        <i class="fas fa-cube"></i>
+                        <div class="detail-content">
+                            <div class="detail-label">Modèle</div>
+                            <div class="detail-value">{{ objet.modele }}</div>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if objet.annee_fabrication %}
+                    <div class="detail-item">
+                        <i class="fas fa-calendar-alt"></i>
+                        <div class="detail-content">
+                            <div class="detail-label">Année de fabrication</div>
+                            <div class="detail-value">{{ objet.annee_fabrication }}</div>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if objet.etat %}
                     <div class="detail-item">
                         <i class="fas fa-cog"></i>
                         <div class="detail-content">
@@ -663,6 +908,101 @@
                             <div class="detail-value">{{ objet.etat }}</div>
                         </div>
                     </div>
+                {% endif %}
+                {% if objet.puissance %}
+                    <div class="detail-item">
+                        <i class="fas fa-bolt"></i>
+                        <div class="detail-content">
+                            <div class="detail-label">Puissance</div>
+                            <div class="detail-value">{{ objet.puissance }}</div>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if objet.poids %}
+                    <div class="detail-item">
+                        <i class="fas fa-weight-hanging"></i>
+                        <div class="detail-content">
+                            <div class="detail-label">Poids</div>
+                            <div class="detail-value">{{ objet.poids }} kg</div>
+                        </div>
+                    </div>
+                {% endif %}
+                <div class="detail-item">
+                    <i class="fas fa-align-left"></i>
+                    <div class="detail-content">
+                        <div class="detail-label">Description</div>
+                        <div class="detail-value">{{ objet.description }}</div>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-check-circle"></i>
+                    <div class="detail-content">
+                        <div class="detail-label">Disponibilité</div>
+                        <div class="detail-value">{{ objet.disponibilite|yesno:"Disponible,Indisponible" }}</div>
+                    </div>
+                </div>
+            {% elif type_objet == 'informatique_electronique' %}
+                {% if objet.marque %}
+                    <div class="detail-item">
+                        <i class="fas fa-tag"></i>
+                        <div class="detail-content">
+                            <div class="detail-label">Marque</div>
+                            <div class="detail-value">{{ objet.marque }}</div>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if objet.modele %}
+                    <div class="detail-item">
+                        <i class="fas fa-cube"></i>
+                        <div class="detail-content">
+                            <div class="detail-label">Modèle</div>
+                            <div class="detail-value">{{ objet.modele }}</div>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if objet.annee %}
+                    <div class="detail-item">
+                        <i class="fas fa-calendar-alt"></i>
+                        <div class="detail-content">
+                            <div class="detail-label">Année</div>
+                            <div class="detail-value">{{ objet.annee }}</div>
+                        </div>
+                    </div>
+                {% endif %}
+                <div class="detail-item">
+                    <i class="fas fa-align-left"></i>
+                    <div class="detail-content">
+                        <div class="detail-label">Description</div>
+                        <div class="detail-value">{{ objet.description }}</div>
+                    </div>
+                </div>
+                {% if objet.etat %}
+                    <div class="detail-item">
+                        <i class="fas fa-cog"></i>
+                        <div class="detail-content">
+                            <div class="detail-label">État</div>
+                            <div class="detail-value">{{ objet.etat }}</div>
+                        </div>
+                    </div>
+                {% endif %}
+                <div class="detail-item">
+                    <i class="fas fa-shield-alt"></i>
+                    <div class="detail-content">
+                        <div class="detail-label">Garantie</div>
+                        <div class="detail-value">{{ objet.garantie|yesno:"Oui,Non" }}</div>
+                    </div>
+                </div>
+            {% elif type_objet == 'mobilier_equipements' %}
+                {% if objet.materiau %}
+                    <div class="detail-item">
+                        <i class="fas fa-hammer"></i>
+                        <div class="detail-content">
+                            <div class="detail-label">Matériau</div>
+                            <div class="detail-value">{{ objet.materiau }}</div>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if objet.couleur %}
                     <div class="detail-item">
                         <i class="fas fa-palette"></i>
                         <div class="detail-content">
@@ -670,553 +1010,360 @@
                             <div class="detail-value">{{ objet.couleur }}</div>
                         </div>
                     </div>
-                    <div class="detail-item">
-                        <i class="fas fa-align-left"></i>
-                        <div class="detail-content">
-                            <div class="detail-label">Détails</div>
-                            <div class="detail-value">{{ objet.details }}</div>
-                        </div>
-                    </div>
-                    {% if objet.youtube_video %}
-                        <div class="detail-item">
-                            <i class="fab fa-youtube"></i>
-                            <div class="detail-content">
-                                <div class="detail-label">Vidéo</div>
-                                <div class="detail-value">
-                                    <a href="{{ objet.youtube_video }}" target="_blank">Voir sur YouTube</a>
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}
-                {% elif type_objet == 'immobilier' %}
-                    <div class="detail-item">
-                        <i class="fas fa-home"></i>
-                        <div class="detail-content">
-                            <div class="detail-label">Type de bien</div>
-                            <div class="detail-value">{{ objet.type_bien }}</div>
-                        </div>
-                    </div>
+                {% endif %}
+                {% if objet.dimensions %}
                     <div class="detail-item">
                         <i class="fas fa-ruler-combined"></i>
                         <div class="detail-content">
-                            <div class="detail-label">Surface</div>
-                            <div class="detail-value">{{ objet.surface }} m²</div>
-                        </div>
-                    </div>
-                    <div class="detail-item">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <div class="detail-content">
-                            <div class="detail-label">Adresse</div>
-                            <div class="detail-value">{{ objet.adresse }}</div>
-                        </div>
-                    </div>
-                    <div class="detail-item">
-                        <i class="fas fa-city"></i>
-                        <div class="detail-content">
-                            <div class="detail-label">Ville</div>
-                            <div class="detail-value">{{ objet.ville }}</div>
-                        </div>
-                    </div>
-                    <div class="detail-item">
-                        <i class="fas fa-mail-bulk"></i>
-                        <div class="detail-content">
-                            <div class="detail-label">Code Postal</div>
-                            <div class="detail-value">{{ objet.code_postal }}</div>
-                        </div>
-                    </div>
-                    <div class="detail-item">
-                        <i class="fas fa-align-left"></i>
-                        <div class="detail-content">
-                            <div class="detail-label">Description</div>
-                            <div class="detail-value">{{ objet.description }}</div>
-                        </div>
-                    </div>
-                    {% if objet.nombre_pieces %}
-                        <div class="detail-item">
-                            <i class="fas fa-door-open"></i>
-                            <div class="detail-content">
-                                <div class="detail-label">Nombre de pièces</div>
-                                <div class="detail-value">{{ objet.nombre_pieces }}</div>
-                            </div>
-                        </div>
-                    {% endif %}
-                    {% if objet.nombre_chambres %}
-                        <div class="detail-item">
-                            <i class="fas fa-bed"></i>
-                            <div class="detail-content">
-                                <div class="detail-label">Nombre de chambres</div>
-                                <div class="detail-value">{{ objet.nombre_chambres }}</div>
-                            </div>
-                        </div>
-                    {% endif %}
-                    {% if objet.salle_de_bain %}
-                        <div class="detail-item">
-                            <i class="fas fa-bath"></i>
-                            <div class="detail-content">
-                                <div class="detail-label">Salle(s) de bain</div>
-                                <div class="detail-value">{{ objet.salle_de_bain }}</div>
-                            </div>
-                        </div>
-                    {% endif %}
-                    {% if objet.date_construction %}
-                        <div class="detail-item">
-                            <i class="fas fa-calendar-alt"></i>
-                            <div class="detail-content">
-                                <div class="detail-label">Année de construction</div>
-                                <div class="detail-value">{{ objet.date_construction|date:"Y" }}</div>
-                            </div>
-                        </div>
-                    {% endif %}
-                {% elif type_objet == 'materiel_pro' %}
-                    <div class="detail-item">
-                        <i class="fas fa-tools"></i>
-                        <div class="detail-content">
-                            <div class="detail-label">Type de matériel</div>
-                            <div class="detail-value">{{ objet.type_materiel }}</div>
-                        </div>
-                    </div>
-                    {% if objet.marque %}
-                        <div class="detail-item">
-                            <i class="fas fa-tag"></i>
-                            <div class="detail-content">
-                                <div class="detail-label">Marque</div>
-                                <div class="detail-value">{{ objet.marque }}</div>
-                            </div>
-                        </div>
-                    {% endif %}
-                    {% if objet.modele %}
-                        <div class="detail-item">
-                            <i class="fas fa-cube"></i>
-                            <div class="detail-content">
-                                <div class="detail-label">Modèle</div>
-                                <div class="detail-value">{{ objet.modele }}</div>
-                            </div>
-                        </div>
-                    {% endif %}
-                    {% if objet.annee_fabrication %}
-                        <div class="detail-item">
-                            <i class="fas fa-calendar-alt"></i>
-                            <div class="detail-content">
-                                <div class="detail-label">Année de fabrication</div>
-                                <div class="detail-value">{{ objet.annee_fabrication }}</div>
-                            </div>
-                        </div>
-                    {% endif %}
-                    {% if objet.etat %}
-                        <div class="detail-item">
-                            <i class="fas fa-cog"></i>
-                            <div class="detail-content">
-                                <div class="detail-label">État</div>
-                                <div class="detail-value">{{ objet.etat }}</div>
-                            </div>
-                        </div>
-                    {% endif %}
-                    {% if objet.puissance %}
-                        <div class="detail-item">
-                            <i class="fas fa-bolt"></i>
-                            <div class="detail-content">
-                                <div class="detail-label">Puissance</div>
-                                <div class="detail-value">{{ objet.puissance }}</div>
-                            </div>
-                        </div>
-                    {% endif %}
-                    {% if objet.poids %}
-                        <div class="detail-item">
-                            <i class="fas fa-weight-hanging"></i>
-                            <div class="detail-content">
-                                <div class="detail-label">Poids</div>
-                                <div class="detail-value">{{ objet.poids }} kg</div>
-                            </div>
-                        </div>
-                    {% endif %}
-                    <div class="detail-item">
-                        <i class="fas fa-align-left"></i>
-                        <div class="detail-content">
-                            <div class="detail-label">Description</div>
-                            <div class="detail-value">{{ objet.description }}</div>
-                        </div>
-                    </div>
-                    <div class="detail-item">
-                        <i class="fas fa-check-circle"></i>
-                        <div class="detail-content">
-                            <div class="detail-label">Disponibilité</div>
-                            <div class="detail-value">{{ objet.disponibilite|yesno:"Disponible,Indisponible" }}</div>
-                        </div>
-                    </div>
-                {% elif type_objet == 'informatique_electronique' %}
-                    {% if objet.marque %}
-                        <div class="detail-item">
-                            <i class="fas fa-tag"></i>
-                            <div class="detail-content">
-                                <div class="detail-label">Marque</div>
-                                <div class="detail-value">{{ objet.marque }}</div>
-                            </div>
-                        </div>
-                    {% endif %}
-                    {% if objet.modele %}
-                        <div class="detail-item">
-                            <i class="fas fa-cube"></i>
-                            <div class="detail-content">
-                                <div class="detail-label">Modèle</div>
-                                <div class="detail-value">{{ objet.modele }}</div>
-                            </div>
-                        </div>
-                    {% endif %}
-                    {% if objet.annee %}
-                        <div class="detail-item">
-                            <i class="fas fa-calendar-alt"></i>
-                            <div class="detail-content">
-                                <div class="detail-label">Année</div>
-                                <div class="detail-value">{{ objet.annee }}</div>
-                            </div>
-                        </div>
-                    {% endif %}
-                    <div class="detail-item">
-                        <i class="fas fa-align-left"></i>
-                        <div class="detail-content">
-                            <div class="detail-label">Description</div>
-                            <div class="detail-value">{{ objet.description }}</div>
-                        </div>
-                    </div>
-                    {% if objet.etat %}
-                        <div class="detail-item">
-                            <i class="fas fa-cog"></i>
-                            <div class="detail-content">
-                                <div class="detail-label">État</div>
-                                <div class="detail-value">{{ objet.etat }}</div>
-                            </div>
-                        </div>
-                    {% endif %}
-                    <div class="detail-item">
-                        <i class="fas fa-shield-alt"></i>
-                        <div class="detail-content">
-                            <div class="detail-label">Garantie</div>
-                            <div class="detail-value">{{ objet.garantie|yesno:"Oui,Non" }}</div>
-                        </div>
-                    </div>
-                {% elif type_objet == 'mobilier_equipements' %}
-                    {% if objet.materiau %}
-                        <div class="detail-item">
-                            <i class="fas fa-hammer"></i>
-                            <div class="detail-content">
-                                <div class="detail-label">Matériau</div>
-                                <div class="detail-value">{{ objet.materiau }}</div>
-                            </div>
-                        </div>
-                    {% endif %}
-                    {% if objet.couleur %}
-                        <div class="detail-item">
-                            <i class="fas fa-palette"></i>
-                            <div class="detail-content">
-                                <div class="detail-label">Couleur</div>
-                                <div class="detail-value">{{ objet.couleur }}</div>
-                            </div>
-                        </div>
-                    {% endif %}
-                    {% if objet.dimensions %}
-                        <div class="detail-item">
-                            <i class="fas fa-ruler-combined"></i>
-                            <div class="detail-content">
-                                <div class="detail-label">Dimensions</div>
-                                <div class="detail-value">{{ objet.dimensions }}</div>
-                            </div>
-                        </div>
-                    {% endif %}
-                    <div class="detail-item">
-                        <i class="fas fa-align-left"></i>
-                        <div class="detail-content">
-                            <div class="detail-label">Description</div>
-                            <div class="detail-value">{{ objet.description }}</div>
-                        </div>
-                    </div>
-                    {% if objet.etat %}
-                        <div class="detail-item">
-                            <i class="fas fa-cog"></i>
-                            <div class="detail-content">
-                                <div class="detail-label">État</div>
-                                <div class="detail-value">{{ objet.etat }}</div>
-                            </div>
-                        </div>
-                    {% endif %}
-                {% elif type_objet == 'bijoux_objets_valeur' %}
-                    <div class="detail-item">
-                        <i class="fas fa-gem"></i>
-                        <div class="detail-content">
-                            <div class="detail-label">Matière</div>
-                            <div class="detail-value">{{ objet.matiere }}</div>
-                        </div>
-                    </div>
-                    <div class="detail-item">
-                        <i class="fas fa-weight-hanging"></i>
-                        <div class="detail-content">
-                            <div class="detail-label">Poids</div>
-                            <div class="detail-value">{{ objet.poids }} g</div>
-                        </div>
-                    </div>
-                    {% if objet.carats %}
-                        <div class="detail-item">
-                            <i class="fas fa-star"></i>
-                            <div class="detail-content">
-                                <div class="detail-label">Carats</div>
-                                <div class="detail-value">{{ objet.carats }}</div>
-                            </div>
-                        </div>
-                    {% endif %}
-                    <div class="detail-item">
-                        <i class="fas fa-align-left"></i>
-                        <div class="detail-content">
-                            <div class="detail-label">Description</div>
-                            <div class="detail-value">{{ objet.description }}</div>
-                        </div>
-                    </div>
-                {% elif type_objet == 'stocks_invendus' %}
-                    <div class="detail-item">
-                        <i class="fas fa-layer-group"></i>
-                        <div class="detail-content">
-                            <div class="detail-label">Quantité</div>
-                            <div class="detail-value">{{ objet.quantite }} {{ objet.unite }}</div>
-                        </div>
-                    </div>
-                    <div class="detail-item">
-                        <i class="fas fa-align-left"></i>
-                        <div class="detail-content">
-                            <div class="detail-label">Description</div>
-                            <div class="detail-value">{{ objet.description }}</div>
-                        </div>
-                    </div>
-                {% elif type_objet == 'oeuvres_collections' %}
-                    {% if objet.artiste %}
-                        <div class="detail-item">
-                            <i class="fas fa-user"></i>
-                            <div class="detail-content">
-                                <div class="detail-label">Artiste</div>
-                                <div class="detail-value">{{ objet.artiste }}</div>
-                            </div>
-                        </div>
-                    {% endif %}
-                    {% if objet.annee_creation %}
-                        <div class="detail-item">
-                            <i class="fas fa-calendar-alt"></i>
-                            <div class="detail-content">
-                                <div class="detail-label">Année de création</div>
-                                <div class="detail-value">{{ objet.annee_creation }}</div>
-                            </div>
-                        </div>
-                    {% endif %}
-                    <div class="detail-item">
-                        <i class="fas fa-paint-brush"></i>
-                        <div class="detail-content">
-                            <div class="detail-label">Type d'œuvre</div>
-                            <div class="detail-value">{{ objet.type_oeuvre }}</div>
-                        </div>
-                    </div>
-                    {% if objet.dimensions %}
-                        <div class="detail-item">
-                            <i class="fas fa-ruler-combined"></i>
-                            <div class="detail-content">
-                                <div class="detail-label">Dimensions</div>
-                                <div class="detail-value">{{ objet.dimensions }}</div>
-                            </div>
-                        </div>
-                    {% endif %}
-                    {% if objet.technique %}
-                        <div class="detail-item">
-                            <i class="fas fa-tools"></i>
-                            <div class="detail-content">
-                                <div class="detail-label">Technique</div>
-                                <div class="detail-value">{{ objet.technique }}</div>
-                            </div>
-                        </div>
-                    {% endif %}
-                    <div class="detail-item">
-                        <i class="fas fa-align-left"></i>
-                        <div class="detail-content">
-                            <div class="detail-label">Description</div>
-                            <div class="detail-value">{{ objet.description }}</div>
+                            <div class="detail-label">Dimensions</div>
+                            <div class="detail-value">{{ objet.dimensions }}</div>
                         </div>
                     </div>
                 {% endif %}
-            </div>
-
-            <!-- Features Section for Vehicles and Real Estate -->
-            {% if type_objet == 'vehicules' %}
-                <div class="features-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-list-check"></i>
-                        Équipements
-                    </h3>
-                    <div class="features-grid">
-                        <div class="feature-item">
-                            <i class="fas {% if objet.climatiseur %}fa-check feature-icon yes{% else %}fa-times feature-icon no{% endif %}"></i>
-                            <span class="feature-text">Climatiseur</span>
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas {% if objet.gps_navigation %}fa-check feature-icon yes{% else %}fa-times feature-icon no{% endif %}"></i>
-                            <span class="feature-text">GPS Navigation</span>
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas {% if objet.toit_ouvrant %}fa-check feature-icon yes{% else %}fa-times feature-icon no{% endif %}"></i>
-                            <span class="feature-text">Toit Ouvrant</span>
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas {% if objet.sieges_ventiles %}fa-check feature-icon yes{% else %}fa-times feature-icon no{% endif %}"></i>
-                            <span class="feature-text">Sièges Ventilés</span>
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas {% if objet.camera_recul %}fa-check feature-icon yes{% else %}fa-times feature-icon no{% endif %}"></i>
-                            <span class="feature-text">Caméra de Recul</span>
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas {% if objet.capteurs_stationnement %}fa-check feature-icon yes{% else %}fa-times feature-icon no{% endif %}"></i>
-                            <span class="feature-text">Capteurs de Stationnement</span>
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas {% if objet.regulateur_vitesse %}fa-check feature-icon yes{% else %}fa-times feature-icon no{% endif %}"></i>
-                            <span class="feature-text">Régulateur de Vitesse</span>
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas {% if objet.regulateur_vitesse_adaptatif %}fa-check feature-icon yes{% else %}fa-times feature-icon no{% endif %}"></i>
-                            <span class="feature-text">Régulateur de Vitesse Adaptatif</span>
-                        </div>
+                <div class="detail-item">
+                    <i class="fas fa-align-left"></i>
+                    <div class="detail-content">
+                        <div class="detail-label">Description</div>
+                        <div class="detail-value">{{ objet.description }}</div>
                     </div>
                 </div>
-            {% elif type_objet == 'immobilier' %}
-                <div class="features-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-list-check"></i>
-                        Caractéristiques
-                    </h3>
-                    <div class="features-grid">
-                        <div class="feature-item">
-                            <i class="fas {% if objet.garage %}fa-check feature-icon yes{% else %}fa-times feature-icon no{% endif %}"></i>
-                            <span class="feature-text">Garage</span>
+                {% if objet.etat %}
+                    <div class="detail-item">
+                        <i class="fas fa-cog"></i>
+                        <div class="detail-content">
+                            <div class="detail-label">État</div>
+                            <div class="detail-value">{{ objet.etat }}</div>
                         </div>
-                        <div class="feature-item">
-                            <i class="fas {% if objet.jardin %}fa-check feature-icon yes{% else %}fa-times feature-icon no{% endif %}"></i>
-                            <span class="feature-text">Jardin</span>
+                    </div>
+                {% endif %}
+            {% elif type_objet == 'bijoux_objets_valeur' %}
+                <div class="detail-item">
+                    <i class="fas fa-gem"></i>
+                    <div class="detail-content">
+                        <div class="detail-label">Matière</div>
+                        <div class="detail-value">{{ objet.matiere }}</div>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-weight-hanging"></i>
+                    <div class="detail-content">
+                        <div class="detail-label">Poids</div>
+                        <div class="detail-value">{{ objet.poids }} g</div>
+                    </div>
+                </div>
+                {% if objet.carats %}
+                    <div class="detail-item">
+                        <i class="fas fa-star"></i>
+                        <div class="detail-content">
+                            <div class="detail-label">Carats</div>
+                            <div class="detail-value">{{ objet.carats }}</div>
                         </div>
-                        <div class="feature-item">
-                            <i class="fas {% if objet.piscine %}fa-check feature-icon yes{% else %}fa-times feature-icon no{% endif %}"></i>
-                            <span class="feature-text">Piscine</span>
+                    </div>
+                {% endif %}
+                <div class="detail-item">
+                    <i class="fas fa-align-left"></i>
+                    <div class="detail-content">
+                        <div class="detail-label">Description</div>
+                        <div class="detail-value">{{ objet.description }}</div>
+                    </div>
+                </div>
+            {% elif type_objet == 'stocks_invendus' %}
+                <div class="detail-item">
+                    <i class="fas fa-layer-group"></i>
+                    <div class="detail-content">
+                        <div class="detail-label">Quantité</div>
+                        <div class="detail-value">{{ objet.quantite }} {{ objet.unite }}</div>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-align-left"></i>
+                    <div class="detail-content">
+                        <div class="detail-label">Description</div>
+                        <div class="detail-value">{{ objet.description }}</div>
+                    </div>
+                </div>
+            {% elif type_objet == 'oeuvres_collections' %}
+                {% if objet.artiste %}
+                    <div class="detail-item">
+                        <i class="fas fa-user"></i>
+                        <div class="detail-content">
+                            <div class="detail-label">Artiste</div>
+                            <div class="detail-value">{{ objet.artiste }}</div>
                         </div>
+                    </div>
+                {% endif %}
+                {% if objet.annee_creation %}
+                    <div class="detail-item">
+                        <i class="fas fa-calendar-alt"></i>
+                        <div class="detail-content">
+                            <div class="detail-label">Année de création</div>
+                            <div class="detail-value">{{ objet.annee_creation }}</div>
+                        </div>
+                    </div>
+                {% endif %}
+                <div class="detail-item">
+                    <i class="fas fa-paint-brush"></i>
+                    <div class="detail-content">
+                        <div class="detail-label">Type d'œuvre</div>
+                        <div class="detail-value">{{ objet.type_oeuvre }}</div>
+                    </div>
+                </div>
+                {% if objet.dimensions %}
+                    <div class="detail-item">
+                        <i class="fas fa-ruler-combined"></i>
+                        <div class="detail-content">
+                            <div class="detail-label">Dimensions</div>
+                            <div class="detail-value">{{ objet.dimensions }}</div>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if objet.technique %}
+                    <div class="detail-item">
+                        <i class="fas fa-tools"></i>
+                        <div class="detail-content">
+                            <div class="detail-label">Technique</div>
+                            <div class="detail-value">{{ objet.technique }}</div>
+                        </div>
+                    </div>
+                {% endif %}
+                <div class="detail-item">
+                    <i class="fas fa-align-left"></i>
+                    <div class="detail-content">
+                        <div class="detail-label">Description</div>
+                        <div class="detail-value">{{ objet.description }}</div>
                     </div>
                 </div>
             {% endif %}
         </div>
 
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <!-- Auction Information -->
-            <div class="auction-info">
+        <!-- Features Section for Vehicles and Real Estate -->
+        {% if type_objet == 'vehicules' %}
+            <div class="features-section">
                 <h3 class="section-title">
-                    <i class="fas fa-gavel"></i>
-                    Informations d'enchère
+                    <i class="fas fa-list-check"></i>
+                    Équipements
                 </h3>
-                
-                <div class="price-item">
-                    <span class="price-label">Prix de départ</span>
-                    <span class="price-value highlight">{{ enchaireObjet.first_price }} DA</span>
-                </div>
-                
-                <div class="price-item">
-                    <span class="price-label">Pas d'enchère</span>
-                    <span class="price-value">{{ enchaireObjet.pas }} DA</span>
-                </div>
-                
-                {% if enchaireObjet.reserved %}
-                    <div class="price-item">
-                        <span class="price-label">Prix de réserve</span>
-                        <span class="price-value">{{ enchaireObjet.price_reserved }} DA</span>
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <i class="fas {% if objet.climatiseur %}fa-check feature-icon yes{% else %}fa-times feature-icon no{% endif %}"></i>
+                        <span class="feature-text">Climatiseur</span>
                     </div>
-                    {% if enchaireObjet.winner %}
-                        <div class="price-item">
-                            <span class="price-label">Gagnant</span>
-                            <span class="price-value">{{ enchaireObjet.winner }}</span>
-                        </div>
-                    {% endif %}
-                {% else %}
-                    <div class="no-reserve">
-                        <i class="fas fa-info-circle"></i>
-                        Aucun prix de réserve défini
+                    <div class="feature-item">
+                        <i class="fas {% if objet.gps_navigation %}fa-check feature-icon yes{% else %}fa-times feature-icon no{% endif %}"></i>
+                        <span class="feature-text">GPS Navigation</span>
                     </div>
-                {% endif %}
+                    <div class="feature-item">
+                        <i class="fas {% if objet.toit_ouvrant %}fa-check feature-icon yes{% else %}fa-times feature-icon no{% endif %}"></i>
+                        <span class="feature-text">Toit Ouvrant</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas {% if objet.sieges_ventiles %}fa-check feature-icon yes{% else %}fa-times feature-icon no{% endif %}"></i>
+                        <span class="feature-text">Sièges Ventilés</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas {% if objet.camera_recul %}fa-check feature-icon yes{% else %}fa-times feature-icon no{% endif %}"></i>
+                        <span class="feature-text">Caméra de Recul</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas {% if objet.capteurs_stationnement %}fa-check feature-icon yes{% else %}fa-times feature-icon no{% endif %}"></i>
+                        <span class="feature-text">Capteurs de Stationnement</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas {% if objet.regulateur_vitesse %}fa-check feature-icon yes{% else %}fa-times feature-icon no{% endif %}"></i>
+                        <span class="feature-text">Régulateur de Vitesse</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas {% if objet.regulateur_vitesse_adaptatif %}fa-check feature-icon yes{% else %}fa-times feature-icon no{% endif %}"></i>
+                        <span class="feature-text">Régulateur de Vitesse Adaptatif</span>
+                    </div>
+                </div>
             </div>
-            <!-- Section Prix Actuel et Participation -->
-            <div class="auction-info">
+        {% elif type_objet == 'immobilier' %}
+            <div class="features-section">
                 <h3 class="section-title">
-                    <i class="fas fa-chart-line"></i>
-                    Enchère en cours
+                    <i class="fas fa-list-check"></i>
+                    Caractéristiques
                 </h3>
-                
-                <div class="price-item">
-                    <span class="price-label">Prix actuel</span>
-                    <span class="price-value highlight">{{ current_price|default:enchaireObjet.first_price }} DA</span>
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <i class="fas {% if objet.garage %}fa-check feature-icon yes{% else %}fa-times feature-icon no{% endif %}"></i>
+                        <span class="feature-text">Garage</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas {% if objet.jardin %}fa-check feature-icon yes{% else %}fa-times feature-icon no{% endif %}"></i>
+                        <span class="feature-text">Jardin</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas {% if objet.piscine %}fa-check feature-icon yes{% else %}fa-times feature-icon no{% endif %}"></i>
+                        <span class="feature-text">Piscine</span>
+                    </div>
                 </div>
-                
-                <div class="price-item">
-                    <span class="price-label">Prochaine enchère</span>
-                    <span class="price-value">{{ next_bid_price|default:enchaireObjet.price_reserved|add:enchaireObjet.pas }} DA</span>
-                </div>
-                
-                {% if  valid %}
-                    {% if demande_state == 'Approuvée' %}
-                        <form method="POST" action="{% url 'participer' %}" style="margin-top: 20px;">
-                            {% csrf_token %}
-                            <input type="hidden" name="type_objet" value="{{ type_objet }}">
-                            <input type="hidden" name="objet_id" value="{{ objet.id }}">
-                            <input type="hidden" name="enchaireObjet_id" value="{{ enchaireObjet.id }}">
-                            <button type="submit" class="participate-btn">
-                                <i class="fas fa-gavel"></i>
-                                Participer pour {{ next_bid_price|default:enchaireObjet.price_reserved|add:enchaireObjet.pas }} DA
-                            </button>
-                        </form>
-                    {% else %}
-                        {% if demande_state %}
-                            <div style="padding: 12px 20px; border-radius: 8px; text-align: center; font-weight: 600; {% if demande_state == 'Rejetée' %}background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white;{% else %}background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%); color: white;{% endif %}">
-                                {% if demande_state == 'Rejetée' %}
-                                    <i class="fas fa-times-circle" style="margin-right: 8px;"></i>Demande rejetée
-                                {% elif demande_state == 'unread' %}
-                                    <i class="fas fa-clock" style="margin-right: 8px;"></i>Demande en attente
-                                {% endif %}
-                            </div>
-                        {% else %}
-                                    
-                            <form method="post" action="{% url 'demande' %}" style="margin: 0;">
-                            {% csrf_token %}
-                            <input type="hidden" name="user" value="{{ user.id }}">
-                            <input type="hidden" name="enchaire" value="{{ enchaire_id }}">
-                            <button type="submit"
-                                style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; border: none; border-radius: 8px; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: white; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 3px 12px rgba(255, 107, 53, 0.3);"
-                                onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 15px rgba(255, 107, 53, 0.4)'"
-                                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 3px 12px rgba(255, 107, 53, 0.3)'">
-                                <i class="fas fa-paper-plane"></i>
-                                <span>Faire une demande</span>
-                            </button>
-                        </form>
+            </div>
+        {% endif %}
+        
+    </div>
 
-                        {% endif %}
-                    {% endif %}
-                {% else %}
-                    <button type="submit" class="participate-btn" style="margin-top: 20px;">
-                            En tete
-                    </button>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <!-- Auction Information -->
+        <div class="auction-info">
+            <h3 class="section-title">
+                <i class="fas fa-gavel"></i>
+                Informations d'enchère
+            </h3>
+            
+            <div class="price-item">
+                <span class="price-label">Prix de départ</span>
+                <span class="price-value highlight">{{ enchaireObjet.first_price }} DA</span>
+            </div>
+            
+            <div class="price-item">
+                <span class="price-label">Pas d'enchère</span>
+                <span class="price-value">{{ enchaireObjet.pas }} DA</span>
+            </div>
+            
+            {% if enchaireObjet.reserved %}
+                <div class="price-item">
+                    <span class="price-label">Prix de réserve</span>
+                    <span class="price-value">{{ enchaireObjet.price_reserved }} DA</span>
+                </div>
+                {% if enchaireObjet.winner %}
+                    <div class="price-item">
+                        <span class="price-label">Gagnant</span>
+                        <span class="price-value">{{ enchaireObjet.winner }}</span>
+                    </div>
                 {% endif %}
-                
-                <div class="auction-status">
-                    <div class="status-item">
-                        <i class="fas fa-users"></i>
-                        <span>{{ participation_count|default:0 }} participant{{ participation_count|default:0|pluralize }}</span>
-                    </div>
-                    <div class="status-item">
-                        <i class="fas fa-clock"></i>
-                        <span>Temps restant: {{ time_remaining|default:"--:--:--" }}</span>
-                    </div>
+            {% else %}
+                <div class="no-reserve">
+                    <i class="fas fa-info-circle"></i>
+                    Aucun prix de réserve défini
+                </div>
+            {% endif %}
+        </div>
+        <!-- Section Prix Actuel et Participation -->
+        <div class="auction-info">
+            <h3 class="section-title">
+                <i class="fas fa-chart-line"></i>
+                Enchère en cours
+            </h3>
+            
+            <div class="price-item">
+                <span class="price-label">Prix actuel</span>
+                <span class="price-value highlight">
+                    {% if enchaireObjet.price_reserved < enchaireObjet.first_price %}
+                        {{ enchaireObjet.first_price }} DA
+                    {% else %}
+                        {{ enchaireObjet.price_reserved }} DA
+                    {% endif %}
+                </span>
+            </div>
+            
+            <div class="price-item">
+                <span class="price-label">
+                    {% if enchaireObjet.price_reserved < enchaireObjet.first_price %}
+                        Première enchère
+                    {% else %}
+                        Prochaine enchère
+                    {% endif %}
+                </span>
+                <span class="price-value">{{ next_bid_price|default:enchaireObjet.price_reserved|add:enchaireObjet.pas }} DA</span>
+            </div>
+            
+            {% if  not is_winner %}
+                {% if demande_state == 'Approuvée' %}
+                    <form method="POST" action="{% url 'participer' %}" style="margin-top: 20px;">
+                        {% csrf_token %}
+                        <input type="hidden" name="type_objet" value="{{ type_objet }}">
+                        <input type="hidden" name="objet_id" value="{{ objet.id }}">
+                        <input type="hidden" name="enchaireObjet_id" value="{{ enchaireObjet.id }}">
+                        <button type="submit" class="participate-btn">
+                            <i class="fas fa-gavel"></i>
+                            Participer pour {{ next_bid_price|default:enchaireObjet.price_reserved|add:enchaireObjet.pas }} DA
+                        </button>
+                    </form>
+                {% else %}
+                    {% if demande_state %}
+                        <div style="padding: 12px 20px; border-radius: 8px; text-align: center; font-weight: 600; {% if demande_state == 'Rejetée' %}background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white;{% else %}background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%); color: white;{% endif %}">
+                            {% if demande_state == 'Rejetée' %}
+                                <i class="fas fa-times-circle" style="margin-right: 8px;"></i>Demande rejetée
+                            {% elif demande_state == 'unread' %}
+                                <i class="fas fa-clock" style="margin-right: 8px;"></i>Demande en attente
+                            {% endif %}
+                        </div>
+                    {% else %}
+                                
+                        <form method="post" action="{% url 'demande' %}" style="margin: 0;">
+                        {% csrf_token %}
+                        <input type="hidden" name="user" value="{{ user.id }}">
+                        <input type="hidden" name="enchaire" value="{{ enchaire_id }}">
+                        <button type="submit"
+                            style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; border: none; border-radius: 8px; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: white; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 3px 12px rgba(255, 107, 53, 0.3);"
+                            onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 15px rgba(255, 107, 53, 0.4)'"
+                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 3px 12px rgba(255, 107, 53, 0.3)'">
+                            <i class="fas fa-paper-plane"></i>
+                            <span>Faire une demande</span>
+                        </button>
+                    </form>
+
+                    {% endif %}
+                {% endif %}
+            {% else %}
+                <button type="submit" class="participate-btn-en-tete" style="margin-top: 20px; cursor: default;" disabled>
+                    En tete
+                </button>
+            {% endif %}
+            
+            <div class="auction-status">
+                <div class="status-item">
+                    <i class="fas fa-users"></i>
+                    <span>{{ participation_count|default:0 }} participant{{ participation_count|default:0|pluralize }}</span>
+                </div>
+                <div class="status-item">
+                    <i class="fas fa-clock"></i>
+                    <span>Temps restant: {{ time_remaining|default:"--:--:--" }}</span>
                 </div>
             </div>
         </div>
     </div>
 
+     <!-- Participants Card Section -->
+    <div class="participants-card">
+        <h3 class="section-title">
+            <i class="fas fa-gavel"></i>
+            Participations à l'enchère
+        </h3>
+        
+        <div class="participant-list">
+            {% if participations %}
+                {% for participation in participations %}
+                    <div class="participant-item">
+                        <div class="participant-info">
+                            {% if participation.user.pfp %}
+                                <div class="participant-avatar">
+                                    <img src="{{ participation.user.pfp.url }}" alt="Photo de profil" class="profile-avatar">
+                                </div>
+                            {% else %}
+                                <div class="participant-avatar">
+                                    {{ participation.user.username|slice:":1"|upper }}
+                                </div>
+                            {% endif %}
 
+                            <div>
+                                <div class="participant-name">{{ participation.user.username }}</div>
+                                <div class="participant-date">{{ participation.date_participation|date:"H:i \l\e d/m/Y" }}</div>
+                            </div>
+                        </div>
+                        <div class="participant-amount">{{ participation.montant }} DA</div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-participants">
+                    <i class="fas fa-info-circle"></i> Aucun participant pour le moment
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
 
 <!-- Modal amélioré pour les images en plein écran -->
 <div id="imageModal" class="modal">

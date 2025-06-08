@@ -34,7 +34,7 @@ class EnchaireObjet(models.Model):
 
     def save(self, *args, **kwargs):
         if self.pk is None and self.price_reserved is None:
-            self.price_reserved = self.first_price
+            self.price_reserved = self.first_price - self.pas
         super().save(*args, **kwargs)
 
     def participer(self, user):
@@ -43,7 +43,8 @@ class EnchaireObjet(models.Model):
         self.winner = user
         ParticipationEnchaire.objects.create(
             enchaireObjet=self,
-            user=user
+            user=user,
+            montant=self.price_reserved,
         )
         self.save()
 
@@ -187,7 +188,13 @@ class ParticipationEnchaire(models.Model):
         on_delete=models.CASCADE,
         related_name="participations_enchères"
     )
-
+    
+    montant = models.IntegerField(
+        null=False,
+        validators=[MinValueValidator(0)],
+        help_text="Montant de la participation",
+        default=0,
+    )
     date_participation = models.DateTimeField(default=timezone.now)
 
     def __str__(self):

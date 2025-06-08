@@ -44,28 +44,28 @@
                 
                 <div class="profile-badges">
                     {% if user.is_active %}
-                        <span class="badge active">
+                        <span class="profile-badge active">
                             <i class="fas fa-check-circle"></i>
                             Actif
                         </span>
                     {% endif %}
                     
                     {% if user.email_verified %}
-                        <span class="badge verified">
-                            <i class="fas fa-shield-check"></i>
+                        <span class="profile-badge verified">
+                            <i class="fas fa-check-circle"></i>
                             Vérifié
                         </span>
                     {% endif %}
                     
                     {% if user.is_admin %}
-                        <span class="badge admin">
+                        <span class="profile-badge admin">
                             <i class="fas fa-crown"></i>
                             Admin
                         </span>
                     {% endif %}
                     
                     {% if user.special_profile %}
-                        <span class="badge special">
+                        <span class="profile-badge special">
                             <i class="fas fa-star"></i>
                             Spécial
                         </span>
@@ -372,7 +372,7 @@
         flex-wrap: wrap;
     }
 
-    .badge {
+    .profile-badge {
         padding: 4px 10px;
         border-radius: 12px;
         font-size: 0.75rem;
@@ -383,22 +383,22 @@
         font-family: var(--font-family);
     }
 
-    .badge.admin {
+    .profile-badge.admin {
         background-color: var(--error-color);
         color: white;
     }
 
-    .badge.verified {
+    .profile-badge.verified {
         background-color: var(--success-color);
         color: white;
     }
 
-    .badge.special {
+    .profile-badge.special {
         background-color: var(--warning-color);
         color: var(--background-dark);
     }
 
-    .badge.active {
+    .profile-badge.active {
         background-color: var(--primary-color);
         color: white;
     }
