@@ -42,7 +42,7 @@ class EnchaireObjetAdmin(admin.ModelAdmin):
 # ---------- Admin pour ParticipationEnchaire ----------
 @admin.register(ParticipationEnchaire)
 class ParticipationEnchaireAdmin(admin.ModelAdmin):
-    list_display = ('enchaireObjet', 'user', 'montant', 'date_participation')
+    list_display = ('enchaireObjet', 'user', 'date_participation')
     list_filter = ('date_participation',)
     search_fields = ('user__username', 'enchaireObjet__id')
     ordering = ('-date_participation',)

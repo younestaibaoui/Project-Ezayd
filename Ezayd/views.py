@@ -1,6 +1,6 @@
 import random
 
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404,HttpResponse
 from django.http import Http404
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
@@ -10,6 +10,7 @@ from perso.models import UserAccount
 
 from .models import (
     Enchaire,
+    EnchaireObjet,
     Voiture,
     Immobilier,
     MaterielProfessionnel,
@@ -155,17 +156,17 @@ def details_view(request, enchere_id):
         'objets' : objets,
     }
     
-    notifications = request.user.notifications.all() if request.user.is_authenticated else None
-    if notifications:
-        unread_count = notifications.filter(is_read=False).count()
-    else:
-        unread_count = 0
+    if request.user.is_authenticated:
+        notifications = request.user.notifications.all() if request.user.is_authenticated else None
+        if notifications:
+            unread_count = notifications.filter(is_read=False).count()
+        else:
+            unread_count = 0
     
-    
-    # Récupérer les notifications de l'utilisateur connecté
-    notifications = request.user.notifications.all().order_by('-created_at')    
-    context['unread_count'] = unread_count
-    context['notifications'] = notifications
+        # Récupérer les notifications de l'utilisateur connecté
+        notifications = request.user.notifications.all().order_by('-created_at')    
+        context['unread_count'] = unread_count
+        context['notifications'] = notifications
 
     return render(request, 'details_enchaire/details_enchaire.html', context)
 
@@ -191,11 +192,24 @@ def details_objet_view(request, type_objet, objet_id):
     enchaire = objet.lot.enchaire.id
     enchaireObjet = objet.enchaireObjet
 
+    valid = True
+    if request.user.is_authenticated:
+        winner = enchaireObjet.winner
+
+        if winner and winner == request.user:
+            valid = False 
+
+    demande = DemandeEnchaire.objects.filter(user=request.user, enchaire=enchaire).first() if request.user.is_authenticated else None
+    demande_state = demande.state if demande else None
+
     context = {
         'enchaireObjet': enchaireObjet,
         'type_objet': type_objet,
         'objet': objet,
-        'enchaire_id': enchaire,       
+        'enchaire_id': enchaire, 
+        'valid': valid,
+        'demande_state': demande_state,    
+        'participation_count' : enchaireObjet.participations.values('user').distinct().count() if enchaireObjet else 0,
     }
     
     if request.user.is_authenticated:
@@ -277,23 +291,40 @@ def profil_view(request):
 def participer(request):
     user = request.user
     type_objet = request.POST.get('type_objet')
-    enchaireObjet_id = request.POST.get('enchaire_id')
-    valid = True
+    objet_id = request.POST.get('objet_id')
+
+    if not objet_id or not type_objet:
+        raise Http404("Something is missing.")
+    
+    if type_objet == 'vehicules':
+        objet = get_object_or_404(Voiture, id=objet_id)
+    elif type_objet == 'immobilier':
+        objet = get_object_or_404(Immobilier, id=objet_id)
+    elif type_objet == 'materiel_pro':
+        objet = get_object_or_404(MaterielProfessionnel, id=objet_id)
+    elif type_objet == 'informatique_electronique':
+        objet = get_object_or_404(InformatiqueElectronique, id=objet_id)
+    elif type_objet == 'mobilier_equipements':
+        objet = get_object_or_404(MobilierEquipement, id=objet_id)
+    elif type_objet == 'bijoux_objets_valeur':
+        objet = get_object_or_404(BijouxObjetValeur, id=objet_id)
+    elif type_objet == 'stocks_invendus':
+        objet = get_object_or_404(StockInvendu, id=objet_id)
+    elif type_objet == 'oeuvres_collections':
+        objet = get_object_or_404(OeuvreCollection, id=objet_id)
+
+    demande = DemandeEnchaire.objects.filter(user=request.user, enchaire=objet.lot.enchaire).first() if request.user.is_authenticated else None
+    demande_state = demande.state if demande else None
+    enchaireObjet = objet.enchaireObjet
 
     if not enchaireObjet:
-        raise Http404("Enchaire ID is missing.")
-
-    enchaireObjet = get_object_or_404(Enchaire, id=enchaireObjet_id)
-
-    pas = enchaireObjet.pas
-    reserved_price = enchaireObjet.reserved_price if enchaireObjet.reserved_price else enchaireObjet.first_price
-
-    winner = enchaireObjet.winner
-
-    if winner and winner == user:
-        valid = False
+        raise Http404("EnchaireObjet not found.")
+    
+    if (enchaireObjet.winner and enchaireObjet.winner == user):
+        raise Http404("You are already the runner up winner.")
+    elif  demande_state != 'Approuvée':
+        raise Http404("You must have an approved request to participate in this auction.")
     else:
         enchaireObjet.participer(user)
 
-    # Redirect to the referring page or fallback to a named route (e.g., 'accueil')
-    return redirect('details_objet', type_objet, objet_id=enchaireObjet.id)
+    return redirect('details_objet', type_objet, objet_id)

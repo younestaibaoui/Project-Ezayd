@@ -17,9 +17,12 @@ ETAT_ENCHAIRE_CHOICES = (
     ('finis', 'Terminé'),
 )
 
+from django.db import models
+from django.core.validators import MinValueValidator
+
 class EnchaireObjet(models.Model):
-    first_price = models.IntegerField(null=False,validators=[MinValueValidator(0)])
-    pas = models.IntegerField(null=False,validators=[MinValueValidator(0)])
+    first_price = models.IntegerField(null=False, validators=[MinValueValidator(0)])
+    pas = models.IntegerField(null=False, validators=[MinValueValidator(0)])
     reserved = models.BooleanField(default=False)
     winner = models.ForeignKey(
         "perso.UserAccount",
@@ -27,11 +30,15 @@ class EnchaireObjet(models.Model):
         blank=True,
         on_delete=models.SET_NULL,
     )
+    price_reserved = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0)])
 
-    price_reserved = models.IntegerField(null=True, blank=True,validators=[MinValueValidator(0)])
+    def save(self, *args, **kwargs):
+        if self.pk is None and self.price_reserved is None:
+            self.price_reserved = self.first_price
+        super().save(*args, **kwargs)
 
     def participer(self, user):
-        price_reserved = self.price_reserved if self.reserved else self.first_price
+        price_reserved = self.price_reserved 
         self.price_reserved = price_reserved + self.pas
         self.winner = user
         ParticipationEnchaire.objects.create(
@@ -39,7 +46,6 @@ class EnchaireObjet(models.Model):
             user=user
         )
         self.save()
-
 
 class Enchaire(models.Model):
     date_debut = models.DateField(default=timezone.now, null=False)
@@ -183,10 +189,9 @@ class ParticipationEnchaire(models.Model):
     )
 
     date_participation = models.DateTimeField(default=timezone.now)
-    montant = models.IntegerField(validators=[MinValueValidator(0)])
 
     def __str__(self):
-        return f"Participation de {self.user} à l'enchère {self.enchaire} pour {self.montant} €"
+        return f"Participation de {self.user} à l'enchère {self.enchaireObjet}."
 
 # ----------------------------------------LOTS -----------------------------------------------
 

@@ -1155,20 +1155,54 @@
                 
                 <div class="price-item">
                     <span class="price-label">Prochaine enchère</span>
-                    <span class="price-value">{{ next_bid_price|default:enchaireObjet.first_price|add:enchaireObjet.pas }} DA</span>
+                    <span class="price-value">{{ next_bid_price|default:enchaireObjet.price_reserved|add:enchaireObjet.pas }} DA</span>
                 </div>
                 
-                <div style="margin-top: 20px;">
-                    <button class="participate-btn" onclick="participateInAuction()">
-                        <i class="fas fa-gavel"></i>
-                        Participer pour {{ next_bid_price|default:enchaireObjet.first_price|add:enchaireObjet.pas }} DA
+                {% if  valid %}
+                    {% if demande_state == 'Approuvée' %}
+                        <form method="POST" action="{% url 'participer' %}" style="margin-top: 20px;">
+                            {% csrf_token %}
+                            <input type="hidden" name="type_objet" value="{{ type_objet }}">
+                            <input type="hidden" name="objet_id" value="{{ objet.id }}">
+                            <input type="hidden" name="enchaireObjet_id" value="{{ enchaireObjet.id }}">
+                            <button type="submit" class="participate-btn">
+                                <i class="fas fa-gavel"></i>
+                                Participer pour {{ next_bid_price|default:enchaireObjet.price_reserved|add:enchaireObjet.pas }} DA
+                            </button>
+                        </form>
+                    {% else %}
+                        {% if demande_state %}
+                            <div style="padding: 12px 20px; border-radius: 8px; text-align: center; font-weight: 600; {% if demande_state == 'Rejetée' %}background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white;{% else %}background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%); color: white;{% endif %}">
+                                {% if demande_state == 'Rejetée' %}
+                                    <i class="fas fa-times-circle" style="margin-right: 8px;"></i>Demande rejetée
+                                {% elif demande_state == 'unread' %}
+                                    <i class="fas fa-clock" style="margin-right: 8px;"></i>Demande en attente
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <form method="post" action="{% url 'demande' %}" style="margin: 0;">
+                                {% csrf_token %}
+                                <input type="hidden" name="user" value="{{ user.id }}">
+                                <input type="hidden" name="enchaire" value="{{ enchaire.id }}">
+                                <button type="submit" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; border: none; border-radius: 8px; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: white; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 3px 12px rgba(255, 107, 53, 0.3);"
+                                        onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 15px rgba(255, 107, 53, 0.4)'"
+                                        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 3px 12px rgba(255, 107, 53, 0.3)'">
+                                    <i class="fas fa-paper-plane"></i>
+                                    <span>Faire une demande</span>
+                                </button>
+                            </form>
+                        {% endif %}
+                    {% endif %}
+                {% else %}
+                    <button type="submit" class="participate-btn" style="margin-top: 20px;">
+                            En tete
                     </button>
-                </div>
+                {% endif %}
                 
                 <div class="auction-status">
                     <div class="status-item">
                         <i class="fas fa-users"></i>
-                        <span>{{ total_bidders|default:0 }} participant{{ total_bidders|default:0|pluralize }}</span>
+                        <span>{{ participation_count|default:0 }} participant{{ participation_count|default:0|pluralize }}</span>
                     </div>
                     <div class="status-item">
                         <i class="fas fa-clock"></i>
@@ -1419,7 +1453,7 @@
             }
         {% else %}
             alert('Vous devez être connecté pour participer aux enchères.');
-            window.location.href = "{% url 'login' %}";
+            window.location.href = "{% url 'connexion' %}";
         {% endif %}
     }
 

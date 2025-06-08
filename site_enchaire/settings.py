@@ -24,6 +24,9 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 LOGIN_URL = '/connexion/'
 LOGIN_REDIRECT_URL = '/'  # redirection après connexion
+LOGOUT_REDIRECT_URL = '/'
+
+
 # Application definition
 
 INSTALLED_APPS = [
