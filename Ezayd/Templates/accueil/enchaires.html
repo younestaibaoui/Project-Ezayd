@@ -83,51 +83,72 @@
 
       <div class="sidebar-content">
         <!-- Catégories compactes -->
-           <label class="filter-group-title">
-            <i class="fas fa-tags"></i>
-            Catégories
-          </label>
         <div class="filter-group" data-filter="categories">
-        
-          
-          <div class="categories-compact">
-            <label class="checkbox-compact">
-              <input type="checkbox" name="category" value="vehicules" onchange="updateFilters()">
-              <span class="checkmark-compact"></span>
-              <span class="label-compact">Véhicules</span>
-            </label>
-            
-            <label class="checkbox-compact">
-              <input type="checkbox" name="category" value="immobilier" onchange="updateFilters()">
-              <span class="checkmark-compact"></span>
-              <span class="label-compact">Immobilier</span>
-            </label>
-            
-            <label class="checkbox-compact">
-              <input type="checkbox" name="category" value="materiel_pro" onchange="updateFilters()">
-              <span class="checkmark-compact"></span>
-              <span class="label-compact">Matériel pro</span>
-            </label>
-            
-            <label class="checkbox-compact">
-              <input type="checkbox" name="category" value="informatique" onchange="updateFilters()">
-              <span class="checkmark-compact"></span>
-              <span class="label-compact">Informatique</span>
-            </label>
-            
-            <label class="checkbox-compact">
-              <input type="checkbox" name="category" value="mobilier" onchange="updateFilters()">
-              <span class="checkmark-compact"></span>
-              <span class="label-compact">Mobilier</span>
-            </label>
-            
-            <label class="checkbox-compact">
-              <input type="checkbox" name="category" value="bijoux" onchange="updateFilters()">
-              <span class="checkmark-compact"></span>
-              <span class="label-compact">Bijoux</span>
-            </label>
-          </div>
+  <label class="filter-group-title">
+    <i class="fas fa-tags"></i>
+    Catégories
+  </label>
+  <div class="category-dropdown-wrapper">
+    <button class="category-dropdown-btn" onclick="toggleCategoryDropdown()">
+      <span id="category-selected-text">Toutes les catégories</span>
+      <i class="fas fa-chevron-down category-dropdown-arrow"></i>
+    </button>
+    
+    <div id="category-dropdown-menu" class="category-dropdown-menu">
+      <div class="category-dropdown-content">
+        <div class="category-dropdown-header">
+          <span>Sélectionnez les catégories</span>
+          <button class="category-clear-btn" onclick="clearCategorySelection(event)">Effacer</button>
         </div>
+        <div class="category-dropdown-search">
+          <input type="text" placeholder="Rechercher une catégorie..." onkeyup="filterCategories(this.value)">
+        </div>
+        <div class="category-dropdown-items">
+          <label class="category-dropdown-item">
+            <input type="checkbox" name="category" value="vehicules" onchange="updateCategorySelection(this)">
+            <span class="category-checkmark"></span>
+            <span class="category-text">🚗 Véhicules</span>
+          </label>
+          <label class="category-dropdown-item">
+            <input type="checkbox" name="category" value="immobilier" onchange="updateCategorySelection(this)">
+            <span class="category-checkmark"></span>
+            <span class="category-text">🏠 Immobilier</span>
+          </label>
+          <label class="category-dropdown-item">
+            <input type="checkbox" name="category" value="materiel_pro" onchange="updateCategorySelection(this)">
+            <span class="category-checkmark"></span>
+            <span class="category-text">🔧 Matériel professionnel</span>
+          </label>
+          <label class="category-dropdown-item">
+            <input type="checkbox" name="category" value="informatique" onchange="updateCategorySelection(this)">
+            <span class="category-checkmark"></span>
+            <span class="category-text">💻 Informatique & électronique</span>
+          </label>
+          <label class="category-dropdown-item">
+            <input type="checkbox" name="category" value="mobilier" onchange="updateCategorySelection(this)">
+            <span class="category-checkmark"></span>
+            <span class="category-text">🪑 Mobilier & équipements</span>
+          </label>
+          <label class="category-dropdown-item">
+            <input type="checkbox" name="category" value="bijoux" onchange="updateCategorySelection(this)">
+            <span class="category-checkmark"></span>
+            <span class="category-text">💎 Bijoux & objets de valeur</span>
+          </label>
+          <label class="category-dropdown-item">
+            <input type="checkbox" name="category" value="stocks" onchange="updateCategorySelection(this)">
+            <span class="category-checkmark"></span>
+            <span class="category-text">📦 Stocks et invendus</span>
+          </label>
+          <label class="category-dropdown-item">
+            <input type="checkbox" name="category" value="oeuvres" onchange="updateCategorySelection(this)">
+            <span class="category-checkmark"></span>
+            <span class="category-text">🎨 Œuvres & collections</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
         
         <!-- Date compacte -->
         <div class="filter-group" data-filter="date">
@@ -147,64 +168,271 @@
 
         <!-- Localisation compacte -->
         <div class="filter-group" data-filter="wilaya">
-          <label class="filter-group-title">
-            <i class="fas fa-map-marker-alt"></i>
-            Wilaya
-          </label>
-          <div class="select-wrapper-compact">
-            <select id="wilaya" name="wilaya" class="styled-select-compact" onchange="updateFilters()">
-              <option value="">Toutes les wilayas</option>
-              <option value="01">Adrar</option>
-              <option value="02">Chlef</option>
-              <option value="03">Laghouat</option>
-              <option value="04">Oum El Bouaghi</option>
-              <option value="05">Batna</option>
-              <option value="06">Béjaïa</option>
-              <option value="07">Biskra</option>
-              <option value="08">Béchar</option>
-              <option value="09">Blida</option>
-              <option value="10">Bouira</option>
-              <option value="11">Tamanrasset</option>
-              <option value="12">Tébessa</option>
-              <option value="13">Tlemcen</option>
-              <option value="14">Tiaret</option>
-              <option value="15">Tizi Ouzou</option>
-              <option value="16">Alger</option>
-              <option value="17">Djelfa</option>
-              <option value="18">Jijel</option>
-              <option value="19">Sétif</option>
-              <option value="20">Saïda</option>
-              <option value="21">Skikda</option>
-              <option value="22">Sidi Bel Abbès</option>
-              <option value="23">Annaba</option>
-              <option value="24">Guelma</option>
-              <option value="25">Constantine</option>
-              <option value="26">Médéa</option>
-              <option value="27">Mostaganem</option>
-              <option value="28">M'Sila</option>
-              <option value="29">Mascara</option>
-              <option value="30">Ouargla</option>
-              <option value="31">Oran</option>
-              <option value="32">El Bayadh</option>
-              <option value="33">Illizi</option>
-              <option value="34">Bordj Bou Arréridj</option>
-              <option value="35">Boumerdès</option>
-              <option value="36">El Tarf</option>
-              <option value="37">Tindouf</option>
-              <option value="38">Tissemsilt</option>
-              <option value="39">El Oued</option>
-              <option value="40">Khenchela</option>
-              <option value="41">Souk Ahras</option>
-              <option value="42">Tipaza</option>
-              <option value="43">Mila</option>
-              <option value="44">Aïn Defla</option>
-              <option value="45">Naâma</option>
-              <option value="46">Aïn Témouchent</option>
-              <option value="47">Ghardaïa</option>
-              <option value="48">Relizane</option>
-            </select>
-          </div>
+  <label class="filter-group-title">
+    <i class="fas fa-map-marker-alt"></i>
+    Wilaya
+  </label>
+  <div class="wilaya-dropdown-wrapper">
+    <button class="wilaya-dropdown-btn" onclick="toggleWilayaDropdown()">
+      <span id="wilaya-selected-text">Toutes les wilayas</span>
+      <i class="fas fa-chevron-down wilaya-dropdown-arrow"></i>
+    </button>
+    
+    <div id="wilaya-dropdown-menu" class="wilaya-dropdown-menu">
+      <div class="wilaya-dropdown-content">
+        <div class="wilaya-dropdown-header">
+          <span>Sélectionnez les wilayas</span>
+          <button class="wilaya-clear-btn" onclick="clearWilayaSelection(event)">Effacer</button>
         </div>
+        <div class="wilaya-dropdown-search">
+          <input type="text" placeholder="Rechercher une wilaya..." onkeyup="filterWilayas(this.value)">
+        </div>
+        <div class="wilaya-dropdown-items">
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="01" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Adrar</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="02" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Chlef</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="03" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Laghouat</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="04" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Oum El Bouaghi</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="05" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Batna</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="06" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Béjaïa</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="07" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Biskra</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="08" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Béchar</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="09" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Blida</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="10" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Bouira</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="11" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Tamanrasset</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="12" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Tébessa</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="13" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Tlemcen</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="14" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Tiaret</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="15" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Tizi Ouzou</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="16" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Alger</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="17" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Djelfa</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="18" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Jijel</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="19" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Sétif</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="20" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Saïda</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="21" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Skikda</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="22" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Sidi Bel Abbès</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="23" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Annaba</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="24" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Guelma</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="25" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Constantine</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="26" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Médéa</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="27" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Mostaganem</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="28" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">M'Sila</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="29" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Mascara</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="30" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Ouargla</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="31" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Oran</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="32" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">El Bayadh</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="33" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Illizi</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="34" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Bordj Bou Arréridj</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="35" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Boumerdès</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="36" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">El Tarf</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="37" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Tindouf</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="38" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Tissemsilt</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="39" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">El Oued</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="40" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Khenchela</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="41" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Souk Ahras</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="42" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Tipaza</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="43" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Mila</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="44" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Aïn Defla</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="45" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Naâma</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="46" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Aïn Témouchent</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="47" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Ghardaïa</span>
+          </label>
+          <label class="wilaya-dropdown-item">
+            <input type="checkbox" name="wilaya" value="48" onchange="updateWilayaSelection(this)">
+            <span class="wilaya-checkmark"></span>
+            <span class="wilaya-text">Relizane</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
         <!-- Boutons d'action compacts -->
         <div class="filter-actions-compact">
@@ -400,7 +628,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  margin-bottom: 0px;
+  margin-bottom: 24px;
   width: 100%;
   max-width: 1000px;
   margin-left: auto;
@@ -559,7 +787,7 @@
   border: 1px solid var(--border-color);
   border-radius: 12px;
   box-shadow: var(--shadow-heavy);
-  z-index: 1000;
+  z-index: 1002;
   opacity: 0;
   visibility: hidden;
   transform: translateX(-50%) translateY(-8px);
@@ -718,85 +946,6 @@
   color: var(--primary-color);
 }
 
-/* ===== CATÉGORIES COMPACTES ===== */
-.categories-compact {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2px;
-}
-
-.checkbox-compact {
-  display: flex;
-  align-items: center;
-  position: relative;
-  padding-left: 24px;
-  cursor: pointer;
-  font-size: 12px;
-  user-select: none;
-  color: var(--text-light);
-  transition: color 0.2s ease;
-  padding: 6px 0 6px 24px;
-}
-
-.checkbox-compact input {
-  position: absolute;
-  opacity: 0;
-  cursor: pointer;
-  height: 0;
-  width: 0;
-}
-
-.checkmark-compact {
-  position: absolute;
-  left: 0;
-  height: 14px;
-  width: 14px;
-  background-color: var(--input-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 3px;
-  transition: all 0.2s ease;
-}
-
-.checkbox-compact:hover .checkmark-compact {
-  background-color: #333;
-  border-color: var(--primary-color);
-}
-
-.checkbox-compact input:checked ~ .checkmark-compact {
-  background-color: var(--primary-color);
-  border-color: var(--primary-color);
-}
-
-.checkmark-compact:after {
-  content: "";
-  position: absolute;
-  display: none;
-}
-
-.checkbox-compact input:checked ~ .checkmark-compact:after {
-  display: block;
-}
-
-.checkbox-compact .checkmark-compact:after {
-  left: 4px;
-  top: 1px;
-  width: 3px;
-  height: 7px;
-  border: solid white;
-  border-width: 0 2px 2px 0;
-  transform: rotate(45deg);
-}
-
-.label-compact {
-  transition: color 0.2s ease;
-  font-weight: 500;
-}
-
-.checkbox-compact:hover .label-compact,
-.checkbox-compact input:checked ~ .label-compact {
-  color: var(--white);
-}
-
 /* ===== SELECT COMPACTS ===== */
 .select-wrapper-compact {
   position: relative;
@@ -887,7 +1036,6 @@
   margin: 0 auto 20px;
   max-width: 1000px;
   padding: 0 10px;
-  margin-top: 10px;
 }
 
 .active-filter {
@@ -1382,6 +1530,449 @@
     min-width: 75px;
   }
 }
+
+/* ===== DROPDOWN WILAYAS ===== */
+.wilaya-dropdown-wrapper,
+.category-dropdown-wrapper {
+  position: relative;
+  width: 100%;
+  z-index: 1001;
+}
+
+.wilaya-dropdown-btn {
+  width: 100%;
+  padding: 10px 12px;
+  background-color: var(--input-bg);
+  color: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.wilaya-dropdown-btn:hover {
+  border-color: var(--primary-color);
+  background-color: #333;
+}
+
+.wilaya-dropdown-btn.active {
+  border-color: var(--primary-color);
+  background-color: rgba(255, 107, 53, 0.1);
+}
+
+.wilaya-dropdown-arrow {
+  font-size: 10px;
+  transition: transform 0.3s ease;
+}
+
+.wilaya-dropdown-btn.open .wilaya-dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+.wilaya-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: var(--shadow-heavy);
+  z-index: 1001;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition: all 0.3s ease;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.wilaya-dropdown-menu.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.wilaya-dropdown-content {
+  padding: 8px;
+}
+
+.wilaya-dropdown-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 8px;
+}
+
+.wilaya-dropdown-header span {
+  font-size: 11px;
+  color: var(--text-light);
+  font-weight: 500;
+}
+
+.wilaya-clear-btn {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.wilaya-clear-btn:hover {
+  background-color: rgba(255, 107, 53, 0.1);
+  text-decoration: underline;
+}
+
+.wilaya-dropdown-search {
+  margin-bottom: 8px;
+  padding: 0 8px;
+}
+
+.wilaya-dropdown-search input {
+  width: 100%;
+  padding: 8px 10px;
+  background-color: var(--input-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--white);
+  font-size: 12px;
+}
+
+.wilaya-dropdown-search input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+.wilaya-dropdown-items {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.wilaya-dropdown-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  position: relative;
+  margin-bottom: 2px;
+}
+
+.wilaya-dropdown-item:last-child {
+  margin-bottom: 0;
+}
+
+.wilaya-dropdown-item:hover {
+  background-color: rgba(255, 107, 53, 0.1);
+}
+
+.wilaya-dropdown-item input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.wilaya-checkmark {
+  width: 16px;
+  height: 16px;
+  background-color: var(--input-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  margin-right: 10px;
+  position: relative;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.wilaya-dropdown-item:hover .wilaya-checkmark {
+  border-color: var(--primary-color);
+}
+
+.wilaya-dropdown-item input:checked ~ .wilaya-checkmark {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.wilaya-checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+  left: 5px;
+  top: 2px;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.wilaya-dropdown-item input:checked ~ .wilaya-checkmark:after {
+  display: block;
+}
+
+.wilaya-text {
+  color: var(--text-light);
+  font-size: 12px;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.wilaya-dropdown-item:hover .wilaya-text,
+.wilaya-dropdown-item input:checked ~ .wilaya-text {
+  color: var(--white);
+}
+
+.wilaya-dropdown-item.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Scrollbar pour le dropdown des wilayas */
+.wilaya-dropdown-items::-webkit-scrollbar {
+  width: 4px;
+}
+
+.wilaya-dropdown-items::-webkit-scrollbar-track {
+  background: #2a2a2a;
+}
+
+.wilaya-dropdown-items::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 2px;
+}
+
+/* ===== DROPDOWN CATÉGORIES ===== */
+.category-dropdown-wrapper {
+  position: relative;
+  width: 100%;
+  z-index: 1001;
+}
+
+.category-dropdown-btn {
+  width: 100%;
+  padding: 10px 12px;
+  background-color: var(--input-bg);
+  color: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.category-dropdown-btn:hover {
+  border-color: var(--primary-color);
+  background-color: #333;
+}
+
+.category-dropdown-btn.active {
+  border-color: var(--primary-color);
+  background-color: rgba(255, 107, 53, 0.1);
+}
+
+.category-dropdown-arrow {
+  font-size: 10px;
+  transition: transform 0.3s ease;
+}
+
+.category-dropdown-btn.open .category-dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+.category-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: var(--shadow-heavy);
+  z-index: 1002;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition: all 0.3s ease;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.category-dropdown-menu.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.category-dropdown-content {
+  padding: 8px;
+}
+
+.category-dropdown-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 8px;
+}
+
+.category-dropdown-header span {
+  font-size: 11px;
+  color: var(--text-light);
+  font-weight: 500;
+}
+
+.category-clear-btn {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.category-clear-btn:hover {
+  background-color: rgba(255, 107, 53, 0.1);
+  text-decoration: underline;
+}
+
+.category-dropdown-search {
+  margin-bottom: 8px;
+  padding: 0 8px;
+}
+
+.category-dropdown-search input {
+  width: 100%;
+  padding: 8px 10px;
+  background-color: var(--input-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--white);
+  font-size: 12px;
+}
+
+.category-dropdown-search input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+.category-dropdown-items {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.category-dropdown-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  position: relative;
+  margin-bottom: 2px;
+}
+
+.category-dropdown-item:last-child {
+  margin-bottom: 0;
+}
+
+.category-dropdown-item:hover {
+  background-color: rgba(255, 107, 53, 0.1);
+}
+
+.category-dropdown-item input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.category-checkmark {
+  width: 16px;
+  height: 16px;
+  background-color: var(--input-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  margin-right: 10px;
+  position: relative;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.category-dropdown-item:hover .category-checkmark {
+  border-color: var(--primary-color);
+}
+
+.category-dropdown-item input:checked ~ .category-checkmark {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.category-checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+  left: 5px;
+  top: 2px;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.category-dropdown-item input:checked ~ .category-checkmark:after {
+  display: block;
+}
+
+.category-text {
+  color: var(--text-light);
+  font-size: 12px;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.category-dropdown-item:hover .category-text,
+.category-dropdown-item input:checked ~ .category-text {
+  color: var(--white);
+}
+
+/* Scrollbar pour le dropdown des catégories */
+.category-dropdown-items::-webkit-scrollbar {
+  width: 4px;
+}
+
+.category-dropdown-items::-webkit-scrollbar-track {
+  background: #2a2a2a;
+}
+
+.category-dropdown-items::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 2px;
+}
+
+/* ===== TOAST NOTIFICATION ===== */
+
 </style>
 
 <script>
@@ -1504,13 +2095,13 @@ function closeSidebar() {
 
 // ===== GESTION DES FILTRES =====
 function updateFilters() {
-  const wilaya = document.getElementById("wilaya").value;
   const dateFilter = document.getElementById("date-filter").value;
   const selectedCategories = document.querySelectorAll('input[name="category"]:checked');
+  const selectedWilayas = document.querySelectorAll('input[name="wilaya"]:checked');
 
   activeFilters.clear();
   
-  if (wilaya && wilaya !== "") activeFilters.add("wilaya");
+  if (selectedWilayas.length > 0) activeFilters.add("wilaya");
   if (dateFilter !== "all") activeFilters.add("date");
   if (selectedCategories.length > 0) activeFilters.add("categories");
 
@@ -1549,9 +2140,11 @@ function updateActiveFiltersDisplay() {
   container.innerHTML = "";
 
   if (activeFilters.has("wilaya")) {
-    const wilayaSelect = document.getElementById("wilaya");
-    const wilayaText = wilayaSelect.options[wilayaSelect.selectedIndex].text;
-    addActiveFilter("Wilaya", wilayaText, "wilaya");
+    const selectedWilayas = document.querySelectorAll('input[name="wilaya"]:checked');
+    selectedWilayas.forEach(wilaya => {
+      const wilayaText = wilaya.nextElementSibling.nextElementSibling.textContent;
+      addActiveFilter("Wilaya", wilayaText, "wilaya", wilaya.value);
+    });
   }
 
   if (activeFilters.has("date")) {
@@ -1584,14 +2177,19 @@ function addActiveFilter(label, value, type, specificValue = null) {
 }
 
 function removeActiveFilter(type, specificValue) {
-  if (type === "wilaya") {
-    document.getElementById("wilaya").selectedIndex = 0;
+  if (type === "wilaya" && specificValue) {
+    const checkbox = document.querySelector(`input[name="wilaya"][value="${specificValue}"]`);
+    if (checkbox) {
+      checkbox.checked = false;
+      updateWilayaSelection(checkbox);
+    }
   } else if (type === "date") {
     document.getElementById("date-filter").value = "all";
   } else if (type === "category" && specificValue) {
     const checkbox = document.querySelector(`input[name="category"][value="${specificValue}"]`);
     if (checkbox) {
       checkbox.checked = false;
+      updateCategorySelection(checkbox);
     }
   }
   
@@ -1599,12 +2197,25 @@ function removeActiveFilter(type, specificValue) {
 }
 
 function clearAllFilters() {
-  document.getElementById("wilaya").selectedIndex = 0;
   document.getElementById("date-filter").value = "all";
   
+  // Réinitialiser les catégories
   document.querySelectorAll('input[name="category"]').forEach(checkbox => {
     checkbox.checked = false;
   });
+  const categorySelectedText = document.getElementById('category-selected-text');
+  const categoryBtn = document.querySelector('.category-dropdown-btn');
+  categorySelectedText.textContent = 'Toutes les catégories';
+  categoryBtn.classList.remove('active');
+  
+  // Réinitialiser les wilayas
+  document.querySelectorAll('input[name="wilaya"]').forEach(checkbox => {
+    checkbox.checked = false;
+  });
+  const wilayaSelectedText = document.getElementById('wilaya-selected-text');
+  const wilayaBtn = document.querySelector('.wilaya-dropdown-btn');
+  wilayaSelectedText.textContent = 'Toutes les wilayas';
+  wilayaBtn.classList.remove('active');
 
   // Réinitialiser la recherche
   document.getElementById("live-search").value = "";
@@ -1633,7 +2244,7 @@ function clearAllFilters() {
 
 function applyFilters() {
   const filters = {
-    wilaya: document.getElementById("wilaya").value,
+    wilayas: Array.from(document.querySelectorAll('input[name="wilaya"]:checked')).map(cb => cb.value),
     date: document.getElementById("date-filter").value,
     categories: Array.from(document.querySelectorAll('input[name="category"]:checked')).map(cb => cb.value)
   };
@@ -1643,9 +2254,9 @@ function applyFilters() {
     let shouldShow = true;
     
     // Filtre par wilaya
-    if (filters.wilaya) {
+    if (filters.wilayas.length > 0) {
       const cardWilaya = card.getAttribute('data-wilaya');
-      if (cardWilaya !== filters.wilaya) {
+      if (!filters.wilayas.includes(cardWilaya)) {
         shouldShow = false;
       }
     }
@@ -1686,6 +2297,124 @@ function updateResultsCount() {
   } else if (emptyState) {
     emptyState.style.display = 'none';
   }
+}
+
+// ===== GESTION DU DROPDOWN WILAYAS =====
+function toggleWilayaDropdown() {
+  const dropdown = document.getElementById('wilaya-dropdown-menu');
+  const btn = document.querySelector('.wilaya-dropdown-btn');
+
+  dropdown.classList.toggle('show');
+  btn.classList.toggle('open');
+}
+
+function updateWilayaSelection(checkbox) {
+  const selectedWilayas = document.querySelectorAll('input[name="wilaya"]:checked');
+  const selectedText = document.getElementById('wilaya-selected-text');
+  const btn = document.querySelector('.wilaya-dropdown-btn');
+  
+  if (selectedWilayas.length === 0) {
+    selectedText.textContent = 'Toutes les wilayas';
+    btn.classList.remove('active');
+  } else if (selectedWilayas.length === 1) {
+    const wilayaText = selectedWilayas[0].nextElementSibling.nextElementSibling.textContent;
+    selectedText.textContent = wilayaText;
+    btn.classList.add('active');
+  } else {
+    selectedText.textContent = `${selectedWilayas.length} wilayas sélectionnées`;
+    btn.classList.add('active');
+  }
+
+  updateFilters();
+}
+
+function clearWilayaSelection(event) {
+  event.stopPropagation();
+  
+  document.querySelectorAll('input[name="wilaya"]').forEach(checkbox => {
+    checkbox.checked = false;
+  });
+  
+  const selectedText = document.getElementById('wilaya-selected-text');
+  const btn = document.querySelector('.wilaya-dropdown-btn');
+  
+  selectedText.textContent = 'Toutes les wilayas';
+  btn.classList.remove('active');
+  
+  updateFilters();
+}
+
+function filterWilayas(searchTerm) {
+  const term = searchTerm.toLowerCase().trim();
+  const items = document.querySelectorAll('.wilaya-dropdown-item');
+  
+  items.forEach(item => {
+    const text = item.querySelector('.wilaya-text').textContent.toLowerCase();
+    if (text.includes(term) || term === '') {
+      item.style.display = 'flex';
+    } else {
+      item.style.display = 'none';
+    }
+  });
+}
+
+// ===== GESTION DU DROPDOWN CATÉGORIES =====
+function toggleCategoryDropdown() {
+  const dropdown = document.getElementById('category-dropdown-menu');
+  const btn = document.querySelector('.category-dropdown-btn');
+
+  dropdown.classList.toggle('show');
+  btn.classList.toggle('open');
+}
+
+function updateCategorySelection(checkbox) {
+  const selectedCategories = document.querySelectorAll('input[name="category"]:checked');
+  const selectedText = document.getElementById('category-selected-text');
+  const btn = document.querySelector('.category-dropdown-btn');
+  
+  if (selectedCategories.length === 0) {
+    selectedText.textContent = 'Toutes les catégories';
+    btn.classList.remove('active');
+  } else if (selectedCategories.length === 1) {
+    const categoryText = selectedCategories[0].nextElementSibling.nextElementSibling.textContent;
+    selectedText.textContent = categoryText;
+    btn.classList.add('active');
+  } else {
+    selectedText.textContent = `${selectedCategories.length} catégories sélectionnées`;
+    btn.classList.add('active');
+  }
+
+  updateFilters();
+}
+
+function clearCategorySelection(event) {
+  event.stopPropagation();
+  
+  document.querySelectorAll('input[name="category"]').forEach(checkbox => {
+    checkbox.checked = false;
+  });
+  
+  const selectedText = document.getElementById('category-selected-text');
+  const btn = document.querySelector('.category-dropdown-btn');
+  
+  selectedText.textContent = 'Toutes les catégories';
+  btn.classList.remove('active');
+  
+  updateFilters();
+}
+
+function filterCategories(searchTerm) {
+  const term = searchTerm.toLowerCase().trim();
+  const items = document.querySelectorAll('.category-dropdown-item');
+  
+  items.forEach(item => {
+    const text = item.querySelector('.category-text').textContent.toLowerCase();
+    if (text.includes(term) || term === '') {
+      item.style.display = 'flex';
+    } else {
+      item.style.display = 'none';
+    }
+  });
 }
 
 // ===== EVENT LISTENERS =====
@@ -1730,5 +2459,29 @@ function initializeEventListeners() {
       }, 150);
     });
   }
+
+  // Fermer le dropdown des wilayas en cliquant à l'extérieur
+  document.addEventListener('click', function(event) {
+    if (!event.target.closest('.wilaya-dropdown-wrapper')) {
+      const dropdown = document.getElementById('wilaya-dropdown-menu');
+      const btn = document.querySelector('.wilaya-dropdown-btn');
+      if (dropdown && btn) {
+        dropdown.classList.remove('show');
+        btn.classList.remove('open');
+      }
+    }
+  });
+
+  // Fermer le dropdown des catégories en cliquant à l'extérieur
+  document.addEventListener('click', function(event) {
+    if (!event.target.closest('.category-dropdown-wrapper')) {
+      const dropdown = document.getElementById('category-dropdown-menu');
+      const btn = document.querySelector('.category-dropdown-btn');
+      if (dropdown && btn) {
+        dropdown.classList.remove('show');
+        btn.classList.remove('open');
+      }
+    }
+  });
 }
 </script>
