@@ -101,13 +101,14 @@
   <a href="{% url 'notifications' %}" style="position: relative; color: #fff; transition: color 0.2s ease;"
      onmouseover="this.style.color='#ccc'" onmouseout="this.style.color='#fff'">
     <i class="fas fa-bell" style="font-size: 20px;"></i>
-    <span style="position: absolute; top: -5px; right: -5px; background: #ff4444; color: white; font-size: 10px; padding: 2px 5px; border-radius: 50%; animation: pulse 2s infinite;">3</span>
-  </a>
+    {% if unread_count != 0 %}
+      <span style="position: absolute; top: -5px; right: -5px; background: #ff4444; color: white; font-size: 10px; padding: 2px 5px; border-radius: 50%; animation: pulse 2s infinite;">{{unread_count}}</span>
+    {% endif %}
+    </a>
 {% else %}
   <a href="{% url 'connexion' %}?next={% url 'notifications' %}" style="position: relative; color: #fff; transition: color 0.2s ease;"
      onmouseover="this.style.color='#ccc'" onmouseout="this.style.color='#fff'">
     <i class="fas fa-bell" style="font-size: 20px;"></i>
-    <span style="position: absolute; top: -5px; right: -5px; background: #ff4444; color: white; font-size: 10px; padding: 2px 5px; border-radius: 50%; animation: pulse 2s infinite;">3</span>
   </a>
 {% endif %}
 

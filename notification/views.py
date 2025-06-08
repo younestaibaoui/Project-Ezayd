@@ -1,10 +1,16 @@
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 
+@login_required
 def notifications_view(request):
-    # Exemple statique ou récupérer des objets Notification
-    notifications = {
-        1 : 'new enchaire',
-        2 : 'enchaire active',
-        3 : 'objet auctioned',
-    }  # Exemple : Notification.objects.filter(user=request.user)
-    return render(request, 'notifications.html', {'notifications': notifications})
+
+    user = request.user
+    notifications = user.notifications.all().order_by('-created_at')
+    
+    context = {
+        'user': user,
+        'notifications': notifications,
+        'unread_count': notifications.filter(is_read=False).count(),
+    } 
+
+    return render(request, 'notifications.html', context)

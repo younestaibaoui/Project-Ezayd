@@ -86,8 +86,18 @@ def accueil(request):
         # --- Choisir une image aléatoire comme image principale ---
         enchere.main_image_url = random.choice(all_images) if all_images else None
 
+    notifications = request.user.notifications.all() if request.user.is_authenticated else None
+    if notifications:
+        unread_count = notifications.filter(is_read=False).count()
+    else:
+        unread_count = 0
 
-    return render(request, 'accueil/accueil.html', {'enchaires': enchaires})
+    context = {
+        'enchaires': enchaires,
+        'unread_count':unread_count,
+    }
+
+    return render(request, 'accueil/accueil.html', context)
 
 @require_POST
 @login_required

@@ -1,1 +1,12 @@
-notifications brr
+<h2> {{user.username}} </h2>
+
+{% if unread_count == 0 %}
+    <p>no notifications</p>
+{% else %}
+    <p>Unread notifications: {{ unread_count }}</p>
+    <ul>
+        {% for notification in notifications %}
+            {% include './notification.html' %}
+        {% endfor %}
+    </ul>
+{% endif %}
