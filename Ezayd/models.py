@@ -176,6 +176,7 @@ class DemandeEnchaire(models.Model):
     def get_absolute_url(self):
         return reverse('demande_enchaire_detail', args=[self.pk])
  
+# ---------------------------------------- PARTICIPATION ENCHERE ----------------------------------------
 class ParticipationEnchaire(models.Model):
     enchaireObjet = models.ForeignKey(
         "EnchaireObjet",
@@ -195,7 +196,7 @@ class ParticipationEnchaire(models.Model):
         help_text="Montant de la participation",
         default=0,
     )
-    date_participation = models.DateTimeField(default=timezone.now)
+    date_participation = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Participation de {self.user} à l'enchère {self.enchaireObjet}."

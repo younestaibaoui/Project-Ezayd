@@ -224,6 +224,7 @@ def details_objet_view(request, type_objet, objet_id):
         'participation_count' : participation_count,
         'is_winner': is_winner,
         'demande_state': demande_state,  
+
     }
     
     if request.user.is_authenticated:

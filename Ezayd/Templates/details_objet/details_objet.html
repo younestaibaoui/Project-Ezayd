@@ -1205,11 +1205,12 @@
 
     <!-- Sidebar -->
     <div class="sidebar">
-        <!-- Auction Information -->
+     
+        <!-- Section Prix Actuel et Participation -->
         <div class="auction-info">
-            <h3 class="section-title">
+                <h3 class="section-title">
                 <i class="fas fa-gavel"></i>
-                Informations d'enchère
+                Action et Informations d'enchère
             </h3>
             
             <div class="price-item">
@@ -1234,18 +1235,9 @@
                     </div>
                 {% endif %}
             {% else %}
-                <div class="no-reserve">
-                    <i class="fas fa-info-circle"></i>
-                    Aucun prix de réserve défini
-                </div>
+            
             {% endif %}
-        </div>
-        <!-- Section Prix Actuel et Participation -->
-        <div class="auction-info">
-            <h3 class="section-title">
-                <i class="fas fa-chart-line"></i>
-                Enchère en cours
-            </h3>
+         
             
             <div class="price-item">
                 <span class="price-label">Prix actuel</span>
