@@ -22,9 +22,16 @@ from .models import (
     DemandeEnchaire
 )
 
-
 def accueil(request):
+    # Get search parameter from request
+    search_query = request.GET.get('search', '')
+    
+    # Base query with select_related
     enchaires = Enchaire.objects.select_related('lot').all()
+    
+    # Apply search filter if provided
+    if search_query:
+        enchaires = enchaires.filter(nom__icontains=search_query)
 
     for enchere in enchaires:
         enchere.images = {
@@ -87,10 +94,9 @@ def accueil(request):
         # --- Choisir une image aléatoire comme image principale ---
         enchere.main_image_url = random.choice(all_images) if all_images else None
 
-  
-
     context = {
         'enchaires': enchaires,
+        'search_query': search_query,  # Pass search query to template
     }
 
     # Vérifier si l'utilisateur est authentifié et récupérer les notifications
@@ -105,11 +111,14 @@ def accueil(request):
         notifications = request.user.notifications.all().order_by('-created_at')    
         context['unread_count'] = unread_count
         context['notifications'] = notifications
-    
-
 
     return render(request, 'accueil/accueil.html', context)
 
+
+
+
+
+# Toggle favorite status for an auction
 @require_POST
 @login_required
 def toggle_favori(request, enchere_id):
@@ -202,6 +211,10 @@ def details_objet_view(request, type_objet, objet_id):
     demande = DemandeEnchaire.objects.filter(user=request.user, enchaire=enchaire).first() if request.user.is_authenticated else None
     demande_state = demande.state if demande else None
 
+   
+    current_price = enchaireObjet.price_reserved or enchaireObjet.first_price
+
+
     context = {
         'enchaireObjet': enchaireObjet,
         'type_objet': type_objet,
@@ -210,6 +223,7 @@ def details_objet_view(request, type_objet, objet_id):
         'valid': valid,
         'demande_state': demande_state,    
         'participation_count' : enchaireObjet.participations.values('user').distinct().count() if enchaireObjet else 0,
+        'current_price': current_price,
     }
     
     if request.user.is_authenticated:

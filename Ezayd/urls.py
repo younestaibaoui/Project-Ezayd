@@ -14,15 +14,11 @@ urlpatterns = [
     path('details/<int:enchere_id>/', details_view, name='details_enchaire'),
     path('details-objet/<str:type_objet>/<int:objet_id>/', details_objet_view, name='details_objet'),
     path('demande/', demande, name='demande'),
-
     # 🔍 Barre de recherche
     path('search/', search_view, name='search'),
-
     # 🛒 Panier
     path('panier/', panier_view, name='panier'),
-
     path('profil/', profil_view, name='profil'),
-
     path('participer/', participer, name='participer'),
 ]
 
