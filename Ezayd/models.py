@@ -506,6 +506,16 @@ class InformatiqueElectronique(models.Model):
     def save(self, *args, **kwargs):
         self.full_clean()
         super().save(*args, **kwargs)
+    def __str__(self):
+        parts = []
+        if self.marque:
+            parts.append(self.marque)
+        if self.modele:
+            parts.append(self.modele)
+        if self.type_objet:
+            parts.append(f"({self.get_type_objet_display()})")  # Affiche le label lisible du choix
+        return " ".join(parts) if parts else f"Informatique #{self.id}"
+
 
 class InformatiqueImage(models.Model):
     objet = models.ForeignKey(InformatiqueElectronique, related_name='images', on_delete=models.CASCADE)

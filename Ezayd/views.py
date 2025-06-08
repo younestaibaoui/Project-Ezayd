@@ -1,10 +1,11 @@
 import random
-
-from django.shortcuts import render, redirect, get_object_or_404,HttpResponse
+from django.shortcuts import render, redirect, get_object_or_404, HttpResponse
 from django.http import Http404
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
+from django.db.models import Count, Q
+from datetime import datetime, timedelta
 
 from perso.models import UserAccount
 
@@ -19,101 +20,242 @@ from .models import (
     BijouxObjetValeur,
     StockInvendu,
     OeuvreCollection,
-    DemandeEnchaire
+    DemandeEnchaire,
+    ParticipationEnchaire
 )
 
+import random
+from django.shortcuts import render
+from django.db.models import Count, Q
+from .models import Enchaire, Lot
+
+import random
+from django.shortcuts import render
+from django.db.models import Count, Q
+from .models import Enchaire, Lot, Voiture, Immobilier, MaterielProfessionnel, InformatiqueElectronique, MobilierEquipement, BijouxObjetValeur, StockInvendu, OeuvreCollection
+from django.utils import timezone
+
+
+import random
+from django.shortcuts import render
+from django.db.models import Count, Q
+from .models import Enchaire, Lot, Voiture, Immobilier, MaterielProfessionnel, InformatiqueElectronique, MobilierEquipement, BijouxObjetValeur, StockInvendu, OeuvreCollection
+from django.utils import timezone
+
+
 def accueil(request):
-    # Get search parameter from request
-    search_query = request.GET.get('search', '')
-    
-    # Base query with select_related
-    enchaires = Enchaire.objects.select_related('lot').all()
-    
-    # Apply search filter if provided
-    if search_query:
-        enchaires = enchaires.filter(nom__icontains=search_query)
+  # Get search parameter from request
+  search_query = request.GET.get('search', '')
+  
+  # Base query with select_related
+  enchaires = Enchaire.objects.select_related('lot').all()
+  
+  # Apply search filter if provided
+  if search_query:
+      enchaires = enchaires.filter(lot__nom__icontains=search_query)
 
-    for enchere in enchaires:
-        enchere.images = {
-            'voitures': [],
-            'immobiliers': [],
-            'materiels': [],
-            'informatique': [],
-            'mobilier': [],
-            'bijoux': [],
-            'stocks': [],
-        }
+  # Récupérer les top 3 objets par catégorie avec images aléatoires
+  top_objets_by_category = get_top_3_objets_by_category()
 
-        lot = enchere.lot
-        all_images = []
+  # Traitement des enchères existantes (votre code original)
+  for enchere in enchaires:
+      enchere.images = {
+          'voitures': [],
+          'immobiliers': [],
+          'materiels': [],
+          'informatique': [],
+          'mobilier': [],
+          'bijoux': [],
+          'stocks': [],
+      }
 
-        # --- Remplir toutes les images par catégorie ---
-        for voiture in lot.voitures.all():
-            for img in voiture.images.all():
-                url = img.image.url
-                enchere.images['voitures'].append(url)
-                all_images.append(url)
+      lot = enchere.lot
+      all_images = []
 
-        for immo in lot.immobiliers.all():
-            for img in immo.images.all():
-                url = img.image.url
-                enchere.images['immobiliers'].append(url)
-                all_images.append(url)
+      # --- Remplir toutes les images par catégorie ---
+      for voiture in lot.voitures.all():
+          for img in voiture.images.all():
+              url = img.image.url
+              enchere.images['voitures'].append(url)
+              all_images.append(url)
 
-        for materiel in lot.materiels.all():
-            for img in materiel.images.all():
-                url = img.image.url
-                enchere.images['materiels'].append(url)
-                all_images.append(url)
+      for immo in lot.immobiliers.all():
+          for img in immo.images.all():
+              url = img.image.url
+              enchere.images['immobiliers'].append(url)
+              all_images.append(url)
 
-        for info in lot.informatique.all():
-            for img in info.images.all():
-                url = img.image.url
-                enchere.images['informatique'].append(url)
-                all_images.append(url)
+      for materiel in lot.materiels.all():
+          for img in materiel.images.all():
+              url = img.image.url
+              enchere.images['materiels'].append(url)
+              all_images.append(url)
 
-        for mob in lot.mobilier.all():
-            for img in mob.images.all():
-                url = img.image.url
-                enchere.images['mobilier'].append(url)
-                all_images.append(url)
+      for info in lot.informatique.all():
+          for img in info.images.all():
+              url = img.image.url
+              enchere.images['informatique'].append(url)
+              all_images.append(url)
 
-        for bijou in lot.bijoux.all():
-            for img in bijou.images.all():
-                url = img.image.url
-                enchere.images['bijoux'].append(url)
-                all_images.append(url)
+      for mob in lot.mobilier.all():
+          for img in mob.images.all():
+              url = img.image.url
+              enchere.images['mobilier'].append(url)
+              all_images.append(url)
 
-        for stock in lot.stocks.all():
-            if hasattr(stock, 'images'):
-                for img in stock.images.all():
-                    url = img.image.url
-                    enchere.images['stocks'].append(url)
-                    all_images.append(url)
+      for bijou in lot.bijoux.all():
+          for img in bijou.images.all():
+              url = img.image.url
+              enchere.images['bijoux'].append(url)
+              all_images.append(url)
 
-        # --- Choisir une image aléatoire comme image principale ---
-        enchere.main_image_url = random.choice(all_images) if all_images else None
+      for stock in lot.stocks.all():
+          if hasattr(stock, 'images'):
+              for img in stock.images.all():
+                  url = img.image.url
+                  enchere.images['stocks'].append(url)
+                  all_images.append(url)
 
-    context = {
-        'enchaires': enchaires,
-        'search_query': search_query,  # Pass search query to template
+      # --- Choisir une image aléatoire comme image principale ---
+      enchere.main_image_url = random.choice(all_images) if all_images else None
+
+  context = {
+      'enchaires': enchaires,
+      'search_query': search_query,
+      'top_objets_by_category': top_objets_by_category,
+  }
+
+  # Vérifier si l'utilisateur est authentifié et récupérer les notifications
+  if request.user.is_authenticated:
+      notifications = request.user.notifications.all() if request.user.is_authenticated else None
+      if notifications:
+          unread_count = notifications.filter(is_read=False).count()
+      else:
+          unread_count = 0
+  
+      # Récupérer les notifications de l'utilisateur connecté
+      notifications = request.user.notifications.all().order_by('-created_at')    
+      context['unread_count'] = unread_count
+      context['notifications'] = notifications
+
+  return render(request, 'accueil/accueil.html', context)
+
+
+def get_top_3_objets_by_category():
+    """
+    Récupère les top 3 objets par nombre de participations pour chaque catégorie
+    avec une image aléatoire pour chaque objet
+    """
+    # Dictionnaire pour mapper les types aux modèles
+    type_models = {
+        'vehicules': Voiture,
+        'immobilier': Immobilier,
+        'materiel_pro': MaterielProfessionnel,
+        'informatique_electronique': InformatiqueElectronique,
+        'mobilier_equipements': MobilierEquipement,
+        'bijoux_objets_valeur': BijouxObjetValeur,
+        'stocks_invendus': StockInvendu,
+        'oeuvres_collections': OeuvreCollection,
     }
-
-    # Vérifier si l'utilisateur est authentifié et récupérer les notifications
-    if request.user.is_authenticated:
-        notifications = request.user.notifications.all() if request.user.is_authenticated else None
-        if notifications:
-            unread_count = notifications.filter(is_read=False).count()
-        else:
-            unread_count = 0
     
-        # Récupérer les notifications de l'utilisateur connecté
-        notifications = request.user.notifications.all().order_by('-created_at')    
-        context['unread_count'] = unread_count
-        context['notifications'] = notifications
+    # Dictionnaire pour les icônes par catégorie
+    category_icons = {
+        'vehicules': 'fas fa-car',
+        'immobilier': 'fas fa-home',
+        'materiel_pro': 'fas fa-tools',
+        'informatique_electronique': 'fas fa-laptop',
+        'mobilier_equipements': 'fas fa-couch',
+        'bijoux_objets_valeur': 'fas fa-gem',
+        'stocks_invendus': 'fas fa-boxes',
+        'oeuvres_collections': 'fas fa-palette',
+    }
+    
+    # Dictionnaire pour les noms des catégories
+    category_names = {
+        'vehicules': 'Véhicules',
+        'immobilier': 'Immobilier',
+        'materiel_pro': 'Matériel professionnel',
+        'informatique_electronique': 'Informatique & électronique',
+        'mobilier_equipements': 'Mobilier & équipements',
+        'bijoux_objets_valeur': 'Bijoux & objets de valeur',
+        'stocks_invendus': 'Stocks et invendus',
+        'oeuvres_collections': 'Œuvres & collections',
+    }
+    
+    top_objets = []
+    
+    for type_key, model_class in type_models.items():
+        try:
+            # Récupérer les objets de cette catégorie avec le nombre de participations
+            objets = model_class.objects.select_related(
+                'enchaireObjet', 'lot', 'lot__enchaire'
+            ).annotate(
+                participation_count=Count('enchaireObjet__participations', distinct=True)
+            ).filter(
+                lot__enchaire__etat='active',  # Seulement les enchères actives
+                participation_count__gt=0  # Seulement ceux avec des participations
+            ).order_by('-participation_count')[:1]  # Top 1 par catégorie
+            
+            if objets.exists():
+                top_objet = objets.first()
+                
+                # Calculer les jours restants
+                today = timezone.now().date()
+                jours_restants = (top_objet.lot.enchaire.date_fin - today).days
 
-    return render(request, 'accueil/accueil.html', context)
+                # Récupérer les images
+                images = []
+                if hasattr(top_objet, 'images'):
+                    images = [img.image.url for img in top_objet.images.all()[:3]]
 
+                # Déterminer le titre selon la catégorie
+                if type_key == 'vehicules' and hasattr(top_objet, 'voiture'):
+                    title = f"{top_objet.voiture.nom} - {top_objet.voiture.model}"
+                elif type_key == 'immobilier' and hasattr(top_objet, 'immobilier'):
+                    title = top_objet.immobilier.titre
+                elif type_key == 'materiel_pro' and hasattr(top_objet, 'materielProfessionnel'):
+                    title = top_objet.materielProfessionnel.nom
+                elif type_key == 'informatique_electronique' and hasattr(top_objet, 'informatiqueElectronique'):
+                    title = f"{top_objet.InformatiqueElectronique.marque}"
+                elif type_key == 'mobilier_equipements' and hasattr(top_objet, 'mobilierEquipement'):
+                    title = top_objet.mobilierEquipement.categorie
+                elif type_key == 'bijoux_objets_valeur' and hasattr(top_objet, 'bijouxObjetValeur'):
+                    title = top_objet.bijouxObjetValeur.type_objet
+                elif type_key == 'stocks_invendus' and hasattr(top_objet, 'stockInvendu'):
+                    title = top_objet.stockInvendu.nom_produit
+                elif type_key == 'oeuvres_collections' and hasattr(top_objet, 'oeuvreCollection'):
+                    title = top_objet.oeuvreCollection.titre
+                else:
+                    title = str(top_objet)
+
+                # Créer l'objet de données
+                objet_data = {
+                    'title': title,
+                    'type': type_key,
+                    'category_name': category_names.get(type_key, 'Autre'),
+                    'category_icon': category_icons.get(type_key, 'fa-question'),
+                    'participation_count': top_objet.participation_count,
+                    'price_current': top_objet.enchaireObjet.price_reserved if top_objet.enchaireObjet else 0,
+                    'jours_restants': max(0, jours_restants),
+                    'images': images,
+                    'main_image': random.choice(images) if images else '/static/images/placeholder.jpg',
+                    'enchaire': top_objet.lot.enchaire,
+                    'objet': top_objet,
+                    'views': random.randint(10, 500),  # Simuler des vues
+                    'favorites': random.randint(1, 50),  # Simuler des favoris
+                }
+
+                top_objets.append(objet_data)
+
+        except Exception as e:
+            # Log l'erreur mais continue avec les autres catégories
+            print(f"Erreur pour la catégorie {type_key}: {e}")
+            continue
+    
+    # Mélanger la liste pour avoir un ordre aléatoire dans le carrousel
+    random.shuffle(top_objets)
+    
+    return top_objets
 
 
 

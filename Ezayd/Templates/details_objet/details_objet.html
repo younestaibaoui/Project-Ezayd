@@ -223,7 +223,7 @@
 
     .status-item-right {
         color: #adb5bd;
-        font-size: 12px;
+        font-size: 14px;
         margin-top: 2px;
     }
 
@@ -567,7 +567,7 @@
 
     /* Statut de l'enchère */
     .auction-status {
-        margin-top: 16px;
+        margin-top: 5px;
         padding-top: 16px;
         display: flex;
         flex-direction: column;
@@ -773,10 +773,6 @@
             </h3>
             
             <div>
-                <div class="price-item">
-                    <span class="price-label">Prix de départ</span>
-                    <span class="price-value">{{ enchaireObjet.first_price }} DA</span>
-                </div>
                 {% if enchaireObjet.price_reserved < enchaireObjet.first_price %}
                     <div class="price-item">
                         <span class="price-label">Prix actuel</span>
@@ -784,6 +780,10 @@
                             {{ enchaireObjet.price_reserved|add:enchaireObjet.pas }} DA
                         </span>
                     </div>
+                                    <div class="price-item">
+                    <span class="price-label">Prix de départ</span>
+                    <span class="price-value">{{ enchaireObjet.first_price }} DA</span>
+                </div>
                 {% else %}
                     {% with price_reserved=enchaireObjet.price_reserved %}
                         <div class="price-item">
@@ -792,21 +792,28 @@
                                 {{ price_reserved }} DA
                             </span>
                         </div>
+
+                                        <div class="price-item">
+                    <span class="price-label">Prix de départ</span>
+                    <span class="price-value">{{ enchaireObjet.first_price }} DA</span>
+                </div>
                         <div class="price-item last-child">
                             <span class="price-label">
                                 Prochaine enchère
                             </span>
 
+
                             <div class="price-value-container">
                                 <p class="price-value">
                                     {{ price_reserved|add:enchaireObjet.pas }} DA
                                 </p>
-
-                                {% if enchaireObjet.price_reserved > enchaireObjet.first_price %}
+                                                          
                                     <p class="status-item-right">Pas: {{ enchaireObjet.pas }} DA</p>
-                                {% endif %}
+                            
                             </div>
+                            
                         </div>
+
                     {% endwith %}
                 {% endif %}
 
@@ -851,7 +858,7 @@
                     {% endif %}
                 {% endif %}
             {% else %}
-                <button type="submit" class="participate-btn-en-tete" style="margin-top: 20px; cursor: default;" disabled>
+                <button type="submit" class="participate-btn-en-tete" style="margin-top: 0px; cursor: default;" disabled>
                     En Tete
                 </button>
             {% endif %}

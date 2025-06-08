@@ -163,12 +163,12 @@
     {% if user.is_authenticated %}
       <a href="{% url 'panier' %}" style="color: #fff; transition: color 0.2s ease;"
         onmouseover="this.style.color='#ccc'" onmouseout="this.style.color='#fff'">
-        <i class="fas fa-shopping-cart" style="font-size: 20px;"></i>
+        <i class="fas fa-gavel" style="font-size: 20px;"></i>
       </a>
     {% else %}
       <a href="{% url 'connexion' %}?next={% url 'panier' %}" style="color: #fff; transition: color 0.2s ease;"
         onmouseover="this.style.color='#ccc'" onmouseout="this.style.color='#fff'">
-        <i class="fas fa-shopping-cart" style="font-size: 20px;"></i>
+        <i class="fas fa-gavel" style="font-size: 20px;"></i>
       </a>
     {% endif %}
 
