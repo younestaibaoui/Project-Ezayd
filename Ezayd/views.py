@@ -275,7 +275,210 @@ def toggle_favori(request, enchere_id):
         enchere.savers.add(request.user)
     return redirect(request.META.get('HTTP_REFERER', 'accueil'))
 
+from django.shortcuts import render, get_object_or_404
+from .models import Enchaire, DemandeEnchaire, ParticipationEnchaire
+
 def details_view(request, enchere_id):
+    enchaire = get_object_or_404(Enchaire, id=enchere_id)
+    lot = enchaire.lot
+    lot_type = lot.type
+
+    # Récupération de la demande de l'utilisateur
+    demande = None
+    if request.user.is_authenticated:
+        demande = DemandeEnchaire.objects.filter(user=request.user, enchaire=enchaire).first()
+
+    objets_queryset = []
+    objets_info = []
+
+    # Si le lot est de type "vehicules"
+    if lot_type == 'vehicules':
+        objets_queryset = lot.voitures.select_related('enchaireObjet').prefetch_related('enchaireObjet__participations').all()
+
+        for voiture in objets_queryset:
+            enchaire_objet = voiture.enchaireObjet
+            participation_count = (
+                enchaire_objet.participations.values('user').distinct().count()
+                if enchaire_objet else 0
+            )
+
+            objets_info.append({
+                'id': voiture.id,
+                'nom': voiture.nom,
+                'enchaireObjet': enchaire_objet,
+                'get_images': voiture.get_images(),  # Suppose que ça retourne des URLs ou une liste
+                'participation_count': participation_count,
+                'model': voiture.model,
+                'year': voiture.year,
+            })
+
+    # Si le lot est de type "immobilier"
+    elif lot_type == 'immobilier':
+        objets_queryset = lot.immobiliers.select_related('enchaireObjet').prefetch_related('enchaireObjet__participations').all()
+
+        for immobilier in objets_queryset:
+            enchaire_objet = immobilier.enchaireObjet
+            participation_count = (
+                enchaire_objet.participations.values('user').distinct().count()
+                if enchaire_objet else 0
+            )
+            objets_info.append({
+                'id': immobilier.id,
+                'titre': immobilier.titre,
+                'get_images': immobilier.get_images(),  # Suppose que ça retourne des URLs ou une liste
+                'ville': immobilier.ville,
+                'adresse': immobilier.adresse,
+                'participation_count': participation_count,
+            })
+
+    # Si le lot est de type "materiel_pro"
+    elif lot_type == 'materiel_pro':
+        objets_queryset = lot.materiels.select_related('enchaireObjet').prefetch_related('enchaireObjet__participations').all()
+        
+
+        for materiel in objets_queryset:
+            
+            enchaire_objet = materiel.enchaireObjet
+            participation_count = (
+                enchaire_objet.participations.values('user').distinct().count()
+                if enchaire_objet else 0
+            )
+
+            objets_info.append({
+                'id': materiel.id,
+                'nom': materiel.nom,
+                'get_images': materiel.get_images(),  # Suppose que ça retourne des URLs ou une liste
+                'marque': materiel.marque,
+                'modele': materiel.modele,
+                'participation_count': participation_count,
+            })
+
+    # Si le lot est de type "informatique_electronique"
+    elif lot_type == 'informatique_electronique':
+        objets_queryset = lot.informatique.select_related('enchaireObjet').prefetch_related('enchaireObjet__participations').all()
+
+
+        for info in objets_queryset:
+            enchaire_objet = info.enchaireObjet
+            participation_count = (
+                enchaire_objet.participations.values('user').distinct().count()
+                if enchaire_objet else 0
+            )
+
+
+            objets_info.append({
+                'id': info.id,
+                'marque': info.marque,
+                'modele': info.modele,
+                'type_objet': info.type_objet,
+                'get_images': info.get_images(),  # Suppose que ça retourne des URLs ou une liste
+                'etat': info.etat,  # Si applicable
+                'participation_count': participation_count,
+                
+            })
+
+    # Si le lot est de type "mobilier_equipements"
+    elif lot_type == 'mobilier_equipements':
+        objets_queryset = lot.mobilier.all()
+        for mobilier in objets_queryset:
+
+            enchaire_objet = mobilier.enchaireObjet
+            participation_count = (
+                enchaire_objet.participations.values('user').distinct().count()
+                if enchaire_objet else 0
+            )
+
+            objets_info.append({
+                'id': mobilier.id,
+                'categorie': mobilier.categorie,
+                'get_images': mobilier.get_images(),  # Suppose que ça retourne des URLs ou une liste
+                'participation_count': participation_count,
+            })
+    
+    # Si le lot est de type "bijoux_objets_valeur"
+    elif lot_type == 'bijoux_objets_valeur':
+        objets_queryset = lot.bijoux.select_related('enchaireObjet').prefetch_related('enchaireObjet__participations').all()
+
+        for bijou in objets_queryset:
+            enchaire_objet = bijou.enchaireObjet
+            participation_count = (
+                enchaire_objet.participations.values('user').distinct().count()
+                if enchaire_objet else 0
+            )
+            objets_info.append({
+                'id': bijou.id,
+                'type_objet': bijou.type_objet,
+                'get_images': bijou.get_images(),  # Suppose que ça retourne des URLs ou une liste
+                'caracteristiques': bijou.caracteristiques,  # Si applicable
+                'participation_count': participation_count,
+            })
+
+    elif lot_type == 'stocks_invendus':
+        objets_queryset = lot.stocks.select_related('enchaireObjet').prefetch_related('enchaireObjet__participations').all()
+
+        for stock in objets_queryset:
+            enchaire_objet = stock.enchaireObjet
+            participation_count = (
+                enchaire_objet.participations.values('user').distinct().count()
+                if enchaire_objet else 0
+            )
+            objets_info.append({
+                'id': stock.id,
+                'nom_produit': stock.nom_produit,
+                'get_images': stock.get_images(),  # Suppose que ça retourne des URLs ou une liste
+                'quantite': stock.quantite,  # Si applicable
+                'participation_count': participation_count,
+            })
+    # Si le lot est de type "oeuvres_collections"
+    elif lot_type == 'oeuvres_collections':
+        objets_queryset = lot.oeuvres.select_related('enchaireObjet').prefetch_related('enchaireObjet__participations').all()
+        for oeuvre in objets_queryset:
+            enchaire_objet = oeuvre.enchaireObjet
+            participation_count = (
+                enchaire_objet.participations.values('user').distinct().count()
+                if enchaire_objet else 0
+            )
+            objets_info.append({
+                'id': oeuvre.id,
+                'titre': oeuvre.titre,
+                'get_images': oeuvre.get_images(),  # Suppose que ça retourne des URLs ou une liste
+                'artiste': oeuvre.artiste,
+            })
+    else:
+        raise Http404("Type de lot non supporté.")
+
+    # Comptage des participations uniques
+    participations = ParticipationEnchaire.objects.filter(
+        enchaireObjet__in=[
+            obj.enchaireObjet for obj in objets_queryset if obj.enchaireObjet
+        ]
+    ).values('user').distinct()
+    participation_count = participations.count()
+
+    # Notifications
+    unread_count = 0
+    notifications = []
+    if request.user.is_authenticated:
+        notifications = request.user.notifications.all().order_by('-created_at')
+        unread_count = notifications.filter(is_read=False).count()
+
+    context = {
+        'enchaire': enchaire,
+        'demande': demande,
+        'lot': lot,
+        'objets': objets_info,
+        'participation_count': participation_count,
+        'notifications': notifications,
+        'unread_count': unread_count,
+    }
+    return render(request, 'details_enchaire/details_enchaire.html', context)
+  
+
+
+# ------------------------------------------------------------------------
+
+
+
      
     enchaire = get_object_or_404(Enchaire, id=enchere_id)
     lot = enchaire.lot
@@ -305,7 +508,7 @@ def details_view(request, enchere_id):
             object_results.append({
                 'id': voiture.id,
                 'nom': voiture.nom,
-                'model': voiture.model
+
                 'enchaireObjet': enchaire_objet,
                 'get_images': voiture.get_images(),  # assuming this returns a list or URL
                 'participation_count': str(participation_count),
@@ -353,6 +556,7 @@ def details_view(request, enchere_id):
         context['notifications'] = notifications
 
     return render(request, 'details_enchaire/details_enchaire.html', context)
+# --------------------------------------------------------------------
 
 def details_objet_view(request, type_objet, objet_id):
 
