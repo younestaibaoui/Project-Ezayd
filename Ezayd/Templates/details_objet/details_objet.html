@@ -61,7 +61,6 @@
     .object-title {
         font-size: 32px;
         font-weight: 700;
-        margin: 0 0 16px 0;
         color: #fff;
     }
 
@@ -567,7 +566,6 @@
 
     /* Statut de l'enchère */
     .auction-status {
-        margin-top: 5px;
         padding-top: 16px;
         display: flex;
         flex-direction: column;
@@ -697,6 +695,13 @@
         color: #adb5bd;
         font-style: italic;
     }
+    
+    .breadcrumb-gird {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        margin-bottom: 16px;
+    }
 </style>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -716,47 +721,52 @@
 
 <!-- Header Section -->
 <div class="header-section">
-    {% if type_objet == 'vehicules' %}
-        <h1 class="object-title">{{ objet.nom }} - {{ objet.model }} ({{ objet.year }})</h1>
-    {% elif type_objet == 'immobilier' %}
-        <h1 class="object-title">{{ objet.titre }}</h1>
-    {% elif type_objet == 'materiel_pro' %}
-        <h1 class="object-title">{{ objet.nom }}</h1>
-    {% elif type_objet == 'informatique_electronique' %}
-        <h1 class="object-title">{{ objet.type_objet }}</h1>
-    {% elif type_objet == 'mobilier_equipements' %}
-        <h1 class="object-title">{{ objet.categorie }}</h1>
-    {% elif type_objet == 'bijoux_objets_valeur' %}
-        <h1 class="object-title">{{ objet.type_objet }}</h1>
-    {% elif type_objet == 'stocks_invendus' %}
-        <h1 class="object-title">{{ objet.nom_produit }}</h1>
-    {% elif type_objet == 'oeuvres_collections' %}
-        <h1 class="object-title">{{ objet.titre }}</h1>
-    {% else %}
-        <h1 class="object-title">Objet</h1>
-    {% endif %}
+    <div class="breadcrumb-gird">
+        {% if type_objet == 'vehicules' %}
+                <h1 class="object-title">{{ objet.nom }} - {{ objet.model }} ({{ objet.year }})</h1>
+            {% elif type_objet == 'immobilier' %}
+                <h1 class="object-title">{{ objet.titre }}</h1>
+            {% elif type_objet == 'materiel_pro' %}
+                <h1 class="object-title">{{ objet.nom }}</h1>
+            {% elif type_objet == 'informatique_electronique' %}
+                <h1 class="object-title">{{ objet.type_objet }}</h1>
+            {% elif type_objet == 'mobilier_equipements' %}
+                <h1 class="object-title">{{ objet.categorie }}</h1>
+            {% elif type_objet == 'bijoux_objets_valeur' %}
+                <h1 class="object-title">{{ objet.type_objet }}</h1>
+            {% elif type_objet == 'stocks_invendus' %}
+                <h1 class="object-title">{{ objet.nom_produit }}</h1>
+            {% elif type_objet == 'oeuvres_collections' %}
+                <h1 class="object-title">{{ objet.titre }}</h1>
+            {% else %}
+                <h1 class="object-title">Objet</h1>
+        {% endif %}
 
-    
-<!-- Images Section -->
-{% if objet.get_images %}
-    
-        <h2 class="section-title">
-            <i class="fas fa-images"></i>
-            Galerie d'images ({{ objet.get_images|length }} image{{ objet.get_images|length|pluralize }})
-        </h2>
-        
-        <div class="images-grid">
-            {% for image in objet.get_images %}
-                <div class="image-item" onclick="openImageModal({{ forloop.counter0 }})">
-                    <img src="{{ image }}" alt="Image {{ forloop.counter }} de l'objet" loading="lazy">
-                    <div class="image-overlay">
-                        <i class="fas fa-search-plus"></i>
-                    </div>
-                </div>
-            {% endfor %}
+        <div class="section-title">
+            <i class="fas fa-users"></i>
+            <span>{{ participation_count|default:0 }} participant{{ participation_count|default:0|pluralize }}</span>
         </div>
-    
-{% endif %}
+    </div>
+        <!-- Images Section -->
+        {% if objet.get_images %}
+            
+            <h2 class="section-title">
+                <i class="fas fa-images"></i>
+                Galerie d'images ({{ objet.get_images|length }} image{{ objet.get_images|length|pluralize }})
+            </h2>
+            
+            <div class="images-grid">
+                {% for image in objet.get_images %}
+                    <div class="image-item" onclick="openImageModal({{ forloop.counter0 }})">
+                        <img src="{{ image }}" alt="Image {{ forloop.counter }} de l'objet" loading="lazy">
+                        <div class="image-overlay">
+                            <i class="fas fa-search-plus"></i>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+        {% endif %}
 </div>
 
 <!-- Main Content Grid -->
@@ -769,10 +779,14 @@
         <div class="auction-info">
             <h3 class="section-title">
                 <i class="fas fa-gavel"></i>
-                Action et Informations d'enchère
+                Informations et Action d'enchère
             </h3>
             
             <div>
+                <div class="price-item">
+                    <span class="price-label">Prix de départ</span>
+                    <span class="price-value">{{ enchaireObjet.first_price }} DA</span>
+                </div>
                 {% if enchaireObjet.price_reserved < enchaireObjet.first_price %}
                     <div class="price-item">
                         <span class="price-label">Prix actuel</span>
@@ -780,10 +794,6 @@
                             {{ enchaireObjet.price_reserved|add:enchaireObjet.pas }} DA
                         </span>
                     </div>
-                                    <div class="price-item">
-                    <span class="price-label">Prix de départ</span>
-                    <span class="price-value">{{ enchaireObjet.first_price }} DA</span>
-                </div>
                 {% else %}
                     {% with price_reserved=enchaireObjet.price_reserved %}
                         <div class="price-item">
@@ -792,28 +802,21 @@
                                 {{ price_reserved }} DA
                             </span>
                         </div>
-
-                                        <div class="price-item">
-                    <span class="price-label">Prix de départ</span>
-                    <span class="price-value">{{ enchaireObjet.first_price }} DA</span>
-                </div>
                         <div class="price-item last-child">
                             <span class="price-label">
                                 Prochaine enchère
                             </span>
 
-
                             <div class="price-value-container">
                                 <p class="price-value">
                                     {{ price_reserved|add:enchaireObjet.pas }} DA
                                 </p>
-                                                          
-                                    <p class="status-item-right">Pas: {{ enchaireObjet.pas }} DA</p>
-                            
-                            </div>
-                            
-                        </div>
 
+                                {% if price_reserved >= enchaireObjet.first_price %}
+                                    <p class="status-item-right">Pas: {{ enchaireObjet.pas }} DA</p>
+                                {% endif %}
+                            </div>
+                        </div>
                     {% endwith %}
                 {% endif %}
 
@@ -858,7 +861,7 @@
                     {% endif %}
                 {% endif %}
             {% else %}
-                <button type="submit" class="participate-btn-en-tete" style="margin-top: 0px; cursor: default;" disabled>
+                <button type="submit" class="participate-btn-en-tete" style="cursor: default;" disabled>
                     En Tete
                 </button>
             {% endif %}
@@ -874,7 +877,7 @@
                 </div>
             </div>
         </div>
-        <!-- Participants Card Section -->
+        {% comment %} Participants Card Section {% endcomment %}
         <div class="participants-card">
             <h3 class="section-title">
                 <i class="fas fa-gavel"></i>

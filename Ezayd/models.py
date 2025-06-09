@@ -7,9 +7,6 @@ from datetime import datetime
 from perso.models import UserAccount
 from notification.models import NotificationEnchaire,NotificationDemandeEnchaire
 
-
-
-
 # ---------------------------------------- Auction Management ----------------------------------------
 ETAT_ENCHAIRE_CHOICES = (
     ('upcoming', 'À venir'),
@@ -21,6 +18,19 @@ from django.db import models
 from django.core.validators import MinValueValidator
 
 class EnchaireObjet(models.Model):
+
+    TYPE_CHOICES = [
+        (None,'-'),
+        ('vehicules', 'Véhicules'),
+        ('immobilier', 'Immobilier'),
+        ('materiel_pro', 'Matériel professionnel'),
+        ('informatique_electronique', 'Informatique & électronique'),
+        ('mobilier_equipements', 'Mobilier & équipements'),
+        ('bijoux_objets_valeur', 'Bijoux & objets de valeur'),
+        ('stocks_invendus', 'Stocks et invendus'),
+        ('oeuvres_collections', 'Œuvres & collections'),
+    ]
+
     first_price = models.IntegerField(null=False, validators=[MinValueValidator(0)])
     pas = models.IntegerField(null=False, validators=[MinValueValidator(0)])
     reserved = models.BooleanField(default=False)
@@ -30,7 +40,9 @@ class EnchaireObjet(models.Model):
         blank=True,
         on_delete=models.SET_NULL,
     )
-    price_reserved = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0)])
+    price_reserved = models.IntegerField(null=True, blank=True)
+    type = models.CharField(max_length=30, null=True, blank=True, default=None,choices=TYPE_CHOICES)
+    objet_id = models.IntegerField(null=True,blank=True,default=None)
 
     def save(self, *args, **kwargs):
         if self.pk is None and self.price_reserved is None:
@@ -48,53 +60,34 @@ class EnchaireObjet(models.Model):
         )
         self.save()
 
-    def get_type(self):
+    def get_objet(self):
 
-        if hasattr(self, 'voiture'):
-            type_objet = 'vehicules'
-        elif hasattr(self, 'immobilier'):
-            type_objet = 'immobilier'
-        elif hasattr(self, 'materielProfessionnel'):
-            type_objet = 'materiel_pro'
-        elif hasattr(self, 'informatiqueElectronique'):
-            type_objet = 'informatique_electronique'
-        elif hasattr(self, 'mobilierEquipement'):
-            type_objet = 'mobilier_equipements'
-        elif hasattr(self, 'bijouxObjetValeur'):
-            type_objet = 'bijoux_objets_valeur'
-        elif hasattr(self, 'stockInvendu'):
-            type_objet = 'stocks_invendus'
-        elif hasattr(self, 'oeuvreCollection'):
-            type_objet = 'oeuvres_collections'
+        type_objet = self.type
+
+        if type_objet == 'vehicules':
+            objet = Voiture.objects.get(id=self.objet_id)
+        elif type_objet == 'immobilier':
+            objet = Immobilier.objects.get(id=self.objet_id)
+        elif type_objet == 'materiel_pro':
+            objet = MaterielProfessionnel.objects.get(id=self.objet_id)
+        elif type_objet == 'informatique_electronique':
+            objet = InformatiqueElectronique.objects.get(id=self.objet_id)
+        elif type_objet == 'mobilier_equipements':
+            objet = MobilierEquipement.objects.get(id=self.objet_id)
+        elif type_objet == 'bijoux_objets_valeur':
+            objet = BijouxObjetValeur.objects.get(id=self.objet_id)
+        elif type_objet == 'stocks_invendus':
+            objet = StockInvendu.objects.get(id=self.objet_id)
+        elif type_objet == 'oeuvres_collections':
+            objet = OeuvreCollection.objects.get(id=self.objet_id)
         else:
-            type_objet = False
+            objet = None
 
-        return type_objet
+        return objet
 
     def __str__(self):
-
-        avec_objet = True
-
-        if hasattr(self, 'voiture'):
-            objet = self.voiture
-        elif hasattr(self, 'immobilier'):
-            objet = self.immobilier
-        elif hasattr(self, 'materielProfessionnel'):
-            objet = self.materiel_pro
-        elif hasattr(self, 'informatiqueElectronique'):
-            objet = self.informatiqueElectronique
-        elif hasattr(self, 'mobilierEquipement'):
-            objet = self.mobilierEquipement
-        elif hasattr(self, 'bijouxObjetValeur'):
-            objet = self.bijouxObjetValeur
-        elif hasattr(self, 'stockInvendu'):
-            objet = self.stockInvendu
-        elif hasattr(self, 'oeuvreCollection'):
-            objet = self.oeuvreCollection
-        else:
-            avec_objet = False
-        
-        return str(objet) if avec_objet else f"EnchaireObjet #{self.id} (sans objet)"
+        objet = self.get_objet()
+        return str(objet) if objet else f"EnchaireObjet #{self.id} (sans objet)"
     
 class Enchaire(models.Model):
     date_debut = models.DateField(default=timezone.now, null=False)
@@ -180,7 +173,7 @@ class DemandeEnchaire(models.Model):
     user = models.ForeignKey(
         "perso.UserAccount",
         on_delete=models.CASCADE,
-        related_name="demandes_enchere"
+        related_name="demandes_enchaire"
     )
 
     date_demande = models.DateTimeField(default=timezone.now)
@@ -235,7 +228,7 @@ class ParticipationEnchaire(models.Model):
     user = models.ForeignKey(
         "perso.UserAccount",
         on_delete=models.CASCADE,
-        related_name="participations_enchères"
+        related_name="participations_encheres"
     )
     
     montant = models.IntegerField(
@@ -327,8 +320,16 @@ class Voiture(models.Model):
         if self.lot and self.lot.type != 'vehicules':
             raise ValidationError("Une voiture ne peut être liée qu'à un lot de type 'Véhicules'.")
 
+    def update_enchaireObjet(self):
+        enchaireObjet = self.enchaireObjet
+        enchaireObjet.type = self.lot.type
+        enchaireObjet.objet_id = self.id
+        enchaireObjet.save()
+
     def save(self, *args, **kwargs):
         self.full_clean()  # Appelle clean() et lève une exception si invalide
+        if not self.pk:  # object already exists
+            self.update_enchaireObjet()
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -391,9 +392,18 @@ class Immobilier(models.Model):
         if self.lot and self.lot.type != 'immobilier':
             raise ValidationError("Un bien immobilier doit appartenir à un lot de type 'Immobilier'.")
 
+    def update_enchaireObjet(self):
+        enchaireObjet = self.enchaireObjet
+        enchaireObjet.type = self.lot.type
+        enchaireObjet.objet_id = self.id
+        enchaireObjet.save()
+        
     def save(self, *args, **kwargs):
-        self.full_clean()
+        self.full_clean()  # Appelle clean() et lève une exception si invalide
+        if not self.pk:  # object already exists
+            self.update_enchaireObjet()
         super().save(*args, **kwargs)
+
 
     def __str__(self):
         return f"{self.titre} - {self.ville}"
@@ -448,9 +458,18 @@ class MaterielProfessionnel(models.Model):
         if self.lot and self.lot.type != 'materiel_pro':
             raise ValidationError("Le matériel professionnel doit appartenir à un lot de type 'Matériel professionnel'.")
 
+    def update_enchaireObjet(self):
+        enchaireObjet = self.enchaireObjet
+        enchaireObjet.type = self.lot.type
+        enchaireObjet.objet_id = self.id
+        enchaireObjet.save()
+        
     def save(self, *args, **kwargs):
-        self.full_clean()
+        self.full_clean()  # Appelle clean() et lève une exception si invalide
+        if not self.pk:  # object already exists
+            self.update_enchaireObjet()
         super().save(*args, **kwargs)
+
 
     def __str__(self):
         return f"{self.nom} ({self.type_materiel})"
@@ -503,9 +522,19 @@ class InformatiqueElectronique(models.Model):
         if self.lot.type != 'informatique_electronique':
             raise ValidationError("Ce produit doit appartenir à un lot de type 'Informatique & électronique'.")
 
+    def update_enchaireObjet(self):
+        enchaireObjet = self.enchaireObjet
+        enchaireObjet.type = self.lot.type
+        enchaireObjet.objet_id = self.id
+        enchaireObjet.save()
+        
     def save(self, *args, **kwargs):
-        self.full_clean()
+        self.full_clean()  # Appelle clean() et lève une exception si invalide
+        if not self.pk:  # object already exists
+            self.update_enchaireObjet()
         super().save(*args, **kwargs)
+
+
     def __str__(self):
         parts = []
         if self.marque:
@@ -549,9 +578,18 @@ class MobilierEquipement(models.Model):
         if self.lot.type != 'mobilier_equipements':
             raise ValidationError("Cet objet doit appartenir à un lot de type 'Mobilier & équipements'.")
 
+    def update_enchaireObjet(self):
+        enchaireObjet = self.enchaireObjet
+        enchaireObjet.type = self.lot.type
+        enchaireObjet.objet_id = self.id
+        enchaireObjet.save()
+        
     def save(self, *args, **kwargs):
-        self.full_clean()
+        self.full_clean()  # Appelle clean() et lève une exception si invalide
+        if not self.pk:  # object already exists
+            self.update_enchaireObjet()
         super().save(*args, **kwargs)
+
 
 class MobilierImage(models.Model):
     mobilier = models.ForeignKey(MobilierEquipement, related_name='images', on_delete=models.CASCADE)
@@ -585,9 +623,18 @@ class BijouxObjetValeur(models.Model):
         if self.lot.type != 'bijoux_objets_valeur':
             raise ValidationError("Cet objet doit appartenir à un lot de type 'Bijoux & objets de valeur'.")
 
+    def update_enchaireObjet(self):
+        enchaireObjet = self.enchaireObjet
+        enchaireObjet.type = self.lot.type
+        enchaireObjet.objet_id = self.id
+        enchaireObjet.save()
+        
     def save(self, *args, **kwargs):
-        self.full_clean()
+        self.full_clean()  # Appelle clean() et lève une exception si invalide
+        if not self.pk:  # object already exists
+            self.update_enchaireObjet()
         super().save(*args, **kwargs)
+
 
 class BijouxImage(models.Model):
     bijou = models.ForeignKey(BijouxObjetValeur, related_name='images', on_delete=models.CASCADE)
@@ -620,9 +667,18 @@ class StockInvendu(models.Model):
         if self.lot.type != 'stocks_invendus':
             raise ValidationError("Ce produit doit appartenir à un lot de type 'Stocks et invendus'.")
 
+    def update_enchaireObjet(self):
+        enchaireObjet = self.enchaireObjet
+        enchaireObjet.type = self.lot.type
+        enchaireObjet.objet_id = self.id
+        enchaireObjet.save()
+        
     def save(self, *args, **kwargs):
-        self.full_clean()
+        self.full_clean()  # Appelle clean() et lève une exception si invalide
+        if not self.pk:  # object already exists
+            self.update_enchaireObjet()
         super().save(*args, **kwargs)
+
 
 class StockImage(models.Model):
     produit = models.ForeignKey(StockInvendu, related_name='images', on_delete=models.CASCADE)
@@ -657,9 +713,18 @@ class OeuvreCollection(models.Model):
         if self.lot.type != 'oeuvres_collections':
             raise ValidationError("Cette œuvre doit appartenir à un lot de type 'Œuvres & collections'.")
 
+    def update_enchaireObjet(self):
+        enchaireObjet = self.enchaireObjet
+        enchaireObjet.type = self.lot.type
+        enchaireObjet.objet_id = self.id
+        enchaireObjet.save()
+        
     def save(self, *args, **kwargs):
-        self.full_clean()
+        self.full_clean()  # Appelle clean() et lève une exception si invalide
+        if not self.pk:  # object already exists
+            self.update_enchaireObjet()
         super().save(*args, **kwargs)
+
 
 class OeuvreImage(models.Model):
     oeuvre = models.ForeignKey(OeuvreCollection, related_name='images', on_delete=models.CASCADE)

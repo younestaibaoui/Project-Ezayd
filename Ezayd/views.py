@@ -1,17 +1,18 @@
 import random
+
 from django.shortcuts import render, redirect, get_object_or_404, HttpResponse
 from django.http import Http404
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.db.models import Count, Q
-from datetime import datetime, timedelta
 
 from perso.models import UserAccount
 
 from .models import (
     Enchaire,
     EnchaireObjet,
+    Lot,
     Voiture,
     Immobilier,
     MaterielProfessionnel,
@@ -24,122 +25,102 @@ from .models import (
     ParticipationEnchaire
 )
 
-import random
-from django.shortcuts import render
-from django.db.models import Count, Q
-from .models import Enchaire, Lot
-
-import random
-from django.shortcuts import render
-from django.db.models import Count, Q
-from .models import Enchaire, Lot, Voiture, Immobilier, MaterielProfessionnel, InformatiqueElectronique, MobilierEquipement, BijouxObjetValeur, StockInvendu, OeuvreCollection
-from django.utils import timezone
-
-
-import random
-from django.shortcuts import render
-from django.db.models import Count, Q
-from .models import Enchaire, Lot, Voiture, Immobilier, MaterielProfessionnel, InformatiqueElectronique, MobilierEquipement, BijouxObjetValeur, StockInvendu, OeuvreCollection
-from django.utils import timezone
-
-
 def accueil(request):
-  # Get search parameter from request
-  search_query = request.GET.get('search', '')
+    # Get search parameter from request
+    search_query = request.GET.get('search', '')
   
-  # Base query with select_related
-  enchaires = Enchaire.objects.select_related('lot').all()
+    # Base query with select_related
+    enchaires = Enchaire.objects.select_related('lot').all()
   
-  # Apply search filter if provided
-  if search_query:
-      enchaires = enchaires.filter(lot__nom__icontains=search_query)
+    # Apply search filter if provided
+    if search_query:
+        enchaires = enchaires.filter(lot__nom__icontains=search_query)
 
-  # Récupérer les top 3 objets par catégorie avec images aléatoires
-  top_objets_by_category = get_top_3_objets_by_category()
+    # Récupérer les top 3 objets par catégorie avec images aléatoires
+    top_objets_by_category = get_top_3_objets_by_category()
 
-  # Traitement des enchères existantes (votre code original)
-  for enchere in enchaires:
-      enchere.images = {
-          'voitures': [],
-          'immobiliers': [],
-          'materiels': [],
-          'informatique': [],
-          'mobilier': [],
-          'bijoux': [],
-          'stocks': [],
-      }
+    # Traitement des enchères existantes (votre code original)
+    for enchere in enchaires:
+        enchere.images = {
+            'voitures': [],
+            'immobiliers': [],
+            'materiels': [],
+            'informatique': [],
+            'mobilier': [],
+            'bijoux': [],
+            'stocks': [],
+        }
 
-      lot = enchere.lot
-      all_images = []
+        lot = enchere.lot
+        all_images = []
 
-      # --- Remplir toutes les images par catégorie ---
-      for voiture in lot.voitures.all():
-          for img in voiture.images.all():
-              url = img.image.url
-              enchere.images['voitures'].append(url)
-              all_images.append(url)
+        # --- Remplir toutes les images par catégorie ---
+        for voiture in lot.voitures.all():
+            for img in voiture.images.all():
+                url = img.image.url
+                enchere.images['voitures'].append(url)
+                all_images.append(url)
 
-      for immo in lot.immobiliers.all():
-          for img in immo.images.all():
-              url = img.image.url
-              enchere.images['immobiliers'].append(url)
-              all_images.append(url)
+        for immo in lot.immobiliers.all():
+            for img in immo.images.all():
+                url = img.image.url
+                enchere.images['immobiliers'].append(url)
+                all_images.append(url)
 
-      for materiel in lot.materiels.all():
-          for img in materiel.images.all():
-              url = img.image.url
-              enchere.images['materiels'].append(url)
-              all_images.append(url)
+        for materiel in lot.materiels.all():
+            for img in materiel.images.all():
+                url = img.image.url
+                enchere.images['materiels'].append(url)
+                all_images.append(url)
 
-      for info in lot.informatique.all():
-          for img in info.images.all():
-              url = img.image.url
-              enchere.images['informatique'].append(url)
-              all_images.append(url)
+        for info in lot.informatique.all():
+            for img in info.images.all():
+                url = img.image.url
+                enchere.images['informatique'].append(url)
+                all_images.append(url)
 
-      for mob in lot.mobilier.all():
-          for img in mob.images.all():
-              url = img.image.url
-              enchere.images['mobilier'].append(url)
-              all_images.append(url)
+        for mob in lot.mobilier.all():
+            for img in mob.images.all():
+                url = img.image.url
+                enchere.images['mobilier'].append(url)
+                all_images.append(url)
 
-      for bijou in lot.bijoux.all():
-          for img in bijou.images.all():
-              url = img.image.url
-              enchere.images['bijoux'].append(url)
-              all_images.append(url)
+        for bijou in lot.bijoux.all():
+            for img in bijou.images.all():
+                url = img.image.url
+                enchere.images['bijoux'].append(url)
+                all_images.append(url)
 
-      for stock in lot.stocks.all():
-          if hasattr(stock, 'images'):
-              for img in stock.images.all():
-                  url = img.image.url
-                  enchere.images['stocks'].append(url)
-                  all_images.append(url)
+        for stock in lot.stocks.all():
+            if hasattr(stock, 'images'):
+                for img in stock.images.all():
+                    url = img.image.url
+                    enchere.images['stocks'].append(url)
+                    all_images.append(url)
 
-      # --- Choisir une image aléatoire comme image principale ---
-      enchere.main_image_url = random.choice(all_images) if all_images else None
+        # --- Choisir une image aléatoire comme image principale ---
+        enchere.main_image_url = random.choice(all_images) if all_images else None
 
-  context = {
-      'enchaires': enchaires,
-      'search_query': search_query,
-      'top_objets_by_category': top_objets_by_category,
-  }
+    context = {
+        'enchaires': enchaires,
+        'search_query': search_query,
+        'top_objets_by_category': top_objets_by_category,
+    }
 
-  # Vérifier si l'utilisateur est authentifié et récupérer les notifications
-  if request.user.is_authenticated:
-      notifications = request.user.notifications.all() if request.user.is_authenticated else None
-      if notifications:
-          unread_count = notifications.filter(is_read=False).count()
-      else:
-          unread_count = 0
-  
-      # Récupérer les notifications de l'utilisateur connecté
-      notifications = request.user.notifications.all().order_by('-created_at')    
-      context['unread_count'] = unread_count
-      context['notifications'] = notifications
+    # Vérifier si l'utilisateur est authentifié et récupérer les notifications
+    if request.user.is_authenticated:
+        notifications = request.user.notifications.all() if request.user.is_authenticated else None
+        if notifications:
+            unread_count = notifications.filter(is_read=False).count()
+        else:
+            unread_count = 0
+    
+        # Récupérer les notifications de l'utilisateur connecté
+        notifications = request.user.notifications.all().order_by('-created_at')    
+        context['unread_count'] = unread_count
+        context['notifications'] = notifications
 
-  return render(request, 'accueil/accueil.html', context)
-
+    return render(request, 'accueil/accueil.html', context)
 
 def get_top_3_objets_by_category():
     """
@@ -257,10 +238,6 @@ def get_top_3_objets_by_category():
     
     return top_objets
 
-
-
-
-# Toggle favorite status for an auction
 @require_POST
 @login_required
 def toggle_favori(request, enchere_id):
@@ -300,11 +277,19 @@ def details_view(request, enchere_id):
     elif lot_type == 'oeuvres_collections':
         objets = lot.oeuvres.all()
 
+    participations = ParticipationEnchaire.objects.filter(
+        enchaireObjet__in=[obj.enchaireObjet for obj in objets if obj.enchaireObjet]
+    ).values('user').distinct()
+
+    participation_count = participations.count()
+
     context = {
         'enchaire' : enchaire,
         'demande' : demande if request.user.is_authenticated else None,
         'lot' : lot,
         'objets' : objets,
+        'participation_count': participation_count,
+
     }
     
     if request.user.is_authenticated:
@@ -356,7 +341,6 @@ def details_objet_view(request, type_objet, objet_id):
     participations = enchaireObjet.participations.all().order_by('-date_participation') if enchaireObjet else None
     participation_count = participations.values('user').distinct().count() if participations else 0
 
-
     context = {
         'enchaire_id': enchaire,
         'type_objet': type_objet,
@@ -366,7 +350,6 @@ def details_objet_view(request, type_objet, objet_id):
         'participation_count' : participation_count,
         'is_winner': is_winner,
         'demande_state': demande_state,  
-
     }
     
     if request.user.is_authenticated:
@@ -405,20 +388,6 @@ def demande(request):
     # Redirect to the referring page or fallback to a named route (e.g., 'accueil')
     return redirect(request.META.get('HTTP_REFERER', 'accueil'))
 
-# -----------------------------------------------------------------
-
-def search_view(request):
-    query = request.GET.get('q', '')
-    # Tu peux filtrer tes objets ici selon le modèle (exemple avec un modèle fictif)
-    results = []  # Exemple : Enchere.objects.filter(titre__icontains=query)
-    return render(request, 'search.html', {'query': query, 'results': results})
-
-
-def panier_view(request):
-    # Exemple : récupérer le panier de l'utilisateur
-    panier_items = []  # Exemple : Panier.objects.filter(user=request.user)
-    return render(request, 'panier.html', {'items': panier_items})
-
 @login_required
 def profil_view(request):
 
@@ -442,11 +411,10 @@ def profil_view(request):
 
     return render(request, 'profil.html', context)
 
-
-# # Participer à une enchère
 @require_POST
 @login_required
 def participer(request):
+
     user = request.user
     type_objet = request.POST.get('type_objet')
     objet_id = request.POST.get('objet_id')
@@ -471,7 +439,7 @@ def participer(request):
     elif type_objet == 'oeuvres_collections':
         objet = get_object_or_404(OeuvreCollection, id=objet_id)
 
-    demande = DemandeEnchaire.objects.filter(user=request.user, enchaire=objet.lot.enchaire).first() if request.user.is_authenticated else None
+    demande = user.demandes_enchaire.all().first() if request.user.is_authenticated else None
     demande_state = demande.state if demande else None
     enchaireObjet = objet.enchaireObjet
 
@@ -486,3 +454,51 @@ def participer(request):
         enchaireObjet.participer(user)
 
     return redirect('details_objet', type_objet, objet_id)
+
+@login_required
+def mes_participations(request):
+
+    user = request.user
+    participations = user.participations_encheres.values('enchaireObjet').distinct().order_by('-date_participation')
+
+    for participation in participations:
+        
+        enchaireObjet = get_object_or_404(EnchaireObjet, id=participation['enchaireObjet'])
+        type_objet = enchaireObjet.get_type()
+
+        if type_objet == 'vehicules':
+            objet = enchaireObjet.voiture
+        elif type_objet == 'immobilier':
+            objet = enchaireObjet.immobilier
+        elif type_objet == 'materiel_pro':
+            objet = enchaireObjet.materielProfessionnel
+        elif type_objet == 'informatique_electronique':
+            objet = enchaireObjet.informatiqueElectronique
+        elif type_objet == 'mobilier_equipements':
+            objet = enchaireObjet.mobilierEquipement
+        elif type_objet == 'bijoux_objets_valeur':
+            objet = enchaireObjet.bijouxObjetValeur
+        elif type_objet == 'stocks_invendus':
+            objet = enchaireObjet.stockInvendu
+        elif type_objet == 'oeuvres_collections':
+            objet = enchaireObjet.oeuvreCollection
+
+        participation['objet'] = objet
+        participation['enchere'] = objet.lot.enchaire
+
+    context = {
+        'participations': participations,
+    }
+
+    notifications = request.user.notifications.all() if request.user.is_authenticated else None
+    if notifications:
+        unread_count = notifications.filter(is_read=False).count()
+    else:
+        unread_count = 0
+
+    # Récupérer les notifications de l'utilisateur connecté
+    notifications = request.user.notifications.all().order_by('-created_at')    
+    context['unread_count'] = unread_count
+    context['notifications'] = notifications
+
+    return render(request, 'mes_participations/mes_participations.html', context)

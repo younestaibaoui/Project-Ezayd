@@ -1,12 +1,15 @@
+from django.core.exceptions import ValidationError
+from django.forms.models import BaseInlineFormSet
 from django.contrib import admin
 from .models import (
-    Enchaire, DemandeEnchaire, Lot,
+    Enchaire, EnchaireObjet, DemandeEnchaire, ParticipationEnchaire,
+    Lot, 
     Voiture, VoitureImage,
     Immobilier, ImmobilierImage,
     MaterielProfessionnel, MaterielProfessionnelImage,
     InformatiqueElectronique, InformatiqueImage,
-    MobilierEquipement,
-    EnchaireObjet, ParticipationEnchaire,
+    MobilierEquipement, MobilierImage,
+    BijouxObjetValeur,BijouxImage
 )
 
 
@@ -35,9 +38,10 @@ class DemandeEnchaireAdmin(admin.ModelAdmin):
 # ---------- Admin pour EnchaireObjet ----------
 @admin.register(EnchaireObjet)
 class EnchaireObjetAdmin(admin.ModelAdmin):
-    list_display = ('id', 'first_price', 'pas', 'price_reserved', 'winner')
-    list_filter = ('winner',)
+    list_display = ('objet_id','type', 'first_price', 'pas', 'price_reserved', 'winner')
+    list_filter = ('objet_id',)
     search_fields = ('winner__username',)
+    readonly_fields = ('objet_id', 'type',)
 
 # ---------- Admin pour ParticipationEnchaire ----------
 @admin.register(ParticipationEnchaire)
@@ -57,9 +61,17 @@ class LotAdmin(admin.ModelAdmin):
 
 
 # ---------- Admin pour Voiture et Images ----------
+class VoitureImageInlineFormSet(BaseInlineFormSet):
+    def clean(self):
+        super().clean()
+        images = [form for form in self.forms if not form.cleaned_data.get('DELETE', False)]
+        if len(images) < 3:
+            raise ValidationError("Une voiture doit avoir au moins 3 images attachées.")
+
 class VoitureImageInline(admin.TabularInline):
     model = VoitureImage
-    extra = 1
+    formset = VoitureImageInlineFormSet
+    extra = 3  # show at least 3 fields
 
 @admin.register(Voiture)
 class VoitureAdmin(admin.ModelAdmin):
@@ -70,9 +82,17 @@ class VoitureAdmin(admin.ModelAdmin):
 
 
 # ---------- Admin pour Immobilier et Images ----------
+class ImmobilierImageInlineFormSet(BaseInlineFormSet):
+    def clean(self):
+        super().clean()
+        images = [form for form in self.forms if not form.cleaned_data.get('DELETE', False)]
+        if len(images) < 3:
+            raise ValidationError("Une voiture doit avoir au moins 3 images attachées.")
+
 class ImmobilierImageInline(admin.TabularInline):
     model = ImmobilierImage
-    extra = 1
+    formset = ImmobilierImageInlineFormSet
+    extra = 3  # show at least 3 fields
 
 @admin.register(Immobilier)
 class ImmobilierAdmin(admin.ModelAdmin):
@@ -83,9 +103,17 @@ class ImmobilierAdmin(admin.ModelAdmin):
 
 
 # ---------- Admin pour MaterielProfessionnel et Images ----------
+class MaterielProfessionnelImageInlineFormSet(BaseInlineFormSet):
+    def clean(self):
+        super().clean()
+        images = [form for form in self.forms if not form.cleaned_data.get('DELETE', False)]
+        if len(images) < 3:
+            raise ValidationError("Une voiture doit avoir au moins 3 images attachées.")
+
 class MaterielProfessionnelImageInline(admin.TabularInline):
     model = MaterielProfessionnelImage
-    extra = 1
+    formset = MaterielProfessionnelImageInlineFormSet
+    extra = 3  # show at least 3 fields
 
 @admin.register(MaterielProfessionnel)
 class MaterielProfessionnelAdmin(admin.ModelAdmin):
@@ -96,22 +124,68 @@ class MaterielProfessionnelAdmin(admin.ModelAdmin):
 
 
 # ---------- Admin pour InformatiqueElectronique et Images ----------
-class InformatiqueImageInline(admin.TabularInline):
+class InformatiqueElectroniqueImageInlineFormSet(BaseInlineFormSet):
+    def clean(self):
+        super().clean()
+        images = [form for form in self.forms if not form.cleaned_data.get('DELETE', False)]
+        if len(images) < 3:
+            raise ValidationError("Une voiture doit avoir au moins 3 images attachées.")
+
+class InformatiqueElectroniqueImageInline(admin.TabularInline):
     model = InformatiqueImage
-    extra = 1
+    formset = ImmobilierImageInlineFormSet
+    extra = 3  # show at least 3 fields
 
 @admin.register(InformatiqueElectronique)
 class InformatiqueElectroniqueAdmin(admin.ModelAdmin):
     list_display = ('type_objet', 'marque', 'modele', 'annee', 'garantie')
     list_filter = ('type_objet', 'garantie')
     search_fields = ('marque', 'modele')
-    inlines = [InformatiqueImageInline]
+    inlines = [InformatiqueElectroniqueImageInline]
 
 
 # ---------- Admin pour MobilierEquipement ----------
 @admin.register(MobilierEquipement)
+class MobilierEquipementImageInlineFormSet(BaseInlineFormSet):
+    def clean(self):
+        super().clean()
+        images = [form for form in self.forms if not form.cleaned_data.get('DELETE', False)]
+        if len(images) < 3:
+            raise ValidationError("Un objet de type Mobilier & Équipement doit avoir au moins 3 images attachées.")
+
+# Inline pour les images
+class MobilierEquipementImageInline(admin.TabularInline):
+    model = MobilierImage
+    formset = MobilierEquipementImageInlineFormSet
+    extra = 3  # champs d'images affichés par défaut
+
+# Admin pour MobilierEquipement
+@admin.register(MobilierEquipement)
 class MobilierEquipementAdmin(admin.ModelAdmin):
     list_display = ('categorie', 'materiau', 'couleur', 'lot')
     search_fields = ('categorie', 'materiau', 'couleur')
+    inlines = [MobilierEquipementImageInline]
+
+# ---------- Admin pour BijouxObjetValeur ----------
+# FormSet avec validation : minimum 3 images
+class BijouxImageInlineFormSet(BaseInlineFormSet):
+    def clean(self):
+        super().clean()
+        images = [form for form in self.forms if not form.cleaned_data.get('DELETE', False)]
+        if len(images) < 3:
+            raise ValidationError("Un bijou ou objet de valeur doit avoir au moins 3 images attachées.")
+
+# Inline admin pour BijouxImage
+class BijouxImageInline(admin.TabularInline):
+    model = BijouxImage
+    formset = BijouxImageInlineFormSet
+    extra = 3  # au moins 3 champs d’image visibles
+
+# Admin principal pour BijouxObjetValeur
+@admin.register(BijouxObjetValeur)
+class BijouxObjetValeurAdmin(admin.ModelAdmin):
+    list_display = ('nom', 'type_bijou', 'materiau', 'lot')  # adapte selon ton modèle
+    search_fields = ('nom', 'type_bijou', 'materiau')
+    inlines = [BijouxImageInline]
 
 
