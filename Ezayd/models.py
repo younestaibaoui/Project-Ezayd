@@ -7,12 +7,65 @@ from datetime import datetime
 from perso.models import UserAccount
 from notification.models import NotificationEnchaire,NotificationDemandeEnchaire
 
+# Liste des wilayas d'Algérie (exemple, à adapter si besoin)
+WILAYAS_ALGERIE = [
+    ('Adrar', 'Adrar'),
+    ('Chlef', 'Chlef'),
+    ('Laghouat', 'Laghouat'),
+    ('Oum El Bouaghi', 'Oum El Bouaghi'),
+    ('Batna', 'Batna'),
+    ('Béjaïa', 'Béjaïa'),
+    ('Biskra', 'Biskra'),
+    ('Béchar', 'Béchar'),
+    ('Blida', 'Blida'),
+    ('Bouira', 'Bouira'),
+    ('Tamanrasset', 'Tamanrasset'),
+    ('Tébessa', 'Tébessa'),
+    ('Tlemcen', 'Tlemcen'),
+    ('Tiaret', 'Tiaret'),
+    ('Tizi Ouzou', 'Tizi Ouzou'),
+    ('Alger', 'Alger'),
+    ('Djelfa', 'Djelfa'),
+    ('Jijel', 'Jijel'),
+    ('Sétif', 'Sétif'),
+    ('Saïda', 'Saïda'),
+    ('Skikda', 'Skikda'),
+    ('Sidi Bel Abbès', 'Sidi Bel Abbès'),
+    ('Annaba', 'Annaba'),
+    ('Guelma', 'Guelma'),
+    ('Constantine', 'Constantine'),
+    ('Médéa', 'Médéa'),
+    ('Mostaganem', 'Mostaganem'),
+    ("M'Sila", "M'Sila"),
+    ('Mascara', 'Mascara'),
+    ('Ouargla', 'Ouargla'),
+    ('Oran', 'Oran'),
+    ('El Bayadh', 'El Bayadh'),
+    ('Illizi', 'Illizi'),
+    ('Bordj Bou Arreridj', 'Bordj Bou Arreridj'),
+    ('Boumerdès', 'Boumerdès'),
+    ('El Tarf', 'El Tarf'),
+    ('Tindouf', 'Tindouf'),
+    ('Tissemsilt', 'Tissemsilt'),
+    ('El Oued', 'El Oued'),
+    ('Khenchela', 'Khenchela'),
+    ('Souk Ahras', 'Souk Ahras'),
+    ('Tipaza', 'Tipaza'),
+    ('Mila', 'Mila'),
+    ('Aïn Defla', 'Aïn Defla'),
+    ('Naâma', 'Naâma'),
+    ('Aïn Témouchent', 'Aïn Témouchent'),
+    ('Ghardaïa', 'Ghardaïa'),
+    ('Relizane', 'Relizane'),
+]
+
 # ---------------------------------------- Auction Management ----------------------------------------
 ETAT_ENCHAIRE_CHOICES = (
     ('upcoming', 'À venir'),
     ('active', 'En cours'),
     ('finis', 'Terminé'),
 )
+
 
 from django.db import models
 from django.core.validators import MinValueValidator
@@ -120,6 +173,15 @@ class Enchaire(models.Model):
         blank=True
     )
 
+    wilaya = models.CharField(
+        max_length=50,
+        choices=WILAYAS_ALGERIE,
+        default='Alger',
+        null=True,
+        blank=True,
+        help_text="Wilaya de l'enchère"
+    )
+
     def __str__(self):
         return str(self.lot.nom) if hasattr(self, 'lot') else f"Enchaire #{self.id} (sans lot)"
 
@@ -152,11 +214,7 @@ class Enchaire(models.Model):
             models.Index(fields=["date_debut", "date_fin"]),
         ]
 
-
-from django.db import models
-from django.utils import timezone
-from django.urls import reverse
-
+# ---------------------------------------- DEMANDE ENCHERE ----------------------------------------
 class DemandeEnchaire(models.Model):
     class State(models.TextChoices):
         UNREAD = 'unread', 'Non lu'

@@ -533,16 +533,17 @@
         <div class="location-info">
           <div class="wilaya-info">
             <i class="fas fa-map-marker-alt"></i>
-            <span class="wilaya-name">{{ enchere.lot.wilaya|default:"Non spécifié" }}</span>
+            <span class="wilaya-name">{{ enchere.wilaya|default:"Non spécifié" }}</span>
           </div>
         </div>
         
         <!-- Statistiques avec état d'enchère -->
         <div class="auction-stats">
           <div class="stat-item">
-            <i class="fas fa-users"></i>
-            <span>{{ enchere.participants.count|default:"0" }} participants</span>
+              <i class="fas fa-users"></i>
+              <span>{{ enchere.participant_count|default:"0" }} participants</span>
           </div>
+
           <div class="stat-item status-item">
             <div class="status-indicator 
               {% if enchere.date_fin|timeuntil|slice:':2' == '0 ' %}ending-soon

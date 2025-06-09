@@ -16,8 +16,8 @@ from .models import (
 # ---------- Admin pour Enchaire ----------
 @admin.register(Enchaire)
 class EnchaireAdmin(admin.ModelAdmin):
-    list_display = ('id','lot', 'seller', 'etat', 'date_debut', 'date_fin', 'is_active_display')
-    list_filter = ('etat', 'date_debut', 'date_fin')
+    list_display = ('id','lot', 'seller', 'etat','wilaya' ,'date_debut', 'date_fin', 'is_active_display')
+    list_filter = ('etat' ,'wilaya', 'date_debut', 'date_fin')
     search_fields = ('lot__nom', 'seller__username')
     readonly_fields = ('notified_users',)
     filter_horizontal = ('savers', 'notified_users')
@@ -145,7 +145,12 @@ class InformatiqueElectroniqueAdmin(admin.ModelAdmin):
 
 
 # ---------- Admin pour MobilierEquipement ----------
-@admin.register(MobilierEquipement)
+from django.contrib import admin
+from django.core.exceptions import ValidationError
+from django.forms.models import BaseInlineFormSet
+from .models import MobilierEquipement, MobilierImage
+
+# ❌ PAS DE DÉCORATEUR ICI !
 class MobilierEquipementImageInlineFormSet(BaseInlineFormSet):
     def clean(self):
         super().clean()
@@ -157,7 +162,7 @@ class MobilierEquipementImageInlineFormSet(BaseInlineFormSet):
 class MobilierEquipementImageInline(admin.TabularInline):
     model = MobilierImage
     formset = MobilierEquipementImageInlineFormSet
-    extra = 3  # champs d'images affichés par défaut
+    extra = 3  # Nombre de champs images affichés par défaut
 
 # Admin pour MobilierEquipement
 @admin.register(MobilierEquipement)
@@ -166,7 +171,12 @@ class MobilierEquipementAdmin(admin.ModelAdmin):
     search_fields = ('categorie', 'materiau', 'couleur')
     inlines = [MobilierEquipementImageInline]
 
+
 # ---------- Admin pour BijouxObjetValeur ----------
+from django.contrib import admin
+from django.core.exceptions import ValidationError
+from django.forms.models import BaseInlineFormSet
+
 # FormSet avec validation : minimum 3 images
 class BijouxImageInlineFormSet(BaseInlineFormSet):
     def clean(self):
@@ -184,8 +194,7 @@ class BijouxImageInline(admin.TabularInline):
 # Admin principal pour BijouxObjetValeur
 @admin.register(BijouxObjetValeur)
 class BijouxObjetValeurAdmin(admin.ModelAdmin):
-    list_display = ('nom', 'type_bijou', 'materiau', 'lot')  # adapte selon ton modèle
-    search_fields = ('nom', 'type_bijou', 'materiau')
+    list_display = ('type_objet', 'matiere', 'poids', 'lot')  # noms des champs corrigés
+    search_fields = ('type_objet', 'matiere')
     inlines = [BijouxImageInline]
-
 

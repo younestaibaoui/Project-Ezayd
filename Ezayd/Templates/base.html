@@ -74,9 +74,13 @@
       <nav class="navbar" style="max-width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 2rem; gap: 1rem;">
 
         <!-- Logo -->
-        <div style="flex: 0 0 auto;">
-          <img src="{% static 'img/logo-site.png' %}" alt="Logo Ezayd" style="height: 80px; transition: transform 0.2s ease;">
-        </div>
+
+<div style="flex: 0 0 auto;">
+<a href="{% url 'accueil' %}" class="logo-link" style="display: flex; align-items: center; text-decoration: none; color: inherit;">
+  <img src="{% static 'img/logo-site.png' %}" alt="Logo Ezayd" style="height: 80px;">
+</a>
+
+</div>
 
         <!-- Barre de recherche -->
         <div style="flex: 1; display: flex; justify-content: center;">
@@ -494,3 +498,23 @@
   </style>
 
 </html>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const logoLink = document.querySelector('.logo-link');
+
+    if (logoLink) {
+      logoLink.addEventListener('mousedown', function () {
+        // Supprime l'effet de focus du clic
+        this.style.outline = 'none';
+        this.style.boxShadow = 'none';
+      });
+
+      logoLink.addEventListener('focus', function () {
+        // Supprime aussi si l'utilisateur utilise TAB
+        this.style.outline = 'none';
+        this.style.boxShadow = 'none';
+      });
+    }
+  });
+</script>

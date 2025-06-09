@@ -25,21 +25,25 @@ from .models import (
     ParticipationEnchaire
 )
 
+import random
+from django.utils import timezone
+from django.shortcuts import render
+from .models import Enchaire, ParticipationEnchaire  # adapte les imports selon ton projet
+
 def accueil(request):
-    # Get search parameter from request
+    # Récupérer le paramètre de recherche dans la requête GET
     search_query = request.GET.get('search', '')
-  
-    # Base query with select_related
+
+    # Récupérer toutes les enchères avec lot lié pour optimisation
     enchaires = Enchaire.objects.select_related('lot').all()
-  
-    # Apply search filter if provided
+
+    # Appliquer un filtre si une recherche est fournie
     if search_query:
         enchaires = enchaires.filter(lot__nom__icontains=search_query)
 
-    # Récupérer les top 3 objets par catégorie avec images aléatoires
+    # Récupérer les top 3 objets par catégorie avec images aléatoires (fonction à définir dans ton code)
     top_objets_by_category = get_top_3_objets_by_category()
 
-    # Traitement des enchères existantes (votre code original)
     for enchere in enchaires:
         enchere.images = {
             'voitures': [],
@@ -49,12 +53,13 @@ def accueil(request):
             'mobilier': [],
             'bijoux': [],
             'stocks': [],
+            'oeuvres': [],
         }
 
         lot = enchere.lot
         all_images = []
 
-        # --- Remplir toutes les images par catégorie ---
+        # Remplir images par catégorie
         for voiture in lot.voitures.all():
             for img in voiture.images.all():
                 url = img.image.url
@@ -98,8 +103,34 @@ def accueil(request):
                     enchere.images['stocks'].append(url)
                     all_images.append(url)
 
-        # --- Choisir une image aléatoire comme image principale ---
+        for oeuvre in lot.oeuvres.all():
+            for img in oeuvre.images.all():
+                url = img.image.url
+                enchere.images['oeuvres'].append(url)
+                all_images.append(url)
+
+        # Image principale aléatoire
         enchere.main_image_url = random.choice(all_images) if all_images else None
+
+        # Récupérer tous les objets liés au lot pour récupérer les participations
+        objets = []
+        objets += list(lot.voitures.all())
+        objets += list(lot.immobiliers.all())
+        objets += list(lot.materiels.all())
+        objets += list(lot.informatique.all())
+        objets += list(lot.mobilier.all())
+        objets += list(lot.bijoux.all())
+        objets += list(lot.stocks.all())
+        objets += list(lot.oeuvres.all())
+
+        # Extraire les objets ayant un attribut enchaireObjet (sûr que tous les objets en ont ?)
+        objets_avec_enchaire = [obj.enchaireObjet for obj in objets if hasattr(obj, 'enchaireObjet') and obj.enchaireObjet]
+
+        # Récupérer les participations distinctes par user sur ces objets
+        participations = ParticipationEnchaire.objects.filter(enchaireObjet__in=objets_avec_enchaire).values_list('user', flat=True).distinct()
+
+        # Stocker le nombre de participants dans un attribut dynamique
+        enchere.participant_count = participations.count()
 
     context = {
         'enchaires': enchaires,
@@ -107,16 +138,12 @@ def accueil(request):
         'top_objets_by_category': top_objets_by_category,
     }
 
-    # Vérifier si l'utilisateur est authentifié et récupérer les notifications
+    # Gestion des notifications pour utilisateur connecté
     if request.user.is_authenticated:
-        notifications = request.user.notifications.all() if request.user.is_authenticated else None
-        if notifications:
-            unread_count = notifications.filter(is_read=False).count()
-        else:
-            unread_count = 0
-    
-        # Récupérer les notifications de l'utilisateur connecté
-        notifications = request.user.notifications.all().order_by('-created_at')    
+        notifications = request.user.notifications.all()
+        unread_count = notifications.filter(is_read=False).count() if notifications else 0
+        notifications = notifications.order_by('-created_at') if notifications else []
+
         context['unread_count'] = unread_count
         context['notifications'] = notifications
 
@@ -455,17 +482,31 @@ def participer(request):
 
     return redirect('details_objet', type_objet, objet_id)
 
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, get_object_or_404
+
 @login_required
 def mes_participations(request):
-
     user = request.user
-    participations = user.participations_encheres.values('enchaireObjet').distinct().order_by('-date_participation')
+    # Récupérer toutes les participations triées par date décroissante
+    participations_qs = user.participations_encheres.select_related('enchaireObjet').order_by('-date_participation')
+
+    # Garder uniquement une participation par enchaireObjet (la plus récente)
+    participations_distinctes = {}
+    for participation in participations_qs:
+        enchaire_obj_id = participation.enchaireObjet_id
+        if enchaire_obj_id not in participations_distinctes:
+            participations_distinctes[enchaire_obj_id] = participation
+
+    participations = participations_distinctes.values()
+
+    participations_detaillees = []
 
     for participation in participations:
-        
-        enchaireObjet = get_object_or_404(EnchaireObjet, id=participation['enchaireObjet'])
-        type_objet = enchaireObjet.get_type()
+        enchaireObjet = participation.enchaireObjet
+        type_objet = enchaireObjet.type
 
+        # Choix de l'objet selon le type
         if type_objet == 'vehicules':
             objet = enchaireObjet.voiture
         elif type_objet == 'immobilier':
@@ -482,23 +523,31 @@ def mes_participations(request):
             objet = enchaireObjet.stockInvendu
         elif type_objet == 'oeuvres_collections':
             objet = enchaireObjet.oeuvreCollection
+        else:
+            objet = None
 
-        participation['objet'] = objet
-        participation['enchere'] = objet.lot.enchaire
+
+
+        if objet:
+        
+            participation_info = {
+                'participation': participation,
+                'objet': objet,
+                'enchere': objet.lot.enchaire,
+                'montant': participation.montant,
+                'first_price': participation.enchaireObjet.price_reserved,
+
+            }
+            participations_detaillees.append(participation_info)
+
+    # Notifications
+    notifications = user.notifications.all().order_by('-created_at')
+    unread_count = notifications.filter(is_read=False).count()
 
     context = {
-        'participations': participations,
+        'participations': participations_detaillees,
+        'notifications': notifications,
+        'unread_count': unread_count,
     }
-
-    notifications = request.user.notifications.all() if request.user.is_authenticated else None
-    if notifications:
-        unread_count = notifications.filter(is_read=False).count()
-    else:
-        unread_count = 0
-
-    # Récupérer les notifications de l'utilisateur connecté
-    notifications = request.user.notifications.all().order_by('-created_at')    
-    context['unread_count'] = unread_count
-    context['notifications'] = notifications
 
     return render(request, 'mes_participations/mes_participations.html', context)

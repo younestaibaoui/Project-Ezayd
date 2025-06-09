@@ -7,113 +7,256 @@
         </h3>
         {% if participations %}
             <div class="participants-count">
-                {{ participations|length }} participant{{ participations|length|pluralize }}
+                {{ participations|length }} participation{{ participations|length|pluralize }}
             </div>
         {% endif %}
     </div>
 
-    <div class="participant-list">
+    <div class="participant-list" id="participant-list">
         {% if participations %}
-            {% for participation in participations %}
-                <div class="participant-item" data-participation-id="{{ participation.id }}">
+            {% for participation in participations|slice:":5" %}
+                <div class="participant-item" data-participation-id="{{ participation.participation.id }}">
                     <div class="participant-main">
-                        <div class="participant-avatar">
-                            {% if participation.user.profile_image %}
-                                <img src="{{ participation.user.profile_image.url }}" alt="{{ participation.user.username }}" />
-                            {% elif participation.objet.image %}
-                                <img src="{{ participation.objet.image.url }}" alt="{{ participation.objet.nom }}" />
+                        <div class="participant-image-carousel">
+                            {% if participation.objet.images.all %}
+                                <div class="carousel-container" id="carousel-{{ participation.participation.id }}">
+                                    {% for image in participation.objet.images.all %}
+                                        <div class="carousel-slide {% if forloop.first %}active{% endif %}">
+                                            <img src="{{ image.image.url }}" alt="{{ participation.objet }}" onclick="openFullscreenCarousel({{ participation.participation.id }}, {{ forloop.counter0 }})"/>
+                                        </div>
+                                    {% endfor %}
+                                    {% if participation.objet.images.all|length > 1 %}
+                                        <button class="carousel-prev" onclick="changeSlide('carousel-{{ participation.participation.id }}', -1)">‹</button>
+                                        <button class="carousel-next" onclick="changeSlide('carousel-{{ participation.participation.id }}', 1)">›</button>
+                                        <div class="carousel-indicators">
+                                            {% for image in participation.objet.images.all %}
+                                                <span class="indicator {% if forloop.first %}active{% endif %}" onclick="currentSlide('carousel-{{ participation.participation.id }}', {{ forloop.counter }})"></span>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <!-- Hidden data for fullscreen carousel -->
+                                <script type="application/json" id="images-data-{{ participation.participation.id }}">
+                                    [{% for image in participation.objet.images.all %}{"url": "{{ image.image.url }}", "alt": "{{ participation.objet }}"}{% if not forloop.last %},{% endif %}{% endfor %}]
+                                </script>
+                            {% elif participation.participation.user.profile_image %}
+                                <div class="single-image">
+                                    <img src="{{ participation.participation.user.profile_image.url }}" alt="{{ participation.participation.user.username }}" onclick="openFullscreen('{{ participation.participation.user.profile_image.url }}', '{{ participation.participation.user.username }}')"/>
+                                </div>
                             {% else %}
-                                <div class="avatar-placeholder">
-                                    {{ participation.user.username|first|upper }}
+                                <div class="image-placeholder" onclick="openFullscreen('', '{{ participation.objet }}')">
+                                    {{ participation.objet|first|upper }}
                                 </div>
                             {% endif %}
-                            <div class="status-indicator active"></div>
                         </div>
 
                         <div class="participant-content">
                             <div class="participant-header">
-                                <div class="participant-name">{{ participation.objet }}</div>
-                                <div class="participant-amount">
-                                    <span class="currency">DA</span>
-                                    <span class="amount">{{ participation.enchere|floatformat:0 }}</span>
+                                <div class="participant-name">
+                                    <a href="{% url 'details_objet' participation.enchere.lot.type participation.objet.id %}" class="object-link">
+                                        {{ participation.objet }}
+                                    </a>
                                 </div>
                             </div>
                             
-                            <div class="participant-description">
-                                {% if participation.description %}
-                                    {{ participation.description|truncatewords:15 }}
-                                {% else %}
-                                    Enchère pour {{ participation.objet }} - Offre compétitive soumise
-                                {% endif %}
+                            <div class="auction-name">
+                                <a href="{% url 'details_enchaire' participation.enchere.id %}" class="auction-link">
+                                    <i class="fas fa-gavel"></i> {{ participation.enchere }}
+                                </a>
                             </div>
                             
-                            <div class="participant-meta">
-                                <div class="timestamp">
-                                    <i class="fas fa-clock"></i>
-                                    <span class="date">{{ participation.date_participation|date:"d M Y" }}</span>
-                                    <span class="time">{{ participation.date_participation|date:"H:i" }}</span>
-                                </div>
-                                <div class="participant-badges">
-                                    {% if participation.is_highest %}
-                                        <span class="badge highest">Plus haute</span>
-                                    {% endif %}
-                                    {% if participation.is_recent %}
-                                        <span class="badge recent">Récente</span>
+                            <div class="auction-info">
+                                <div class="time-remaining">
+                                    {% if participation.enchere.date_fin %}
+                                        <i class="fas fa-hourglass-half"></i>
+                                        <span class="days-left" data-end-time="{{ participation.enchere.date_fin }}" id="time-remaining-{{ participation.participation.id }}"></span>
                                     {% endif %}
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="participant-actions">
-                        <button class="action-btn view-details" title="Voir détails">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                        <button class="action-btn favorite" title="Marquer comme favori">
-                            <i class="far fa-heart"></i>
-                        </button>
+                        <div class="price-and-actions">
+                            <div class="bid-info">
+                                <div class="bid-amount">
+                                    <div class="bid-label">Votre offre</div>
+                                    <div class="participant-amount">
+                                        <span class="currency">DA</span>
+                                        <span class="amount">{{ participation.montant|floatformat:0 }}</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="current-amount">
+                                    <div class="bid-label">Prix actuel</div>
+                                    <div class="participant-amount current">
+                                        <span class="currency">DA</span>
+                                        <span class="amount">{{ participation.first_price|floatformat:0 }}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="participant-actions">
+                                <a href="{% url 'details_objet' participation.enchere.lot.type participation.objet.id %}" class="action-btn view-details" title="Voir détails objet">
+                                    <i class="fas fa-eye"></i>
+                                    <span>Détails</span>
+                                </a>
+                                <a href="{% url 'details_enchaire' participation.enchere.id %}" class="action-btn view-auction" title="Voir détails enchère">
+                                    <i class="fas fa-gavel"></i>
+                                    <span>Enchère</span>
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             {% endfor %}
+            
+            <div id="hidden-items" style="display: none;">
+                {% for participation in participations|slice:"5:" %}
+                    <div class="participant-item" data-participation-id="{{ participation.participation.id }}">
+                        <div class="participant-main">
+                            <div class="participant-image-carousel">
+                                {% if participation.objet.images.all %}
+                                    <div class="carousel-container" id="carousel-{{ participation.participation.id }}">
+                                        {% for image in participation.objet.images.all %}
+                                            <div class="carousel-slide {% if forloop.first %}active{% endif %}">
+                                                <img src="{{ image.image.url }}" alt="{{ participation.objet }}" onclick="openFullscreenCarousel({{ participation.participation.id }}, {{ forloop.counter0 }})"/>
+                                            </div>
+                                        {% endfor %}
+                                        {% if participation.objet.images.all|length > 1 %}
+                                            <button class="carousel-prev" onclick="changeSlide('carousel-{{ participation.participation.id }}', -1)">‹</button>
+                                            <button class="carousel-next" onclick="changeSlide('carousel-{{ participation.participation.id }}', 1)">›</button>
+                                            <div class="carousel-indicators">
+                                                {% for image in participation.objet.images.all %}
+                                                    <span class="indicator {% if forloop.first %}active{% endif %}" onclick="currentSlide('carousel-{{ participation.participation.id }}', {{ forloop.counter }})"></span>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <!-- Hidden data for fullscreen carousel -->
+                                    <script type="application/json" id="images-data-{{ participation.participation.id }}">
+                                        [{% for image in participation.objet.images.all %}{"url": "{{ image.image.url }}", "alt": "{{ participation.objet }}"}{% if not forloop.last %},{% endif %}{% endfor %}]
+                                    </script>
+                                {% elif participation.participation.user.profile_image %}
+                                    <div class="single-image">
+                                        <img src="{{ participation.participation.user.profile_image.url }}" alt="{{ participation.participation.user.username }}" onclick="openFullscreen('{{ participation.participation.user.profile_image.url }}', '{{ participation.participation.user.username }}')"/>
+                                    </div>
+                                {% else %}
+                                    <div class="image-placeholder" onclick="openFullscreen('', '{{ participation.objet }}')">
+                                        {{ participation.objet|first|upper }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="participant-content">
+                                <div class="participant-header">
+                                    <div class="participant-name">
+                                        <a href="{% url 'details_objet' participation.enchere.lot.type participation.objet.id %}" class="object-link">
+                                            {{ participation.objet }}
+                                        </a>
+                                    </div>
+                                </div>
+                                
+                                <div class="auction-name">
+                                    <a href="{% url 'details_enchaire' participation.enchere.id %}" class="auction-link">
+                                        <i class="fas fa-gavel"></i> {{ participation.enchere }}
+                                    </a>
+                                </div>
+                                
+                                <div class="auction-info">
+                                    <div class="time-remaining">
+                                        {% if participation.enchere.date_fin %}
+                                            <i class="fas fa-hourglass-half"></i>
+                                            <span class="days-left" data-end-time="{{ participation.enchere.date_fin }}" id="time-remaining-{{ participation.participation.id }}"></span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="price-and-actions">
+                                <div class="bid-info">
+                                    <div class="bid-amount">
+                                        <div class="bid-label">Votre offre</div>
+                                        <div class="participant-amount">
+                                            <span class="currency">DA</span>
+                                            <span class="amount">{{ participation.montant|floatformat:0 }}</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="current-amount">
+                                        <div class="bid-label">Prix actuel</div>
+                                        <div class="participant-amount current">
+                                            <span class="currency">DA</span>
+                                            <span class="amount">{{ participation.first_price|floatformat:0 }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="participant-actions">
+                                    <a href="{% url 'details_objet' participation.enchere.lot.type participation.objet.id %}" class="action-btn view-details" title="Voir détails objet">
+                                        <i class="fas fa-eye"></i>
+                                        <span>Détails</span>
+                                    </a>
+                                    <a href="{% url 'details_enchaire' participation.enchere.id %}" class="action-btn view-auction" title="Voir détails enchère">
+                                        <i class="fas fa-gavel"></i>
+                                        <span>Enchère</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
         {% else %}
             <div class="no-participants">
                 <div class="empty-state">
                     <i class="fas fa-gavel empty-icon"></i>
                     <h4>Aucune participation</h4>
-                    <p>Les participations à cette enchère apparaîtront ici</p>
+                    <p>Vos participations aux enchères apparaîtront ici</p>
                 </div>
             </div>
         {% endif %}
     </div>
 
-    {% if participations %}
+    {% if participations and participations|length > 5 %}
         <div class="card-footer">
-            <button class="load-more-btn">
+            <button class="load-more-btn" id="load-more-btn">
                 <i class="fas fa-chevron-down"></i>
-                Voir plus de participations
+                <span class="btn-text">Voir toutes les participations</span>
             </button>
         </div>
     {% endif %}
 </div>
 
+<!-- Modal avec carousel plein écran -->
+<div id="imageModal" class="modal">
+    <span class="close">&times;</span>
+    <div class="modal-carousel-container">
+        <div class="modal-carousel" id="modal-carousel">
+            <!-- Images will be inserted here dynamically -->
+        </div>
+        <button class="modal-prev" id="modal-prev">‹</button>
+        <button class="modal-next" id="modal-next">›</button>
+        <div class="modal-indicators" id="modal-indicators">
+            <!-- Indicators will be inserted here dynamically -->
+        </div>
+    </div>
+    <div id="caption"></div>
+</div>
+
 <style>
     .participants-card {
         background: linear-gradient(145deg, #1a1a1a, #2d2d2d);
-        border-radius: 20px;
+        border-radius: 16px;
         padding: 0;
         border: 1px solid #404040;
-        box-shadow: 
-            0 10px 40px rgba(0, 0, 0, 0.4),
-            0 2px 8px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
         color: #e0e0e0;
         font-family: 'Inter', 'Segoe UI', sans-serif;
-        margin-top: 20px;
+        margin-top: 16px;
         overflow: hidden;
-        backdrop-filter: blur(10px);
     }
 
     .card-header {
-        padding: 24px 28px 20px;
+        padding: 16px 20px;
         border-bottom: 1px solid #333;
         background: linear-gradient(135deg, #252525, #1f1f1f);
         display: flex;
@@ -122,34 +265,33 @@
     }
 
     .section-title {
-        font-size: 1.4rem;
+        font-size: 1.1rem;
         font-weight: 700;
         color: #ffffff;
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 8px;
         margin: 0;
     }
 
     .section-title i {
         color: #ff6b35;
-        font-size: 1.2rem;
+        font-size: 1rem;
     }
 
     .participants-count {
         background: rgba(255, 107, 53, 0.15);
         color: #ff6b35;
-        padding: 6px 14px;
-        border-radius: 20px;
-        font-size: 0.85rem;
+        padding: 4px 10px;
+        border-radius: 16px;
+        font-size: 0.75rem;
         font-weight: 600;
     }
 
     .participant-list {
-        padding: 16px 28px 24px;
+        padding: 0;
         display: flex;
         flex-direction: column;
-        gap: 16px;
         max-height: 600px;
         overflow-y: auto;
     }
@@ -160,11 +302,10 @@
 
     .participant-list::-webkit-scrollbar-track {
         background: #1a1a1a;
-        border-radius: 3px;
     }
 
     .participant-list::-webkit-scrollbar-thumb {
-        background: #404040;
+        background: #ff6b35;
         border-radius: 3px;
     }
 
@@ -172,311 +313,826 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background: linear-gradient(135deg, #2a2a2a, #242424);
-        padding: 20px;
-        border-radius: 16px;
-        border: 1px solid #333;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .participant-item::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 2px;
-        background: linear-gradient(90deg, #ff6b35, #ff8c42);
-        transform: scaleX(0);
-        transition: transform 0.3s ease;
+        background: #222;
+        padding: 15px 20px;
+        border-bottom: 1px solid #333;
+        transition: background 0.2s ease;
     }
 
     .participant-item:hover {
-        background: linear-gradient(135deg, #333, #2a2a2a);
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-        border-color: #444;
-    }
-
-    .participant-item:hover::before {
-        transform: scaleX(1);
+        background: #2a2a2a;
     }
 
     .participant-main {
         display: flex;
-        align-items: flex-start;
-        gap: 16px;
+        align-items: center;
+        gap: 18px;
         flex: 1;
     }
 
-    .participant-avatar {
+    .participant-image-carousel {
         position: relative;
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
+        width: 120px;
+        height: 120px;
+        border-radius: 8px;
         overflow: hidden;
         flex-shrink: 0;
-        border: 2px solid #404040;
+        border: 3px solid #ff6b35;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     }
 
-    .participant-avatar img {
+    .carousel-container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+
+    .carousel-slide {
+        display: none;
+        width: 100%;
+        height: 100%;
+    }
+
+    .carousel-slide.active {
+        display: block;
+    }
+
+    .carousel-slide img {
         width: 100%;
         height: 100%;
         object-fit: cover;
+        transition: transform 0.2s ease;
     }
 
-    .avatar-placeholder {
+    .carousel-slide img:hover {
+        transform: scale(1.05);
+    }
+
+    .single-image {
         width: 100%;
         height: 100%;
-        background: linear-gradient(135deg, #ff6b35, #ff8c42);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 700;
-        font-size: 1.1rem;
-        color: white;
     }
 
-    .status-indicator {
+    .single-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.2s ease;
+    }
+
+    .single-image img:hover {
+        transform: scale(1.05);
+    }
+
+    .carousel-prev, .carousel-next {
         position: absolute;
-        bottom: 2px;
-        right: 2px;
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        border: 2px solid #2a2a2a;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        border: none;
+        padding: 5px 8px;
+        cursor: pointer;
+        font-size: 14px;
+        border-radius: 3px;
+        z-index: 10;
+        transition: background 0.2s ease;
     }
 
-    .status-indicator.active {
-        background: #4ade80;
+    .carousel-prev {
+        left: 5px;
+    }
+
+    .carousel-next {
+        right: 5px;
+    }
+
+    .carousel-prev:hover, .carousel-next:hover {
+        background: rgba(255, 107, 53, 0.8);
+    }
+
+    .carousel-indicators {
+        position: absolute;
+        bottom: 5px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 3px;
+    }
+
+    .indicator {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.5);
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    .indicator.active {
+        background: #ff6b35;
     }
 
     .participant-content {
         flex: 1;
         min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
     }
 
     .participant-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 8px;
+        margin-bottom: 2px;
     }
 
     .participant-name {
-        font-weight: 700;
-        font-size: 1.1rem;
+        font-weight: 600;
+        font-size: 1.05rem;
         color: #ffffff;
-        line-height: 1.3;
+        line-height: 1.2;
+    }
+
+    .object-link {
+        color: #ffffff;
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+    .object-link:hover {
+        color: #ff6b35;
+    }
+
+    .auction-name {
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .auction-link {
+        color: #aaaaaa;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        transition: color 0.2s ease;
+    }
+
+    .auction-link:hover {
+        color: #ff6b35;
+    }
+
+    .auction-link i {
+        color: #ff6b35;
+        font-size: 0.75rem;
+    }
+
+    .auction-info {
+        margin-top: 2px;
+    }
+
+    .time-remaining {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 0.75rem;
+        color: #aaa;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 4px 8px;
+        width: fit-content;
+    }
+
+    .time-remaining i {
+        color: #44d7b6;
+        font-size: 0.7rem;
+    }
+
+    .days-left {
+        font-weight: 600;
+        color: #44d7b6;
+        font-family: 'Courier New', Courier, monospace;
+    }
+
+    .price-and-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-end;
+    }
+
+    .bid-info {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .bid-amount, .current-amount {
+        background: rgba(0, 0, 0, 0.25);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        padding: 8px 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        min-width: 85px;
+    }
+
+    .bid-amount {
+        border-color: rgba(255, 107, 53, 0.3);
+        background: rgba(255, 107, 53, 0.1);
+    }
+
+    .current-amount {
+        border-color: rgba(68, 215, 182, 0.3);
+        background: rgba(68, 215, 182, 0.1);
+    }
+
+    .bid-label {
+        font-size: 0.7rem;
+        color: #aaa;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        text-align: center;
     }
 
     .participant-amount {
         display: flex;
         align-items: baseline;
-        gap: 4px;
-        background: rgba(255, 107, 53, 0.15);
-        padding: 8px 16px;
-        border-radius: 25px;
-        border: 1px solid rgba(255, 107, 53, 0.3);
+        gap: 3px;
     }
 
     .currency {
-        font-size: 0.8rem;
+        font-size: 0.7rem;
         color: #ff6b35;
-        font-weight: 500;
+        font-weight: 600;
     }
 
     .amount {
-        font-weight: 800;
-        color: #ff6b35;
         font-size: 1rem;
+        font-weight: 700;
+        color: #ff6b35;
+        font-family: 'Courier New', Courier, monospace;
     }
 
-    .participant-description {
-        color: #b8b8b8;
-        font-size: 0.9rem;
-        line-height: 1.4;
-        margin-bottom: 12px;
-    }
-
-    .participant-meta {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 8px;
-    }
-
-    .timestamp {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        color: #888;
-        font-size: 0.85rem;
-    }
-
-    .timestamp i {
-        color: #666;
-    }
-
-    .date {
-        font-weight: 500;
-    }
-
-    .time {
-        color: #aaa;
-    }
-
-    .participant-badges {
-        display: flex;
-        gap: 6px;
-    }
-
-    .badge {
-        padding: 4px 10px;
-        border-radius: 12px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .badge.highest {
-        background: rgba(34, 197, 94, 0.2);
-        color: #4ade80;
-        border: 1px solid rgba(34, 197, 94, 0.3);
-    }
-
-    .badge.recent {
-        background: rgba(59, 130, 246, 0.2);
-        color: #60a5fa;
-        border: 1px solid rgba(59, 130, 246, 0.3);
+    .participant-amount.current .currency,
+    .participant-amount.current .amount {
+        color: #44d7b6;
     }
 
     .participant-actions {
         display: flex;
-        flex-direction: column;
-        gap: 8px;
-        margin-left: 16px;
+        gap: 10px;
+        align-items: center;
     }
 
     .action-btn {
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        border: 1px solid #404040;
-        background: #2a2a2a;
-        color: #888;
+        background: #ff6b35;
+        border: none;
+        color: #fff;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        padding: 8px 12px;
+        border-radius: 6px;
+        text-decoration: none;
         display: flex;
         align-items: center;
         justify-content: center;
-        cursor: pointer;
-        transition: all 0.2s ease;
+        gap: 5px;
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba(255, 107, 53, 0.3);
     }
 
     .action-btn:hover {
-        background: #ff6b35;
-        color: white;
-        border-color: #ff6b35;
-        transform: scale(1.1);
+        background: #ff844e;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
+    }
+
+    .action-btn i {
+        font-size: 0.8rem;
     }
 
     .no-participants {
-        padding: 40px 20px;
+        padding: 30px 0;
+        text-align: center;
+        color: #666;
     }
 
     .empty-state {
-        text-align: center;
-        color: #666;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        opacity: 0.45;
     }
 
     .empty-icon {
-        font-size: 3rem;
-        color: #444;
-        margin-bottom: 16px;
+        font-size: 32px;
+        color: #999999;
     }
 
     .empty-state h4 {
-        font-size: 1.2rem;
-        color: #888;
-        margin-bottom: 8px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: #bbb;
     }
 
     .empty-state p {
-        color: #666;
-        font-size: 0.9rem;
+        font-style: italic;
+        font-size: 0.85rem;
+        max-width: 250px;
+        color: #888;
     }
 
     .card-footer {
-        padding: 16px 28px 24px;
+        padding: 12px 20px;
         border-top: 1px solid #333;
-        text-align: center;
+        background: linear-gradient(135deg, #252525, #1f1f1f);
+        display: flex;
+        justify-content: center;
     }
 
     .load-more-btn {
-        background: linear-gradient(135deg, #333, #2a2a2a);
-        border: 1px solid #404040;
-        color: #ccc;
-        padding: 12px 24px;
-        border-radius: 25px;
+        background: #ff6b35;
+        border: none;
+        border-radius: 16px;
+        padding: 8px 20px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: #fff;
         cursor: pointer;
-        transition: all 0.3s ease;
-        font-weight: 500;
+        box-shadow: 0 4px 10px rgba(255, 107, 53, 0.5);
         display: flex;
         align-items: center;
         gap: 8px;
-        margin: 0 auto;
+        transition: all 0.2s ease;
     }
 
     .load-more-btn:hover {
-        background: linear-gradient(135deg, #ff6b35, #ff8c42);
-        color: white;
-        border-color: #ff6b35;
+        background: #ff844e;
         transform: translateY(-1px);
     }
 
-    /* Responsive Design */
+    .load-more-btn i {
+        font-size: 0.9rem;
+    }
+
+    .image-placeholder {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #ff6b35, #ff8c42);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 2rem;
+        color: white;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+    }
+
+    .image-placeholder:hover {
+        transform: scale(1.05);
+    }
+
+    /* Modal avec carousel plein écran */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.95);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .modal.show {
+        opacity: 1;
+    }
+
+    .close {
+        position: absolute;
+        top: 20px;
+        right: 35px;
+        color: #f1f1f1;
+        font-size: 40px;
+        font-weight: bold;
+        cursor: pointer;
+        z-index: 1001;
+        transition: color 0.2s ease;
+    }
+
+    .close:hover {
+        color: #ff6b35;
+    }
+
+    .modal-carousel-container {
+        position: relative;
+        margin: 5% auto;
+        width: 90%;
+        max-width: 900px;
+        height: 70vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-carousel {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-slide {
+        display: none;
+        width: 100%;
+        height: 100%;
+        text-align: center;
+    }
+
+    .modal-slide.active {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-slide img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        transform: scale(0.8);
+        transition: transform 0.3s ease;
+    }
+
+    .modal.show .modal-slide img {
+        transform: scale(1);
+    }
+
+    .modal-prev, .modal-next {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(255, 107, 53, 0.8);
+        color: white;
+        border: none;
+        padding: 15px 20px;
+        cursor: pointer;
+        font-size: 24px;
+        border-radius: 5px;
+        z-index: 1001;
+        transition: background 0.2s ease;
+    }
+
+    .modal-prev {
+        left: 20px;
+    }
+
+    .modal-next {
+        right: 20px;
+    }
+
+    .modal-prev:hover, .modal-next:hover {
+        background: rgba(255, 107, 53, 1);
+    }
+
+    .modal-indicators {
+        position: absolute;
+        bottom: -50px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 8px;
+    }
+
+    .modal-indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.5);
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    .modal-indicator.active {
+        background: #ff6b35;
+    }
+
+    #caption {
+        margin: 20px auto;
+        display: block;
+        width: 80%;
+        max-width: 700px;
+        text-align: center;
+        color: #ccc;
+        padding: 10px 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    /* Responsive */
     @media (max-width: 768px) {
-        .participants-card {
-            margin: 16px;
-            border-radius: 16px;
-        }
-        
-        .card-header {
-            padding: 20px;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 12px;
-        }
-        
-        .participant-list {
-            padding: 16px 20px;
-        }
-        
         .participant-item {
-            padding: 16px;
             flex-direction: column;
             align-items: stretch;
-            gap: 16px;
+            gap: 15px;
+            padding: 15px;
         }
-        
-        .participant-actions {
-            flex-direction: row;
+
+        .participant-main {
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .participant-image-carousel {
+            width: 100px;
+            height: 100px;
+            align-self: center;
+        }
+
+        .price-and-actions {
+            align-items: center;
+        }
+
+        .bid-info {
             justify-content: center;
-            margin-left: 0;
         }
-        
-        .participant-header {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 8px;
+
+        .participant-actions {
+            justify-content: center;
         }
-        
-        .participant-meta {
-            flex-direction: column;
-            align-items: flex-start;
+
+        .modal-carousel-container {
+            width: 95%;
+            height: 60vh;
+        }
+
+        .modal-prev, .modal-next {
+            padding: 10px 15px;
+            font-size: 18px;
+        }
+
+        .modal-prev {
+            left: 10px;
+        }
+
+        .modal-next {
+            right: 10px;
         }
     }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const loadMoreBtn = document.getElementById('load-more-btn');
+    const hiddenItems = document.getElementById('hidden-items');
+    const participantList = document.getElementById('participant-list');
+    let showingAll = false;
+    let currentModalImages = [];
+    let currentModalIndex = 0;
+
+    if (loadMoreBtn && hiddenItems) {
+        loadMoreBtn.addEventListener('click', function() {
+            const btnText = this.querySelector('.btn-text');
+            const btnIcon = this.querySelector('i');
+            
+            if (!showingAll) {
+                hiddenItems.style.display = 'block';
+                btnText.textContent = 'Voir moins';
+                btnIcon.classList.remove('fa-chevron-down');
+                btnIcon.classList.add('fa-chevron-up');
+                showingAll = true;
+            } else {
+                hiddenItems.style.display = 'none';
+                btnText.textContent = 'Voir toutes les participations';
+                btnIcon.classList.remove('fa-chevron-up');
+                btnIcon.classList.add('fa-chevron-down');
+                showingAll = false;
+                participantList.scrollTop = 0;
+            }
+        });
+    }
+
+    // Mise à jour du temps restant
+    function updateTimeRemaining() {
+        document.querySelectorAll('.days-left').forEach(item => {
+            const endTime = new Date(item.dataset.endTime).getTime();
+            const now = new Date().getTime();
+            const timeLeft = endTime - now;
+
+            if (timeLeft > 0) {
+                const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+                let timeString = '';
+                if (days > 0) {
+                    timeString = `${days}j ${hours}h ${minutes}m ${seconds}s`;
+                } else if (hours > 0) {
+                    timeString = `${hours}h ${minutes}m ${seconds}s`;
+                } else if (minutes > 0) {
+                    timeString = `${minutes}m ${seconds}s`;
+                } else {
+                    timeString = `${seconds}s`;
+                }
+
+                item.textContent = timeString;
+            } else {
+                item.textContent = 'Enchère terminée';
+                item.style.color = '#ff6b35';
+            }
+        });
+    }
+
+    updateTimeRemaining();
+    setInterval(updateTimeRemaining, 1000);
+
+    // Fonctions pour le carousel miniature
+    window.changeSlide = function(carouselId, direction) {
+        const carousel = document.getElementById(carouselId);
+        const slides = carousel.querySelectorAll('.carousel-slide');
+        const indicators = carousel.querySelectorAll('.indicator');
+        let currentIndex = Array.from(slides).findIndex(slide => slide.classList.contains('active'));
+        
+        slides[currentIndex].classList.remove('active');
+        indicators[currentIndex].classList.remove('active');
+        
+        currentIndex += direction;
+        if (currentIndex >= slides.length) currentIndex = 0;
+        if (currentIndex < 0) currentIndex = slides.length - 1;
+        
+        slides[currentIndex].classList.add('active');
+        indicators[currentIndex].classList.add('active');
+    }
+
+    window.currentSlide = function(carouselId, slideIndex) {
+        const carousel = document.getElementById(carouselId);
+        const slides = carousel.querySelectorAll('.carousel-slide');
+        const indicators = carousel.querySelectorAll('.indicator');
+        
+        slides.forEach(slide => slide.classList.remove('active'));
+        indicators.forEach(indicator => indicator.classList.remove('active'));
+        
+        slides[slideIndex - 1].classList.add('active');
+        indicators[slideIndex - 1].classList.add('active');
+    }
+
+    // Fonction pour ouvrir le carousel plein écran
+    window.openFullscreenCarousel = function(participationId, startIndex = 0) {
+        const imagesDataElement = document.getElementById(`images-data-${participationId}`);
+        if (!imagesDataElement) return;
+
+        try {
+            currentModalImages = JSON.parse(imagesDataElement.textContent);
+            currentModalIndex = startIndex;
+            
+            const modal = document.getElementById("imageModal");
+            const modalCarousel = document.getElementById("modal-carousel");
+            const modalIndicators = document.getElementById("modal-indicators");
+            
+            // Créer les slides
+            modalCarousel.innerHTML = '';
+            currentModalImages.forEach((image, index) => {
+                const slide = document.createElement('div');
+                slide.className = `modal-slide ${index === currentModalIndex ? 'active' : ''}`;
+                slide.innerHTML = `<img src="${image.url}" alt="${image.alt}">`;
+                modalCarousel.appendChild(slide);
+            });
+            
+            // Créer les indicateurs
+            modalIndicators.innerHTML = '';
+            if (currentModalImages.length > 1) {
+                currentModalImages.forEach((_, index) => {
+                    const indicator = document.createElement('span');
+                    indicator.className = `modal-indicator ${index === currentModalIndex ? 'active' : ''}`;
+                    indicator.onclick = () => goToModalSlide(index);
+                    modalIndicators.appendChild(indicator);
+                });
+            }
+            
+            // Afficher/masquer les boutons de navigation
+            const prevBtn = document.getElementById('modal-prev');
+            const nextBtn = document.getElementById('modal-next');
+            if (currentModalImages.length > 1) {
+                prevBtn.style.display = 'block';
+                nextBtn.style.display = 'block';
+            } else {
+                prevBtn.style.display = 'none';
+                nextBtn.style.display = 'none';
+            }
+            
+            // Mettre à jour la légende
+            document.getElementById("caption").textContent = currentModalImages[currentModalIndex].alt;
+            
+            // Afficher le modal
+            modal.style.display = "block";
+            modal.offsetHeight; // Force reflow
+            modal.classList.add('show');
+            
+        } catch (e) {
+            console.error('Erreur lors du parsing des données d\'images:', e);
+        }
+    }
+
+    // Navigation du carousel modal
+    function changeModalSlide(direction) {
+        if (currentModalImages.length <= 1) return;
+        
+        const slides = document.querySelectorAll('.modal-slide');
+        const indicators = document.querySelectorAll('.modal-indicator');
+        
+        slides[currentModalIndex].classList.remove('active');
+        if (indicators[currentModalIndex]) {
+            indicators[currentModalIndex].classList.remove('active');
+        }
+        
+        currentModalIndex += direction;
+        if (currentModalIndex >= currentModalImages.length) currentModalIndex = 0;
+        if (currentModalIndex < 0) currentModalIndex = currentModalImages.length - 1;
+        
+        slides[currentModalIndex].classList.add('active');
+        if (indicators[currentModalIndex]) {
+            indicators[currentModalIndex].classList.add('active');
+        }
+        
+        document.getElementById("caption").textContent = currentModalImages[currentModalIndex].alt;
+    }
+
+    function goToModalSlide(index) {
+        if (currentModalImages.length <= 1) return;
+        
+        const slides = document.querySelectorAll('.modal-slide');
+        const indicators = document.querySelectorAll('.modal-indicator');
+        
+        slides[currentModalIndex].classList.remove('active');
+        if (indicators[currentModalIndex]) {
+            indicators[currentModalIndex].classList.remove('active');
+        }
+        
+        currentModalIndex = index;
+        
+        slides[currentModalIndex].classList.add('active');
+        if (indicators[currentModalIndex]) {
+            indicators[currentModalIndex].classList.add('active');
+        }
+        
+        document.getElementById("caption").textContent = currentModalImages[currentModalIndex].alt;
+    }
+
+    // Event listeners pour les boutons du modal
+    document.getElementById('modal-prev').addEventListener('click', () => changeModalSlide(-1));
+    document.getElementById('modal-next').addEventListener('click', () => changeModalSlide(1));
+
+    // Fermeture du modal
+    document.querySelector('.close').onclick = function() {
+        const modal = document.getElementById("imageModal");
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.style.display = "none";
+        }, 300);
+    }
+
+    // Fermeture par clic extérieur
+    window.onclick = function(event) {
+        const modal = document.getElementById("imageModal");
+        if (event.target == modal) {
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = "none";
+            }, 300);
+        }
+    }
+
+    // Navigation clavier
+    document.addEventListener('keydown', function(event) {
+        const modal = document.getElementById("imageModal");
+        if (modal.style.display === "block") {
+            if (event.key === 'ArrowLeft') {
+                changeModalSlide(-1);
+            } else if (event.key === 'ArrowRight') {
+                changeModalSlide(1);
+            } else if (event.key === 'Escape') {
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    modal.style.display = "none";
+                }, 300);
+            }
+        }
+    });
+});
+</script>
