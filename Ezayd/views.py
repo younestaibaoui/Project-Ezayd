@@ -443,6 +443,8 @@ def details_view(request, enchere_id):
                 'titre': oeuvre.titre,
                 'get_images': oeuvre.get_images(),  # Suppose que ça retourne des URLs ou une liste
                 'artiste': oeuvre.artiste,
+                'annee_creation': oeuvre.annee_creation,  # Si applicable
+                'participation_count': participation_count,
             })
     else:
         raise Http404("Type de lot non supporté.")
