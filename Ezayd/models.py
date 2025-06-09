@@ -205,8 +205,7 @@ class Enchaire(models.Model):
             )
 
     def is_active(self):
-        today = timezone.now().date()
-        return self.date_debut <= today <= self.date_fin
+        return True if self.etat == 'active' else False
 
     class Meta:
         indexes = [

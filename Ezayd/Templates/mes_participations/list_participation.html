@@ -1,4 +1,5 @@
 {% comment %} Enhanced Participants Card Section {% endcomment %}
+{% comment %} Enhanced Participants Card Section {% endcomment %}
 <div class="participants-card">
     <div class="card-header">
         <h3 class="section-title">
@@ -39,11 +40,11 @@
                                 <script type="application/json" id="images-data-{{ participation.participation.id }}">
                                     [{% for image in participation.objet.images.all %}{"url": "{{ image.image.url }}", "alt": "{{ participation.objet }}"}{% if not forloop.last %},{% endif %}{% endfor %}]
                                 </script>
-                            {% elif participation.participation.user.profile_image %}
+                                {% elif participation.participation.user.profile_image %}
                                 <div class="single-image">
                                     <img src="{{ participation.participation.user.profile_image.url }}" alt="{{ participation.participation.user.username }}" onclick="openFullscreen('{{ participation.participation.user.profile_image.url }}', '{{ participation.participation.user.username }}')"/>
                                 </div>
-                            {% else %}
+                                {% else %}
                                 <div class="image-placeholder" onclick="openFullscreen('', '{{ participation.objet }}')">
                                     {{ participation.objet|first|upper }}
                                 </div>
@@ -72,38 +73,74 @@
                                         <span class="days-left" data-end-time="{{ participation.enchere.date_fin }}" id="time-remaining-{{ participation.participation.id }}"></span>
                                     {% endif %}
                                 </div>
+                                
+                                <div class="participant-actions">
+                                    <a href="{% url 'details_objet' participation.enchere.lot.type participation.objet.id %}" class="action-btn view-details" title="Voir détails objet">
+                                        <i class="fas fa-eye"></i>
+                                        <span>Détails</span>
+                                    </a>
+                                    <a href="{% url 'details_enchaire' participation.enchere.id %}" class="action-btn view-auction" title="Voir détails enchère">
+                                        <i class="fas fa-gavel"></i>
+                                        <span>Enchère</span>
+                                    </a>
+                                </div>
                             </div>
                         </div>
 
                         <div class="price-and-actions">
-                            <div class="bid-info">
-                                <div class="bid-amount">
-                                    <div class="bid-label">Votre offre</div>
-                                    <div class="participant-amount">
-                                        <span class="currency">DA</span>
-                                        <span class="amount">{{ participation.montant|floatformat:0 }}</span>
-                                    </div>
-                                </div>
-                                
-                                <div class="current-amount">
-                                    <div class="bid-label">Prix actuel</div>
-                                    <div class="participant-amount current">
-                                        <span class="currency">DA</span>
-                                        <span class="amount">{{ participation.first_price|floatformat:0 }}</span>
-                                    </div>
-                                </div>
-                            </div>
 
-                            <div class="participant-actions">
-                                <a href="{% url 'details_objet' participation.enchere.lot.type participation.objet.id %}" class="action-btn view-details" title="Voir détails objet">
-                                    <i class="fas fa-eye"></i>
-                                    <span>Détails</span>
-                                </a>
-                                <a href="{% url 'details_enchaire' participation.enchere.id %}" class="action-btn view-auction" title="Voir détails enchère">
-                                    <i class="fas fa-gavel"></i>
-                                    <span>Enchère</span>
-                                </a>
-                            </div>
+                            <!-- Status message based on auction state -->
+                            {% if participation.enchere.is_active %}
+                                <div class="bid-info">
+                                    <div class="bid-amount">
+                                        <span class="bid-label">Votre offre</span>
+                                        <div class="participant-amount">
+                                            <span class="currency">DA</span>
+                                            <span class="amount">{{ participation.montant|floatformat:0 }}</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="current-amount">
+                                        <span class="bid-label">Prix actuel</span>
+                                        <div class="participant-amount current">
+                                            <span class="currency">DA</span>
+                                            <span class="amount">{{ participation.first_price|floatformat:0 }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% if participation.enchereObjet.winner.id == user.id %}
+                                    <div class="status-message winner">
+                                        <i class="fas fa-crown"></i>
+                                        <span>En tête</span>
+                                    </div>
+                                    {% else %}
+                                    <div class="status-message behind">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        <span>Vous êtes derrière</span>
+                                    </div>
+                                {% endif %}
+                                {% else %}
+                                <div class="bid-info">
+                                    <div class="current-amount">
+                                        <span class="bid-label">Offre gagnant</span>
+                                        <div class="participant-amount current">
+                                            <span class="currency">DA</span>
+                                            <span class="amount">{{ participation.first_price|floatformat:0 }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% if participation.enchereObjet.winner.id == user.id %}
+                                    <div class="status-message winner">
+                                        <i class="fas fa-trophy"></i>
+                                        <span>Vous avez gagné cette enchère</span>
+                                    </div>
+                                    {% else %}
+                                    <div class="status-message lost">
+                                        <i class="fas fa-times-circle"></i>
+                                        <span>Vous avez perdu cette enchère</span>
+                                    </div>
+                                {% endif %}
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -168,13 +205,29 @@
                                             <span class="days-left" data-end-time="{{ participation.enchere.date_fin }}" id="time-remaining-{{ participation.participation.id }}"></span>
                                         {% endif %}
                                     </div>
+                                    
+                                    <div class="participation-timestamp">
+                                        <i class="fas fa-clock"></i>
+                                        <span>Participé le {{ participation.date_participation|date:"d/m/Y à H:i" }}</span>
+                                    </div>
+                                    
+                                    <div class="participant-actions">
+                                        <a href="{% url 'details_objet' participation.enchere.lot.type participation.objet.id %}" class="action-btn view-details" title="Voir détails objet">
+                                            <i class="fas fa-eye"></i>
+                                            <span>Détails</span>
+                                        </a>
+                                        <a href="{% url 'details_enchaire' participation.enchere.id %}" class="action-btn view-auction" title="Voir détails enchère">
+                                            <i class="fas fa-gavel"></i>
+                                            <span>Enchère</span>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
 
                             <div class="price-and-actions">
                                 <div class="bid-info">
                                     <div class="bid-amount">
-                                        <div class="bid-label">Votre offre</div>
+                                        <span class="bid-label">Votre offre</span>
                                         <div class="participant-amount">
                                             <span class="currency">DA</span>
                                             <span class="amount">{{ participation.montant|floatformat:0 }}</span>
@@ -182,23 +235,12 @@
                                     </div>
                                     
                                     <div class="current-amount">
-                                        <div class="bid-label">Prix actuel</div>
+                                        <span class="bid-label">Prix actuel</span>
                                         <div class="participant-amount current">
                                             <span class="currency">DA</span>
                                             <span class="amount">{{ participation.first_price|floatformat:0 }}</span>
                                         </div>
                                     </div>
-                                </div>
-
-                                <div class="participant-actions">
-                                    <a href="{% url 'details_objet' participation.enchere.lot.type participation.objet.id %}" class="action-btn view-details" title="Voir détails objet">
-                                        <i class="fas fa-eye"></i>
-                                        <span>Détails</span>
-                                    </a>
-                                    <a href="{% url 'details_enchaire' participation.enchere.id %}" class="action-btn view-auction" title="Voir détails enchère">
-                                        <i class="fas fa-gavel"></i>
-                                        <span>Enchère</span>
-                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -243,6 +285,35 @@
 </div>
 
 <style>
+
+    /* Status message styles */
+    .status-message {
+        padding: 8px 12px;
+        border-radius: 6px;
+        text-align: center;
+        font-weight: 600;
+        margin: 10px 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: 14px;
+    }
+
+    .status-message.winner {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+    }
+
+    .status-message.behind {
+        background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+        color: #212529;
+    }
+
+    .status-message.lost {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        color: white;
+    }
     .participants-card {
         background: linear-gradient(145deg, #1a1a1a, #2d2d2d);
         border-radius: 16px;
@@ -490,6 +561,9 @@
 
     .auction-info {
         margin-top: 2px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
     }
 
     .time-remaining {
@@ -516,6 +590,24 @@
         font-family: 'Courier New', Courier, monospace;
     }
 
+    .participation-timestamp {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 0.75rem;
+        color: #aaa;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 4px 8px;
+        width: fit-content;
+    }
+
+    .participation-timestamp i {
+        color: #ff6b35;
+        font-size: 0.7rem;
+    }
+
     .price-and-actions {
         display: flex;
         flex-direction: column;
@@ -535,10 +627,8 @@
         border-radius: 8px;
         padding: 8px 12px;
         display: flex;
-        flex-direction: column;
         align-items: center;
-        gap: 4px;
-        min-width: 85px;
+        gap: 8px;
     }
 
     .bid-amount {
@@ -557,7 +647,7 @@
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        text-align: center;
+        white-space: nowrap;
     }
 
     .participant-amount {
@@ -897,242 +987,242 @@
 </style>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const loadMoreBtn = document.getElementById('load-more-btn');
-    const hiddenItems = document.getElementById('hidden-items');
-    const participantList = document.getElementById('participant-list');
-    let showingAll = false;
-    let currentModalImages = [];
-    let currentModalIndex = 0;
+    document.addEventListener('DOMContentLoaded', function() {
+        const loadMoreBtn = document.getElementById('load-more-btn');
+        const hiddenItems = document.getElementById('hidden-items');
+        const participantList = document.getElementById('participant-list');
+        let showingAll = false;
+        let currentModalImages = [];
+        let currentModalIndex = 0;
 
-    if (loadMoreBtn && hiddenItems) {
-        loadMoreBtn.addEventListener('click', function() {
-            const btnText = this.querySelector('.btn-text');
-            const btnIcon = this.querySelector('i');
-            
-            if (!showingAll) {
-                hiddenItems.style.display = 'block';
-                btnText.textContent = 'Voir moins';
-                btnIcon.classList.remove('fa-chevron-down');
-                btnIcon.classList.add('fa-chevron-up');
-                showingAll = true;
-            } else {
-                hiddenItems.style.display = 'none';
-                btnText.textContent = 'Voir toutes les participations';
-                btnIcon.classList.remove('fa-chevron-up');
-                btnIcon.classList.add('fa-chevron-down');
-                showingAll = false;
-                participantList.scrollTop = 0;
-            }
-        });
-    }
-
-    // Mise à jour du temps restant
-    function updateTimeRemaining() {
-        document.querySelectorAll('.days-left').forEach(item => {
-            const endTime = new Date(item.dataset.endTime).getTime();
-            const now = new Date().getTime();
-            const timeLeft = endTime - now;
-
-            if (timeLeft > 0) {
-                const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-
-                let timeString = '';
-                if (days > 0) {
-                    timeString = `${days}j ${hours}h ${minutes}m ${seconds}s`;
-                } else if (hours > 0) {
-                    timeString = `${hours}h ${minutes}m ${seconds}s`;
-                } else if (minutes > 0) {
-                    timeString = `${minutes}m ${seconds}s`;
+        if (loadMoreBtn && hiddenItems) {
+            loadMoreBtn.addEventListener('click', function() {
+                const btnText = this.querySelector('.btn-text');
+                const btnIcon = this.querySelector('i');
+                
+                if (!showingAll) {
+                    hiddenItems.style.display = 'block';
+                    btnText.textContent = 'Voir moins';
+                    btnIcon.classList.remove('fa-chevron-down');
+                    btnIcon.classList.add('fa-chevron-up');
+                    showingAll = true;
                 } else {
-                    timeString = `${seconds}s`;
+                    hiddenItems.style.display = 'none';
+                    btnText.textContent = 'Voir toutes les participations';
+                    btnIcon.classList.remove('fa-chevron-up');
+                    btnIcon.classList.add('fa-chevron-down');
+                    showingAll = false;
+                    participantList.scrollTop = 0;
                 }
-
-                item.textContent = timeString;
-            } else {
-                item.textContent = 'Enchère terminée';
-                item.style.color = '#ff6b35';
-            }
-        });
-    }
-
-    updateTimeRemaining();
-    setInterval(updateTimeRemaining, 1000);
-
-    // Fonctions pour le carousel miniature
-    window.changeSlide = function(carouselId, direction) {
-        const carousel = document.getElementById(carouselId);
-        const slides = carousel.querySelectorAll('.carousel-slide');
-        const indicators = carousel.querySelectorAll('.indicator');
-        let currentIndex = Array.from(slides).findIndex(slide => slide.classList.contains('active'));
-        
-        slides[currentIndex].classList.remove('active');
-        indicators[currentIndex].classList.remove('active');
-        
-        currentIndex += direction;
-        if (currentIndex >= slides.length) currentIndex = 0;
-        if (currentIndex < 0) currentIndex = slides.length - 1;
-        
-        slides[currentIndex].classList.add('active');
-        indicators[currentIndex].classList.add('active');
-    }
-
-    window.currentSlide = function(carouselId, slideIndex) {
-        const carousel = document.getElementById(carouselId);
-        const slides = carousel.querySelectorAll('.carousel-slide');
-        const indicators = carousel.querySelectorAll('.indicator');
-        
-        slides.forEach(slide => slide.classList.remove('active'));
-        indicators.forEach(indicator => indicator.classList.remove('active'));
-        
-        slides[slideIndex - 1].classList.add('active');
-        indicators[slideIndex - 1].classList.add('active');
-    }
-
-    // Fonction pour ouvrir le carousel plein écran
-    window.openFullscreenCarousel = function(participationId, startIndex = 0) {
-        const imagesDataElement = document.getElementById(`images-data-${participationId}`);
-        if (!imagesDataElement) return;
-
-        try {
-            currentModalImages = JSON.parse(imagesDataElement.textContent);
-            currentModalIndex = startIndex;
-            
-            const modal = document.getElementById("imageModal");
-            const modalCarousel = document.getElementById("modal-carousel");
-            const modalIndicators = document.getElementById("modal-indicators");
-            
-            // Créer les slides
-            modalCarousel.innerHTML = '';
-            currentModalImages.forEach((image, index) => {
-                const slide = document.createElement('div');
-                slide.className = `modal-slide ${index === currentModalIndex ? 'active' : ''}`;
-                slide.innerHTML = `<img src="${image.url}" alt="${image.alt}">`;
-                modalCarousel.appendChild(slide);
             });
+        }
+
+        // Mise à jour du temps restant
+        function updateTimeRemaining() {
+            document.querySelectorAll('.days-left').forEach(item => {
+                const endTime = new Date(item.dataset.endTime).getTime();
+                const now = new Date().getTime();
+                const timeLeft = endTime - now;
+
+                if (timeLeft > 0) {
+                    const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+                    let timeString = '';
+                    if (days > 0) {
+                        timeString = `${days}j ${hours}h ${minutes}m ${seconds}s`;
+                    } else if (hours > 0) {
+                        timeString = `${hours}h ${minutes}m ${seconds}s`;
+                    } else if (minutes > 0) {
+                        timeString = `${minutes}m ${seconds}s`;
+                    } else {
+                        timeString = `${seconds}s`;
+                    }
+
+                    item.textContent = timeString;
+                } else {
+                    item.textContent = 'Enchère terminée';
+                    item.style.color = '#ff6b35';
+                }
+            });
+        }
+
+        updateTimeRemaining();
+        setInterval(updateTimeRemaining, 1000);
+
+        // Fonctions pour le carousel miniature
+        window.changeSlide = function(carouselId, direction) {
+            const carousel = document.getElementById(carouselId);
+            const slides = carousel.querySelectorAll('.carousel-slide');
+            const indicators = carousel.querySelectorAll('.indicator');
+            let currentIndex = Array.from(slides).findIndex(slide => slide.classList.contains('active'));
             
-            // Créer les indicateurs
-            modalIndicators.innerHTML = '';
-            if (currentModalImages.length > 1) {
-                currentModalImages.forEach((_, index) => {
-                    const indicator = document.createElement('span');
-                    indicator.className = `modal-indicator ${index === currentModalIndex ? 'active' : ''}`;
-                    indicator.onclick = () => goToModalSlide(index);
-                    modalIndicators.appendChild(indicator);
+            slides[currentIndex].classList.remove('active');
+            indicators[currentIndex].classList.remove('active');
+            
+            currentIndex += direction;
+            if (currentIndex >= slides.length) currentIndex = 0;
+            if (currentIndex < 0) currentIndex = slides.length - 1;
+            
+            slides[currentIndex].classList.add('active');
+            indicators[currentIndex].classList.add('active');
+        }
+
+        window.currentSlide = function(carouselId, slideIndex) {
+            const carousel = document.getElementById(carouselId);
+            const slides = carousel.querySelectorAll('.carousel-slide');
+            const indicators = carousel.querySelectorAll('.indicator');
+            
+            slides.forEach(slide => slide.classList.remove('active'));
+            indicators.forEach(indicator => indicator.classList.remove('active'));
+            
+            slides[slideIndex - 1].classList.add('active');
+            indicators[slideIndex - 1].classList.add('active');
+        }
+
+        // Fonction pour ouvrir le carousel plein écran
+        window.openFullscreenCarousel = function(participationId, startIndex = 0) {
+            const imagesDataElement = document.getElementById(`images-data-${participationId}`);
+            if (!imagesDataElement) return;
+
+            try {
+                currentModalImages = JSON.parse(imagesDataElement.textContent);
+                currentModalIndex = startIndex;
+                
+                const modal = document.getElementById("imageModal");
+                const modalCarousel = document.getElementById("modal-carousel");
+                const modalIndicators = document.getElementById("modal-indicators");
+                
+                // Créer les slides
+                modalCarousel.innerHTML = '';
+                currentModalImages.forEach((image, index) => {
+                    const slide = document.createElement('div');
+                    slide.className = `modal-slide ${index === currentModalIndex ? 'active' : ''}`;
+                    slide.innerHTML = `<img src="${image.url}" alt="${image.alt}">`;
+                    modalCarousel.appendChild(slide);
                 });
+                
+                // Créer les indicateurs
+                modalIndicators.innerHTML = '';
+                if (currentModalImages.length > 1) {
+                    currentModalImages.forEach((_, index) => {
+                        const indicator = document.createElement('span');
+                        indicator.className = `modal-indicator ${index === currentModalIndex ? 'active' : ''}`;
+                        indicator.onclick = () => goToModalSlide(index);
+                        modalIndicators.appendChild(indicator);
+                    });
+                }
+                
+                // Afficher/masquer les boutons de navigation
+                const prevBtn = document.getElementById('modal-prev');
+                const nextBtn = document.getElementById('modal-next');
+                if (currentModalImages.length > 1) {
+                    prevBtn.style.display = 'block';
+                    nextBtn.style.display = 'block';
+                } else {
+                    prevBtn.style.display = 'none';
+                    nextBtn.style.display = 'none';
+                }
+                
+                // Mettre à jour la légende
+                document.getElementById("caption").textContent = currentModalImages[currentModalIndex].alt;
+                
+                // Afficher le modal
+                modal.style.display = "block";
+                modal.offsetHeight; // Force reflow
+                modal.classList.add('show');
+                
+            } catch (e) {
+                console.error('Erreur lors du parsing des données d\'images:', e);
+            }
+        }
+
+        // Navigation du carousel modal
+        function changeModalSlide(direction) {
+            if (currentModalImages.length <= 1) return;
+            
+            const slides = document.querySelectorAll('.modal-slide');
+            const indicators = document.querySelectorAll('.modal-indicator');
+            
+            slides[currentModalIndex].classList.remove('active');
+            if (indicators[currentModalIndex]) {
+                indicators[currentModalIndex].classList.remove('active');
             }
             
-            // Afficher/masquer les boutons de navigation
-            const prevBtn = document.getElementById('modal-prev');
-            const nextBtn = document.getElementById('modal-next');
-            if (currentModalImages.length > 1) {
-                prevBtn.style.display = 'block';
-                nextBtn.style.display = 'block';
-            } else {
-                prevBtn.style.display = 'none';
-                nextBtn.style.display = 'none';
+            currentModalIndex += direction;
+            if (currentModalIndex >= currentModalImages.length) currentModalIndex = 0;
+            if (currentModalIndex < 0) currentModalIndex = currentModalImages.length - 1;
+            
+            slides[currentModalIndex].classList.add('active');
+            if (indicators[currentModalIndex]) {
+                indicators[currentModalIndex].classList.add('active');
             }
             
-            // Mettre à jour la légende
             document.getElementById("caption").textContent = currentModalImages[currentModalIndex].alt;
+        }
+
+        function goToModalSlide(index) {
+            if (currentModalImages.length <= 1) return;
             
-            // Afficher le modal
-            modal.style.display = "block";
-            modal.offsetHeight; // Force reflow
-            modal.classList.add('show');
+            const slides = document.querySelectorAll('.modal-slide');
+            const indicators = document.querySelectorAll('.modal-indicator');
             
-        } catch (e) {
-            console.error('Erreur lors du parsing des données d\'images:', e);
+            slides[currentModalIndex].classList.remove('active');
+            if (indicators[currentModalIndex]) {
+                indicators[currentModalIndex].classList.remove('active');
+            }
+            
+            currentModalIndex = index;
+            
+            slides[currentModalIndex].classList.add('active');
+            if (indicators[currentModalIndex]) {
+                indicators[currentModalIndex].classList.add('active');
+            }
+            
+            document.getElementById("caption").textContent = currentModalImages[currentModalIndex].alt;
         }
-    }
 
-    // Navigation du carousel modal
-    function changeModalSlide(direction) {
-        if (currentModalImages.length <= 1) return;
-        
-        const slides = document.querySelectorAll('.modal-slide');
-        const indicators = document.querySelectorAll('.modal-indicator');
-        
-        slides[currentModalIndex].classList.remove('active');
-        if (indicators[currentModalIndex]) {
-            indicators[currentModalIndex].classList.remove('active');
-        }
-        
-        currentModalIndex += direction;
-        if (currentModalIndex >= currentModalImages.length) currentModalIndex = 0;
-        if (currentModalIndex < 0) currentModalIndex = currentModalImages.length - 1;
-        
-        slides[currentModalIndex].classList.add('active');
-        if (indicators[currentModalIndex]) {
-            indicators[currentModalIndex].classList.add('active');
-        }
-        
-        document.getElementById("caption").textContent = currentModalImages[currentModalIndex].alt;
-    }
+        // Event listeners pour les boutons du modal
+        document.getElementById('modal-prev').addEventListener('click', () => changeModalSlide(-1));
+        document.getElementById('modal-next').addEventListener('click', () => changeModalSlide(1));
 
-    function goToModalSlide(index) {
-        if (currentModalImages.length <= 1) return;
-        
-        const slides = document.querySelectorAll('.modal-slide');
-        const indicators = document.querySelectorAll('.modal-indicator');
-        
-        slides[currentModalIndex].classList.remove('active');
-        if (indicators[currentModalIndex]) {
-            indicators[currentModalIndex].classList.remove('active');
-        }
-        
-        currentModalIndex = index;
-        
-        slides[currentModalIndex].classList.add('active');
-        if (indicators[currentModalIndex]) {
-            indicators[currentModalIndex].classList.add('active');
-        }
-        
-        document.getElementById("caption").textContent = currentModalImages[currentModalIndex].alt;
-    }
-
-    // Event listeners pour les boutons du modal
-    document.getElementById('modal-prev').addEventListener('click', () => changeModalSlide(-1));
-    document.getElementById('modal-next').addEventListener('click', () => changeModalSlide(1));
-
-    // Fermeture du modal
-    document.querySelector('.close').onclick = function() {
-        const modal = document.getElementById("imageModal");
-        modal.classList.remove('show');
-        setTimeout(() => {
-            modal.style.display = "none";
-        }, 300);
-    }
-
-    // Fermeture par clic extérieur
-    window.onclick = function(event) {
-        const modal = document.getElementById("imageModal");
-        if (event.target == modal) {
+        // Fermeture du modal
+        document.querySelector('.close').onclick = function() {
+            const modal = document.getElementById("imageModal");
             modal.classList.remove('show');
             setTimeout(() => {
                 modal.style.display = "none";
             }, 300);
         }
-    }
 
-    // Navigation clavier
-    document.addEventListener('keydown', function(event) {
-        const modal = document.getElementById("imageModal");
-        if (modal.style.display === "block") {
-            if (event.key === 'ArrowLeft') {
-                changeModalSlide(-1);
-            } else if (event.key === 'ArrowRight') {
-                changeModalSlide(1);
-            } else if (event.key === 'Escape') {
+        // Fermeture par clic extérieur
+        window.onclick = function(event) {
+            const modal = document.getElementById("imageModal");
+            if (event.target == modal) {
                 modal.classList.remove('show');
                 setTimeout(() => {
                     modal.style.display = "none";
                 }, 300);
             }
         }
+
+        // Navigation clavier
+        document.addEventListener('keydown', function(event) {
+            const modal = document.getElementById("imageModal");
+            if (modal.style.display === "block") {
+                if (event.key === 'ArrowLeft') {
+                    changeModalSlide(-1);
+                } else if (event.key === 'ArrowRight') {
+                    changeModalSlide(1);
+                } else if (event.key === 'Escape') {
+                    modal.classList.remove('show');
+                    setTimeout(() => {
+                        modal.style.display = "none";
+                    }, 300);
+                }
+            }
+        });
     });
-});
 </script>

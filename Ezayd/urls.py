@@ -13,6 +13,9 @@ urlpatterns = [
     path('mes-participations/', mes_participations, name='mes_participations'),
     path('profil/', profil_view, name='profil'),
     path('participer/', participer, name='participer'),
+
+    # API Search
+    path('api/search/', search_api, name='search_api'),
 ]
 
 if settings.DEBUG:

@@ -87,21 +87,21 @@
             <!-- Right: Action Buttons -->
             <div style="display: flex; flex-direction: column; gap: 8px; min-width: 160px;">
                 <!-- Favorite Button -->
-                {% if user.is_authenticated %}
-                <form method="POST" action="{% url 'toggle_favori' enchaire.id %}" style="margin: 0;">
-                    {% csrf_token %}
-                    <button type="submit" style="width: 100%; height: 36px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: none; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.3s ease; {% if user in enchaire.savers.all %}background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white;{% else %}background: #333; color: #fff; border: 1px solid #555;{% endif %}"
-                            onmouseover="this.style.transform='translateY(-1px)'"
-                            onmouseout="this.style.transform='translateY(0)'">
-                        {% if user in enchaire.savers.all %}
-                            <i class="fas fa-heart" style="font-size: 14px;"></i>
-                            <span>Favoris</span>
-                        {% else %}
-                            <i class="far fa-heart" style="font-size: 14px;"></i>
-                            <span>Favoris</span>
-                        {% endif %}
-                    </button>
-                </form>
+                {% if user.is_authenticated and enchaire.etat != 'finis' %}
+                    <form method="POST" action="{% url 'toggle_favori' enchaire.id %}" style="margin: 0;">
+                        {% csrf_token %}
+                        <button type="submit" style="width: 100%; height: 36px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: none; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.3s ease; {% if user in enchaire.savers.all %}background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white;{% else %}background: #333; color: #fff; border: 1px solid #555;{% endif %}"
+                                onmouseover="this.style.transform='translateY(-1px)'"
+                                onmouseout="this.style.transform='translateY(0)'">
+                            {% if user in enchaire.savers.all %}
+                                <i class="fas fa-heart" style="font-size: 14px;"></i>
+                                <span>Favoris</span>
+                            {% else %}
+                                <i class="far fa-heart" style="font-size: 14px;"></i>
+                                <span>Favoris</span>
+                            {% endif %}
+                        </button>
+                    </form>
                 {% endif %}
 
                 <!-- Request Status/Button -->
@@ -120,17 +120,19 @@
                             {% endif %}
                         </div>
                     {% else %}
-                        <form method="post" action="{% url 'demande' %}" style="margin: 0;">
-                            {% csrf_token %}
-                            <input type="hidden" name="user" value="{{ user.id }}">
-                            <input type="hidden" name="enchaire" value="{{ enchaire.id }}">
-                            <button type="submit" style="width: 100%; height: 36px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: none; border-radius: 8px; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: white; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.3s ease;"
-                                    onmouseover="this.style.transform='translateY(-1px)'"
-                                    onmouseout="this.style.transform='translateY(0)'">
-                                <i class="fas fa-paper-plane" style="font-size: 14px;"></i>
-                                <span>Demander</span>
-                            </button>
-                        </form>
+                        {% if enchaire.is_active %}
+                            <form method="post" action="{% url 'demande' %}" style="margin: 0;">
+                                {% csrf_token %}
+                                <input type="hidden" name="user" value="{{ user.id }}">
+                                <input type="hidden" name="enchaire" value="{{ enchaire.id }}">
+                                <button type="submit" style="width: 100%; height: 36px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: none; border-radius: 8px; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: white; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.3s ease;"
+                                        onmouseover="this.style.transform='translateY(-1px)'"
+                                        onmouseout="this.style.transform='translateY(0)'">
+                                    <i class="fas fa-paper-plane" style="font-size: 14px;"></i>
+                                    <span>Demander</span>
+                                </button>
+                            </form>
+                        {% endif %}
                     {% endif %}
                 {% endif %}
             </div>
