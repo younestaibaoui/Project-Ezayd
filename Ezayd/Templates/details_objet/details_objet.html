@@ -781,32 +781,38 @@
                     <div class="price-item">
                         <span class="price-label">Prix actuel</span>
                         <span class="price-value highlight">
-                            {{ enchaireObjet.price_reserved }} DA
+                            {{ enchaireObjet.price_reserved|add:enchaireObjet.pas }} DA
                         </span>
                     </div>
-                    
-                    <div class="price-item last-child">
-                        <span class="price-label">
-                                Prochaine enchère
-                        </span>
-
-                        <div class="price-value-container">
-                            <p class="price-value">
-                                {% with effective_price=next_bid_price|default:enchaireObjet.price_reserved %}
-                                    {{ effective_price|add:enchaireObjet.pas }} DA
-                                {% endwith %}
-                            </p>
-
-                            {% if enchaireObjet.price_reserved > enchaireObjet.first_price %}
-                                <p class="status-item-right">Pas: {{ enchaireObjet.pas }} DA</p>
-                            {% endif %}
+                {% else %}
+                    {% with price_reserved=enchaireObjet.price_reserved %}
+                        <div class="price-item">
+                            <span class="price-label">Prix actuel</span>
+                            <span class="price-value highlight">
+                                {{ price_reserved }} DA
+                            </span>
                         </div>
-                    </div>
+                        <div class="price-item last-child">
+                            <span class="price-label">
+                                Prochaine enchère
+                            </span>
+
+                            <div class="price-value-container">
+                                <p class="price-value">
+                                    {{ price_reserved|add:enchaireObjet.pas }} DA
+                                </p>
+
+                                {% if enchaireObjet.price_reserved > enchaireObjet.first_price %}
+                                    <p class="status-item-right">Pas: {{ enchaireObjet.pas }} DA</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endwith %}
                 {% endif %}
 
             </div>
 
-            {% if  not is_winner %}
+            {% if not is_winner %}
                 {% if demande_state == 'Approuvée' %}
                     <form method="POST" action="{% url 'participer' %}" style="margin-top: 1px;">
                         {% csrf_token %}
@@ -846,7 +852,7 @@
                 {% endif %}
             {% else %}
                 <button type="submit" class="participate-btn-en-tete" style="margin-top: 20px; cursor: default;" disabled>
-                    Vous Etes Leader
+                    En Tete
                 </button>
             {% endif %}
             
