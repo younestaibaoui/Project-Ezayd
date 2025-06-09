@@ -15,6 +15,16 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+import os
+from pathlib import Path
+    
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+LOGIN_URL = '/connexion/'
+LOGIN_REDIRECT_URL = '/'  # redirection après connexion
+LOGOUT_REDIRECT_URL = '/'
 
 
 # Application definition
@@ -28,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'Ezayd',
     'perso', 
+    'notification',
 ]
 
 AUTH_USER_MODEL = 'perso.UserAccount'
@@ -53,13 +64,14 @@ ROOT_URLCONF = 'site_enchaire.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'notification.context_processors.global_notifications',
             ],
         },
     },
@@ -119,7 +131,6 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
 
 #-------------------------------- Email settings -------------------------------------------------
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

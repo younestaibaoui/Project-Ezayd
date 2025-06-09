@@ -1,0 +1,1351 @@
+{% extends "../base.html" %}
+
+{% load static %}
+
+{% block title %}Ezayd - Accueil{% endblock %}
+{% block content %}
+
+<!-- ------------------------------------------ top ------------------------------------------------------------------------ -->
+
+      <!-- Main Content -->
+      <main id="main-content" class="main-content">
+          <!-- Hero Carousel Section -->
+          <section class="hero-section" aria-label="Top enchères par participation">
+              <h1 class="sr-only">Ezayd - Plateforme d'enchères en ligne</h1>
+              <div class="carousel-container" role="region" aria-label="Carrousel des top enchères par participation">
+                  <div class="carousel-track" aria-live="polite">
+                      {% for objet_data in top_objets_by_category %}
+                      <article class="carousel-slide {% if forloop.first %}active{% endif %}" 
+                               aria-label="Enchère {{ objet_data.title }} - {{ objet_data.participation_count }} participants"
+                               data-category="{{ objet_data.type }}">
+                          
+                          <!-- Image Section avec overlay moderne -->
+                          <div class="slide-image-container">
+                              <div class="image-wrapper">
+                                  <img src="{{ objet_data.main_image }}" 
+                                       alt="{{ objet_data.title }} - Image principale" 
+                                       class="main-image" 
+                                       loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+                                       onerror="this.src='{% static 'images/placeholder.jpg' %}'">
+                                  
+                                  <!-- Overlay moderne avec dégradé -->
+                                  <div class="modern-overlay"></div>
+                                  
+                                  <!-- Header avec titre et badges -->
+                                  <div class="slide-header">
+                                      <div class="title-section">
+                                          <h2 class="slide-title">{{ objet_data.title }}</h2>
+                                          <div class="category-tag {{ objet_data.type }}">
+                                              <i class="{{ objet_data.category_icon }}"></i>
+                                              <span>{{ objet_data.category_name }}</span>
+                                          </div>
+                                      </div>
+                                      
+                                      <div class="badges-section">
+                                          <div class="top-badge">
+                                              <i class="fas fa-crown"></i>
+                                              <span>Top {{ objet_data.category_name }}</span>
+                                          </div>
+                                          <!-- Participants badge moderne - repositionné au-dessus -->
+                                          <div class="participants-badge">
+                                              <div class="participants-content">
+                                                  <div class="participants-number">{{ objet_data.participation_count }}</div>
+                                                  <div class="participants-text">participant{{ objet_data.participation_count|pluralize }}</div>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+                                  
+                                  <!-- Footer moderne - section combinée à gauche avec background transparent -->
+                                  <div class="slide-footer">
+                                      <div class="combined-info-section">
+                                          
+                                          <div class="info-row">
+                                            <div class="price-label">Prix actuel</div>
+                                              <div class="price-value">{{ objet_data.price_current|floatformat:0 }} DA</div>
+                                              
+                                                  <div class="time-label">Temps restant</div>
+                                                  <div class="countdown-timer" 
+                                                       data-end-date="{{ objet_data.enchaire.date_fin|date:'Y-m-d' }}"
+                                                       data-jours-restants="{{ objet_data.jours_restants }}">
+                                                      <div class="time-block">
+                                                          <div class="time-number days">{{ objet_data.jours_restants|stringformat:"02d" }}</div>
+                                                          <div class="time-label-small">j</div>
+                                                      </div>
+                                                      <div class="time-block">
+                                                          <div class="time-number hours">00</div>
+                                                          <div class="time-label-small">h</div>
+                                                      </div>
+                                                      <div class="time-block">
+                                                          <div class="time-number minutes">00</div>
+                                                          <div class="time-label-small">m</div>
+                                                      </div>
+                                                      <div class="time-block">
+                                                          <div class="time-number seconds">00</div>
+                                                          <div class="time-label-small">s</div>
+                                                      </div>
+                                                  </div>
+                                              
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                          
+                          <!-- Sidebar moderne avec images optimisées -->
+                          <div class="modern-sidebar">
+                              <!-- Galerie d'images - 1 grande à gauche, 2 petites à droite -->
+                              <div class="image-gallery">
+                                  {% if objet_data.images|length >= 3 %}
+                            
+                                      <!-- Images secondaires à droite -->
+                                      <div class="gallery-side-images">
+                                          {% for image in objet_data.images|slice:"1:3" %}
+                                          <div class="gallery-side-item">
+                                              <img src="{{ image }}" 
+                                                   alt="{{ objet_data.title }} - Image {{ forloop.counter|add:1 }}" 
+                                                   class="gallery-image-side" 
+                                                   loading="lazy"
+                                                   onerror="this.parentElement.style.display='none'">
+                                              <div class="gallery-overlay">
+                                                  <i class="fas fa-expand-alt"></i>
+                                              </div>
+                                          </div>
+                                          {% endfor %}
+                                      </div>
+                                  {% elif objet_data.images|length == 2 %}
+                                      <!-- Images secondaires à droite -->
+                                      <div class="gallery-side-images">
+                                          <div class="gallery-side-item">
+                                              <img src="{{ objet_data.images.1 }}" 
+                                                   alt="{{ objet_data.title }} - Image 2" 
+                                                   class="gallery-image-side" 
+                                                   loading="lazy"
+                                                   onerror="this.parentElement.style.display='none'">
+                                              <div class="gallery-overlay">
+                                                  <i class="fas fa-expand-alt"></i>
+                                              </div>
+                                          </div>
+                                          <!-- Placeholder pour la 2ème image -->
+                                          <div class="gallery-side-item placeholder">
+                                              <div class="placeholder-content">
+                                                  <i class="fas fa-image"></i>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  {% elif objet_data.images|length == 1 %}
+                                      <!-- Placeholders à droite -->
+                                      <div class="gallery-side-images">
+                                          <div class="gallery-side-item placeholder">
+                                              <div class="placeholder-content">
+                                                  <i class="fas fa-image"></i>
+                                              </div>
+                                          </div>
+                                          <div class="gallery-side-item placeholder">
+                                              <div class="placeholder-content">
+                                                  <i class="fas fa-image"></i>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  {% else %}
+                                      <!-- Cas sans images - placeholders -->
+                                      <div class="gallery-main-image placeholder">
+                                          <div class="placeholder-content">
+                                              <i class="fas fa-image"></i>
+                                          </div>
+                                      </div>
+                                      <div class="gallery-side-images">
+                                          <div class="gallery-side-item placeholder">
+                                              <div class="placeholder-content">
+                                                  <i class="fas fa-image"></i>
+                                              </div>
+                                          </div>
+                                          <div class="gallery-side-item placeholder">
+                                              <div class="placeholder-content">
+                                                  <i class="fas fa-image"></i>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  {% endif %}
+                              </div>
+                              
+                              <!-- Section d'action simplifiée -->
+                              <div class="action-section">
+                                  <a href="{% url 'details_objet' objet_data.type objet_data.objet.id %}" 
+                                     class="cta-button">
+                                      <span class="cta-text">Voir les détails</span>
+                                      <i class="fas fa-arrow-right cta-icon"></i>
+                                  </a>
+                              </div>
+                          </div>
+                      </article>
+                      {% empty %}
+                      <!-- Slide par défaut -->
+                      <article class="carousel-slide active" aria-label="Aucune enchère disponible">
+                          <div class="slide-image-container">
+                              <div class="image-wrapper">
+                                  <img src="{% static 'images/placeholder.jpg' %}" 
+                                       alt="Aucune enchère disponible" 
+                                       class="main-image" 
+                                       loading="eager">
+                                  <div class="modern-overlay"></div>
+                                  <div class="empty-state">
+                                      <i class="fas fa-search"></i>
+                                      <h2>Aucune enchère disponible</h2>
+                                      <p>Revenez plus tard pour découvrir de nouvelles enchères</p>
+                                  </div>
+                              </div>
+                          </div>
+                          <div class="modern-sidebar">
+                              <div class="empty-sidebar">
+                                  <i class="fas fa-info-circle"></i>
+                                  <span>Aucune information disponible</span>
+                              </div>
+                          </div>
+                      </article>
+                      {% endfor %}
+                  </div>
+                  
+                  <!-- Navigation moderne -->
+                  {% if top_objets_by_category|length > 1 %}
+                  <button class="nav-button nav-prev" aria-label="Enchère précédente">
+                      <i class="fas fa-chevron-left"></i>
+                  </button>
+                  <button class="nav-button nav-next" aria-label="Enchère suivante">
+                      <i class="fas fa-chevron-right"></i>
+                  </button>
+                  
+                  <!-- Indicateurs modernes avec info catégorie -->
+                  <div class="modern-indicators">
+                      {% for objet_data in top_objets_by_category %}
+                      <button class="indicator-dot {% if forloop.first %}active{% endif %}" 
+                              role="tab" 
+                              aria-selected="{% if forloop.first %}true{% else %}false{% endif %}" 
+                              aria-label="Aller à l'enchère {{ forloop.counter }} - {{ objet_data.category_name }}"
+                              data-slide="{{ forloop.counter0 }}"
+                              title="{{ objet_data.title }} - {{ objet_data.category_name }}">
+                          <span class="dot-inner"></span>
+                          <span class="category-indicator">{{ objet_data.category_name|first }}</span>
+                      </button>
+                      {% endfor %}
+                  </div>
+                  {% endif %}
+              </div>
+          </section>
+
+<!-- ----------------------------------------------------------------------------------------------------------------- -->
+{% comment %} -------------------------------------------- {% endcomment %}
+{% include './enchaires.html' %}
+{% comment %} -------------------------------------------- {% endcomment %}
+<!-- ------------------------------------------------------------------------------------------------------------------------------ -->
+</main>
+
+<style>
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+/* Variables CSS modernes */
+:root {
+--primary-color: #ff6b35;
+--primary-gradient: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+--secondary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+--dark-bg: #0f0f0f;
+--card-bg: #1a1a1a;
+--surface-bg: #252525;
+--border-color: #333333;
+--text-primary: #ffffff;
+--text-secondary: #b0b0b0;
+--text-muted: #808080;
+--success-color: #00d4aa;
+--warning-color: #ffb800;
+--shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+--shadow-md: 0 4px 16px rgba(0, 0, 0, 0.15);
+--shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.2);
+--shadow-xl: 0 16px 64px rgba(0, 0, 0, 0.25);
+--radius-sm: 8px;
+--radius-md: 12px;
+--radius-lg: 16px;
+--radius-xl: 24px;
+}
+
+/* Hero Section */
+.hero-section {
+  font-family: 'Inter', sans-serif;
+  background: var(--dark-bg);
+  padding: 0;
+  margin: 0 0 1rem 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.carousel-container {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  background: var(--card-bg);
+  margin-top: 25px;
+}
+
+.carousel-track {
+  display: flex;
+  height: 100%;
+  transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  gap: 0; /* Remove gaps between slides */
+}
+
+.carousel-slide {
+  min-width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr 200px;
+  background: var(--card-bg);
+  position: relative;
+}
+
+/* Image Section moderne */
+.slide-image-container {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface-bg);
+}
+
+.image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.main-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.6s ease;
+  filter: drop-shadow(0 8px 32px rgba(0, 0, 0, 0.4)); /* Add drop shadow */
+}
+
+.carousel-slide:hover .main-image {
+  transform: scale(1.02);
+}
+
+.modern-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.4) 0%,
+      rgba(0, 0, 0, 0.1) 40%,
+      rgba(0, 0, 0, 0.1) 60%,
+      rgba(0, 0, 0, 0.7) 100%
+  );
+  z-index: 1;
+}
+
+/* Header moderne */
+.slide-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  z-index: 3;
+}
+
+.title-section {
+  flex: 1;
+}
+
+.slide-title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.1;
+  margin: 0 0 8px 0;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+  letter-spacing: -0.02em;
+}
+
+/* Category tags with colors from enchaires.html */
+.category-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: var(--radius-md);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  box-shadow: var(--shadow-md);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+/* Category colors from enchaires.html */
+.category-tag.vehicules {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.category-tag.immobilier {
+  background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.category-tag.materiel_pro {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.category-tag.informatique_electronique {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  border-color: rgba(139, 92, 246, 0.3);
+}
+
+.category-tag.mobilier_equipements {
+  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+  border-color: rgba(6, 182, 212, 0.3);
+}
+
+.category-tag.bijoux_objets_valeur {
+  background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+  border-color: rgba(236, 72, 153, 0.3);
+}
+
+.category-tag.stocks_invendus {
+  background: linear-gradient(135deg, #84cc16 0%, #65a30d 100%);
+  border-color: rgba(132, 204, 22, 0.3);
+}
+
+.category-tag.oeuvres_collections {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  border-color: rgba(249, 115, 22, 0.3);
+}
+
+.badges-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+/* Enhanced participants badge */
+.participants-badge {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    backdrop-filter: blur(20px);
+    border: 3px solid rgba(59, 130, 246, 0.6);
+    border-radius: 50%;
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 12px 40px rgba(59, 130, 246, 0.4);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.participants-badge::before {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    background: linear-gradient(45deg, #3b82f6, #1d4ed8, #3b82f6);
+    border-radius: 50%;
+    z-index: -1;
+    animation: rotate-border 3s linear infinite;
+}
+
+@keyframes rotate-border {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.participants-badge:hover {
+  transform: scale(1.15);
+  border-color: var(--primary-color);
+  box-shadow: 0 16px 48px rgba(59, 130, 246, 0.6);
+}
+
+.participants-content {
+  text-align: center;
+  color: var(--text-primary);
+  z-index: 2;
+}
+
+.participants-number {
+  font-size: 1.6rem;
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: 2px;
+  color: var(--text-primary);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.participants-text {
+  font-size: 0.5rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+/* Enhanced top badge */
+.top-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+    padding: 10px 16px;
+    border-radius: var(--radius-md);
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    box-shadow: 0 12px 32px rgba(220, 38, 38, 0.5);
+    border: 3px solid rgba(239, 68, 68, 0.4);
+    animation: pulse-glow 3s ease-in-out infinite;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { 
+      transform: scale(1);
+      box-shadow: 0 12px 32px rgba(220, 38, 38, 0.5);
+  }
+  50% { 
+      transform: scale(1.05);
+      box-shadow: 0 16px 40px rgba(220, 38, 38, 0.7);
+  }
+}
+
+/* Footer moderne - section combinée à gauche avec background transparent */
+.slide-footer {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  z-index: 3;
+}
+
+.combined-info-section {
+    background: transparent;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+    max-width: 480px;
+    min-width: 460px;
+    font-size: 0.85rem;
+}
+
+.combined-info-section:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(255, 107, 53, 0.3);
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.price-label {
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.info-row {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.price-value {
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: #10b981;
+    line-height: 1;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    font-family: 'Inter', monospace;
+}
+
+.time-label {
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.countdown-timer {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.time-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-sm);
+  padding: 4px 3px;
+  min-width: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.time-block:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.05);
+}
+
+.time-number {
+  font-size: 0.85rem;
+  font-weight: 900;
+  color: var(--warning-color);
+  line-height: 1;
+  font-family: 'Inter', monospace;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.time-label-small {
+  font-size: 0.5rem;
+  color: var(--text-muted);
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-top: 2px;
+  letter-spacing: 0.5px;
+}
+
+/* Sidebar moderne */
+.modern-sidebar {
+  background: transparent;
+  border-left: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  gap: 12px;
+}
+
+/* Nouvelle galerie d'images - 1 grande à gauche, 2 petites à droite */
+.image-gallery {
+  display: flex;
+  gap: 6px; /* Reduced gap */
+  flex: 1;
+  height: calc(100% - 60px); /* Laisser de la place pour le bouton */
+}
+
+.gallery-main-image {
+  flex: 2;
+  position: relative;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: transparent;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.2)); /* Add drop shadow */
+}
+
+.gallery-main-image:hover {
+  transform: translateY(-1px);
+  filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.3));
+}
+
+.gallery-image-main {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.3s ease;
+  border-radius: var(--radius-sm);
+}
+
+.gallery-main-image:hover .gallery-image-main {
+  transform: scale(1.05);
+}
+
+.gallery-side-images {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px; /* Reduced gap */
+  background: transparent;
+}
+
+.gallery-side-item {
+  flex: 1;
+  position: relative;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: transparent;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.15)); /* Add drop shadow */
+}
+
+.gallery-side-item:hover {
+  transform: translateY(-1px);
+  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.25));
+}
+
+.gallery-image-side {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.3s ease;
+  border-radius: var(--radius-sm);
+}
+
+.gallery-side-item:hover .gallery-image-side {
+  transform: scale(1.05);
+}
+
+.gallery-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.gallery-main-image:hover .gallery-overlay,
+.gallery-side-item:hover .gallery-overlay {
+  opacity: 1;
+}
+
+.gallery-overlay i {
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.placeholder {
+  background: #f1f5f9;
+  border: 2px dashed #cbd5e1;
+  border-radius: var(--radius-sm);
+}
+
+.placeholder-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #64748b;
+  gap: 4px;
+}
+
+.placeholder-content i {
+  font-size: 1.2rem;
+}
+
+/* Section d'action simplifiée */
+.action-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 50px; /* Hauteur fixe pour le bouton */
+}
+
+.cta-button {
+  background: var(--primary-gradient);
+  color: var(--text-primary);
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  height: 100%;
+}
+
+.cta-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(255, 107, 53, 0.4);
+}
+
+.cta-icon {
+  transition: transform 0.3s ease;
+}
+
+.cta-button:hover .cta-icon {
+  transform: translateX(3px);
+}
+
+/* Navigation moderne */
+.nav-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 50px;
+  height: 50px;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(20px);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  color: var(--text-primary);
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 10;
+  box-shadow: var(--shadow-md);
+}
+
+.nav-button:hover {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: var(--shadow-lg);
+}
+
+.nav-prev {
+  left: 20px;
+}
+
+.nav-next {
+  right: 20px;
+}
+
+/* Indicateurs modernes */
+.modern-indicators {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(20px);
+  padding: 8px 16px;
+  border-radius: var(--radius-xl);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 10;
+}
+
+.indicator-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.dot-inner {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  transition: all 0.3s ease;
+}
+
+.indicator-dot.active .dot-inner {
+  background: var(--primary-color);
+  transform: scale(1.3);
+  box-shadow: 0 0 12px rgba(255, 107, 53, 0.6);
+}
+
+.indicator-dot:hover .dot-inner {
+  background: rgba(255, 255, 255, 0.8);
+  transform: scale(1.2);
+}
+
+/* État vide */
+.empty-state {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: var(--text-primary);
+  z-index: 3;
+}
+
+.empty-state i {
+  font-size: 3rem;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.empty-state h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.empty-state p {
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+.empty-sidebar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-muted);
+  gap: 8px;
+}
+
+.empty-sidebar i {
+  font-size: 1.5rem;
+}
+
+.category-indicator {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.indicator-dot:hover .category-indicator,
+.indicator-dot.active .category-indicator {
+  opacity: 1;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .carousel-slide {
+      grid-template-columns: 1fr 180px;
+  }
+  
+  .slide-title {
+      font-size: 1.6rem;
+  }
+  
+  .participants-badge {
+      width: 60px;
+      height: 60px;
+  }
+  
+  .participants-number {
+      font-size: 1.4rem;
+  }
+  
+  .combined-info-section {
+      min-width: 380px;
+      max-width: 400px;
+  }
+}
+
+@media (max-width: 992px) {
+  .carousel-container {
+      height: 350px;
+  }
+  
+  .carousel-slide {
+      grid-template-columns: 1fr;
+      grid-template-rows: 1fr 120px;
+  }
+  
+  .slide-image-container {
+      height: 230px;
+  }
+  
+  .modern-sidebar {
+      flex-direction: row;
+      height: 120px;
+      border-left: none;
+      border-top: 1px solid var(--border-color);
+      padding: 12px;
+      background: #f8f9fa;
+  }
+  
+  .image-gallery {
+      flex-direction: row;
+      flex: 1;
+      gap: 6px;
+      height: auto;
+  }
+  
+  .gallery-main-image {
+      flex: 2;
+      height: 80px;
+  }
+  
+  .gallery-side-images {
+      flex: 1;
+      flex-direction: row;
+      gap: 4px;
+  }
+  
+  .gallery-side-item {
+      flex: 1;
+      height: 80px;
+  }
+  
+  .action-section {
+      min-width: 120px;
+      height: auto;
+  }
+  
+  .slide-header {
+      padding: 16px;
+  }
+  
+  .slide-footer {
+      bottom: 16px;
+      left: 16px;
+  }
+  
+  .combined-info-section {
+      padding: 12px 16px;
+      max-width: 320px;
+      min-width: 280px;
+  }
+  
+  .price-value {
+      font-size: 1.4rem;
+  }
+  
+  .time-number {
+      font-size: 0.75rem;
+  }
+  
+  .time-block {
+      min-width: 24px;
+      padding: 3px 2px;
+  }
+}
+
+@media (max-width: 576px) {
+  .slide-footer {
+      bottom: 12px;
+      left: 12px;
+  }
+  
+  .combined-info-section {
+      padding: 10px 14px;
+      max-width: 280px;
+      min-width: 240px;
+  }
+  
+  .info-row {
+      gap: 16px;
+  }
+  
+  .price-value {
+      font-size: 1.2rem;
+  }
+  
+  .countdown-timer {
+      gap: 3px;
+  }
+  
+  .time-block {
+      min-width: 22px;
+      padding: 3px 2px;
+  }
+  
+  .time-number {
+      font-size: 0.7rem;
+  }
+  
+  .image-gallery {
+      gap: 4px;
+  }
+  
+  .gallery-main-image {
+      height: 60px;
+  }
+  
+  .gallery-side-item {
+      height: 60px;
+  }
+  
+  .participants-badge {
+      width: 50px;
+      height: 50px;
+  }
+  
+  .participants-number {
+      font-size: 1.2rem;
+  }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const track = document.querySelector('.carousel-track');
+  const slides = document.querySelectorAll('.carousel-slide');
+  const indicators = document.querySelectorAll('.indicator-dot');
+  const prevBtn = document.querySelector('.nav-prev');
+  const nextBtn = document.querySelector('.nav-next');
+  const galleryItems = document.querySelectorAll('.gallery-main-image, .gallery-side-item:not(.placeholder)');
+  
+  let currentSlide = 0;
+  const totalSlides = slides.length;
+  
+  if (totalSlides <= 1) {
+      if (prevBtn) prevBtn.style.display = 'none';
+      if (nextBtn) nextBtn.style.display = 'none';
+      return;
+  }
+  
+  // Fonction pour mettre à jour le carrousel
+  function updateCarousel() {
+      const translateX = -currentSlide * 100;
+      track.style.transform = `translateX(${translateX}%)`;
+      
+      // Mettre à jour les indicateurs
+      indicators.forEach((indicator, index) => {
+          indicator.classList.toggle('active', index === currentSlide);
+          indicator.setAttribute('aria-selected', index === currentSlide);
+      });
+      
+      // Mettre à jour les slides
+      slides.forEach((slide, index) => {
+          slide.classList.toggle('active', index === currentSlide);
+      });
+  }
+  
+  function nextSlide() {
+      currentSlide = (currentSlide + 1) % totalSlides;
+      updateCarousel();
+  }
+  
+  function prevSlide() {
+      currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+      updateCarousel();
+  }
+  
+  function goToSlide(index) {
+      currentSlide = index;
+      updateCarousel();
+  }
+  
+  // Initialiser les comptes à rebours
+  function initCountdowns() {
+      const countdowns = document.querySelectorAll('.countdown-timer');
+      
+      countdowns.forEach(countdown => {
+          const endDate = countdown.getAttribute('data-end-date');
+          const joursRestants = parseInt(countdown.getAttribute('data-jours-restants'), 10);
+          
+          if (!endDate || isNaN(joursRestants)) return;
+          
+          const daysElement = countdown.querySelector('.days');
+          if (daysElement) {
+              daysElement.textContent = joursRestants.toString().padStart(2, '0');
+          }
+          
+          const now = new Date();
+          const end = new Date(endDate);
+          end.setHours(23, 59, 59, 999);
+          
+          if (end <= now) {
+              const hoursElement = countdown.querySelector('.hours');
+              const minutesElement = countdown.querySelector('.minutes');
+              const secondsElement = countdown.querySelector('.seconds');
+              
+              if (hoursElement) hoursElement.textContent = '00';
+              if (minutesElement) minutesElement.textContent = '00';
+              if (secondsElement) secondsElement.textContent = '00';
+              return;
+          }
+          
+          function updateCountdown() {
+              const now = new Date();
+              const diff = end - now;
+              
+              if (diff <= 0) {
+                  const hoursElement = countdown.querySelector('.hours');
+                  const minutesElement = countdown.querySelector('.minutes');
+                  const secondsElement = countdown.querySelector('.seconds');
+                  
+                  if (hoursElement) hoursElement.textContent = '00';
+                  if (minutesElement) minutesElement.textContent = '00';
+                  if (secondsElement) secondsElement.textContent = '00';
+                  return;
+              }
+              
+              const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+              const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+              const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+              
+              const hoursElement = countdown.querySelector('.hours');
+              const minutesElement = countdown.querySelector('.minutes');
+              const secondsElement = countdown.querySelector('.seconds');
+              
+              if (hoursElement) hoursElement.textContent = hours.toString().padStart(2, '0');
+              if (minutesElement) minutesElement.textContent = minutes.toString().padStart(2, '0');
+              if (secondsElement) secondsElement.textContent = seconds.toString().padStart(2, '0');
+          }
+          
+          updateCountdown();
+          setInterval(updateCountdown, 1000);
+      });
+  }
+  
+  // Initialiser les comptes à rebours
+  initCountdowns();
+  
+  // Gestion des images de la galerie
+  galleryItems.forEach(item => {
+      item.addEventListener('click', function() {
+          const slide = this.closest('.carousel-slide');
+          const mainImage = slide.querySelector('.main-image');
+          
+          let galleryImage;
+          if (this.classList.contains('gallery-main-image')) {
+              galleryImage = this.querySelector('.gallery-image-main');
+          } else {
+              galleryImage = this.querySelector('.gallery-image-side');
+          }
+          
+          if (!galleryImage) return;
+          
+          // Échanger les sources avec animation
+          const tempSrc = mainImage.src;
+          const tempAlt = mainImage.alt;
+          
+          // Animation de transition
+          mainImage.style.opacity = '0.7';
+          mainImage.style.transform = 'scale(0.95)';
+          
+          setTimeout(() => {
+              mainImage.src = galleryImage.src;
+              mainImage.alt = galleryImage.alt;
+              
+              galleryImage.src = tempSrc;
+              galleryImage.alt = tempAlt;
+              
+              // Restaurer l'animation
+              mainImage.style.opacity = '1';
+              mainImage.style.transform = 'scale(1)';
+          }, 200);
+      });
+  });
+  
+  // Event listeners
+  if (nextBtn) nextBtn.addEventListener('click', nextSlide);
+  if (prevBtn) prevBtn.addEventListener('click', prevSlide);
+  
+  indicators.forEach((indicator, index) => {
+      indicator.addEventListener('click', () => goToSlide(index));
+  });
+  
+  // Auto-play avec pause intelligente
+  let autoPlayInterval = setInterval(nextSlide, 7000);
+  let isUserInteracting = false;
+  
+  // Pause au survol et interactions
+  const carousel = document.querySelector('.carousel-container');
+  
+  carousel.addEventListener('mouseenter', () => {
+      clearInterval(autoPlayInterval);
+      isUserInteracting = true;
+  });
+  
+  carousel.addEventListener('mouseleave', () => {
+      if (!isUserInteracting) return;
+      clearInterval(autoPlayInterval);
+      autoPlayInterval = setInterval(nextSlide, 7000);
+      isUserInteracting = false;
+  });
+  
+  // Pause lors des interactions tactiles
+  carousel.addEventListener('touchstart', () => {
+      clearInterval(autoPlayInterval);
+      isUserInteracting = true;
+  });
+  
+  // Support tactile amélioré
+  let startX = 0;
+  let endX = 0;
+  let startTime = 0;
+  
+  track.addEventListener('touchstart', (e) => {
+      startX = e.touches[0].clientX;
+      startTime = Date.now();
+  });
+  
+  track.addEventListener('touchend', (e) => {
+      endX = e.changedTouches[0].clientX;
+      const diff = startX - endX;
+      const timeDiff = Date.now() - startTime;
+      
+      // Swipe rapide ou distance suffisante
+      if (Math.abs(diff) > 50 && timeDiff < 300) {
+          if (diff > 0) {
+              nextSlide();
+          } else {
+              prevSlide();
+          }
+      }
+      
+      // Reprendre l'autoplay après interaction
+      setTimeout(() => {
+          if (isUserInteracting) {
+              clearInterval(autoPlayInterval);
+              autoPlayInterval = setInterval(nextSlide, 7000);
+              isUserInteracting = false;
+          }
+      }, 2000);
+  });
+  
+  // Support clavier
+  document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') {
+          prevSlide();
+          clearInterval(autoPlayInterval);
+          autoPlayInterval = setInterval(nextSlide, 7000);
+      } else if (e.key === 'ArrowRight') {
+          nextSlide();
+          clearInterval(autoPlayInterval);
+          autoPlayInterval = setInterval(nextSlide, 7000);
+      }
+  });
+  
+  // Animation d'entrée
+  setTimeout(() => {
+      carousel.style.opacity = '1';
+      carousel.style.transform = 'translateY(0)';
+  }, 100);
+});
+</script>
+
+{% endblock %}

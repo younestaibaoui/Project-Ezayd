@@ -1,0 +1,13 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block branding %}
+  <h1 id="site-name"><a href="{% url 'admin:index' %}">My Admin</a></h1>
+  {% if request.user.is_authenticated %}
+  <div style="float: right;" id="header">
+    🔔 <a href="/admin/Ezayd/demandeenchaire/">
+       Demandes non traitées: {{ global_notifications|length }}
+    </a>
+  </div>
+  {% endif %}
+{% endblock %}

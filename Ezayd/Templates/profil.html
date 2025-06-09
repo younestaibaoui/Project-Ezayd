@@ -1,0 +1,604 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}Ezayd - Profil Utilisateur{% endblock %}
+
+{% block content %}
+
+
+
+
+
+    <nav style="margin-bottom: 24px;">
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #adb5bd;">
+            <a href="{% url 'accueil' %}" style="color: #ff6b35; text-decoration: none; transition: color 0.2s ease;" onmouseover="this.style.color='#f7931e'" onmouseout="this.style.color='#ff6b35'">
+                <i class="fas fa-home" style="margin-right: 4px;"></i>Accueil
+            </a>
+            <i class="fas fa-chevron-right" style="font-size: 12px; color: #6c757d;"></i>
+             <i class="fas fa-user"></i> <span>Info de compte</span>
+        </div>
+    </nav>
+
+    <div class="profile-header fade-in">
+        <h1 class="profile-title">
+            <i class="fas fa-user-circle"></i>
+            Profil Utilisateur
+        </h1>
+        <p class="profile-subtitle">Informations détaillées du compte</p>
+    </div>
+
+    {% if user %}
+        <div class="profile-content fade-in">
+            <div class="profile-avatar-section">
+                {% if user.pfp %}
+                    <img src="{{ user.pfp.url }}" alt="Photo de profil" class="profile-avatar">
+                {% else %}
+                    <div class="default-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                {% endif %}
+                
+                <div class="profile-name">{{ user.first_name }} {{ user.last_name }}</div>
+                <div class="profile-username">@{{ user.username }}</div>
+                
+                <div class="profile-badges">
+                    {% if user.is_active %}
+                        <span class="profile-badge active">
+                            <i class="fas fa-check-circle"></i>
+                            Actif
+                        </span>
+                    {% endif %}
+                    
+                    {% if user.email_verified %}
+                        <span class="profile-badge verified">
+                            <i class="fas fa-check-circle"></i>
+                            Vérifié
+                        </span>
+                    {% endif %}
+                    
+                    {% if user.is_admin %}
+                        <span class="profile-badge admin">
+                            <i class="fas fa-crown"></i>
+                            Admin
+                        </span>
+                    {% endif %}
+                    
+                    {% if user.special_profile %}
+                        <span class="profile-badge special">
+                            <i class="fas fa-star"></i>
+                            Spécial
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="profile-details">
+                <div class="detail-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-info-circle"></i>
+                        Informations personnelles
+                    </h2>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">
+                                <i class="fas fa-envelope"></i>
+                                Email
+                            </div>
+                            <div class="detail-value">{{ user.email }}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">
+                                <i class="fas fa-user"></i>
+                                Nom d'utilisateur
+                            </div>
+                            <div class="detail-value">{{ user.username }}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">
+                                <i class="fas fa-id-card"></i>
+                                Prénom
+                            </div>
+                            <div class="detail-value">{{ user.first_name|default:"Non renseigné" }}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">
+                                <i class="fas fa-user-tag"></i>
+                                Nom
+                            </div>
+                            <div class="detail-value">{{ user.last_name|default:"Non renseigné" }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-cog"></i>
+                        Statut du compte
+                    </h2>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">
+                                <i class="fas fa-toggle-on"></i>
+                                Compte actif
+                            </div>
+                            <div class="detail-value">
+                                {% if user.is_active %}
+                                    <span class="status-yes">✓ Oui</span>
+                                {% else %}
+                                    <span class="status-no">✗ Non</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">
+                                <i class="fas fa-shield-check"></i>
+                                Email vérifié
+                            </div>
+                            <div class="detail-value">
+                                {% if user.email_verified %}
+                                    <span class="status-yes">✓ Oui</span>
+                                {% else %}
+                                    <span class="status-no">✗ Non</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">
+                                <i class="fas fa-crown"></i>
+                                Administrateur
+                            </div>
+                            <div class="detail-value">
+                                {% if user.is_admin %}
+                                    <span class="status-admin">✓ Oui</span>
+                                {% else %}
+                                    <span class="status-no">✗ Non</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">
+                                <i class="fas fa-star"></i>
+                                Profil spécial
+                            </div>
+                            <div class="detail-value">
+                                {% if user.special_profile %}
+                                    <span class="status-special">✓ Oui</span>
+                                {% else %}
+                                    <span class="status-no">✗ Non</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-clock"></i>
+                        Informations temporelles
+                    </h2>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">
+                                <i class="fas fa-calendar-plus"></i>
+                                Date d'inscription
+                            </div>
+                            <div class="detail-value">{{ user.date_joined|date:"d F Y à H:i" }}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">
+                                <i class="fas fa-sign-in-alt"></i>
+                                Dernière connexion
+                            </div>
+                            <div class="detail-value">
+                                {% if user.last_login %}
+                                    {{ user.last_login|date:"d F Y à H:i" }}
+                                {% else %}
+                                    Jamais connecté
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">
+                                <i class="fas fa-dice"></i>
+                                Dernière chance utilisée
+                            </div>
+                            <div class="detail-value">
+                                {% if user.last_chance_participation_used %}
+                                    {{ user.last_chance_participation_used|date:"d F Y" }}
+                                {% else %}
+                                    Jamais utilisée
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if user.bio %}
+                    <div class="detail-section">
+                        <h2 class="section-title">
+                            <i class="fas fa-quote-left"></i>
+                            Biographie
+                        </h2>
+                        <div class="bio-section">
+                            <div class="bio-text">{{ user.bio|linebreaksbr }}</div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% else %}
+        <div class="login-prompt fade-in">
+            <i class="fas fa-lock"></i>
+            <h2>Accès restreint</h2>
+            <p>Vous devez être connecté pour voir ce profil.</p>
+        </div>
+    {% endif %}
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animation simple au chargement
+        const elements = document.querySelectorAll('.fade-in');
+        elements.forEach((el, index) => {
+            el.style.animationDelay = `${index * 0.1}s`;
+        });
+        
+        // Effet hover léger
+        const detailItems = document.querySelectorAll('.detail-item');
+        detailItems.forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-1px)';
+            });
+            
+            item.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    });
+</script>
+
+
+
+<style>
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding-top: 80px;
+    }
+
+    /* Styles identiques à la page d'accueil */
+    .profile-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .profile-header {
+        background: var(--background-light);
+        border-radius: var(--border-radius);
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: var(--box-shadow);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        color: var(--text-light);
+        transition: var(--transition);
+    }
+
+    .profile-title {
+        text-align: center;
+        color: var(--text-light);
+        font-size: 2.2rem;
+        margin-bottom: 8px;
+        font-weight: 600;
+        font-family: var(--font-family);
+    }
+
+    .profile-subtitle {
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 1rem;
+        margin-bottom: 0;
+        font-weight: 400;
+        font-family: var(--font-family);
+    }
+
+    .profile-content {
+        display: grid;
+        grid-template-columns: 350px 1fr;
+        gap: 25px;
+        align-items: start;
+    }
+
+    .profile-avatar-section {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: var(--border-radius);
+        padding: 25px;
+        text-align: center;
+        box-shadow: var(--box-shadow);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    .profile-avatar {
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid var(--background-dark);
+        margin-bottom: 15px;
+        box-shadow: var(--box-shadow);
+    }
+
+    .default-avatar {
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--text-muted), var(--border-color));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 15px;
+        box-shadow: var(--box-shadow);
+        border: 4px solid var(--background-dark);
+    }
+
+    .default-avatar i {
+        font-size: 3.5rem;
+        color: var(--text-light);
+    }
+
+    .profile-name {
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: var(--text-light);
+        margin-bottom: 8px;
+        font-family: var(--font-family);
+    }
+
+    .profile-username {
+        color: var(--text-muted);
+        font-size: 1rem;
+        margin-bottom: 15px;
+        font-weight: 400;
+        font-family: var(--font-family);
+    }
+
+    .profile-badges {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .profile-badge {
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-family: var(--font-family);
+    }
+
+    .profile-badge.admin {
+        background-color: var(--error-color);
+        color: white;
+    }
+
+    .profile-badge.verified {
+        background-color: var(--success-color);
+        color: white;
+    }
+
+    .profile-badge.special {
+        background-color: var(--warning-color);
+        color: var(--background-dark);
+    }
+
+    .profile-badge.active {
+        background-color: var(--primary-color);
+        color: white;
+    }
+
+    .profile-details {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: var(--border-radius);
+        padding: 25px;
+        box-shadow: var(--box-shadow);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    .detail-section {
+        margin-bottom: 25px;
+    }
+
+    .detail-section:last-child {
+        margin-bottom: 0;
+    }
+
+    .section-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--text-light);
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-family: var(--font-family);
+    }
+
+    .section-title i {
+        color: var(--text-muted);
+        font-size: 1.1rem;
+    }
+
+    .detail-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 12px;
+    }
+
+    .detail-item {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 15px;
+        border-radius: var(--border-radius);
+        border: 1px solid var(--border-color);
+        transition: var(--transition);
+    }
+
+    .detail-item:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: var(--primary-color);
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .detail-label {
+        font-weight: 600;
+        color: var(--text-muted);
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.9rem;
+        font-family: var(--font-family);
+    }
+
+    .detail-label i {
+        color: var(--text-muted);
+        width: 14px;
+        font-size: 0.85rem;
+    }
+
+    .detail-value {
+        color: var(--text-light);
+        font-size: 0.9rem;
+        font-weight: 400;
+        font-family: var(--font-family);
+    }
+
+    .bio-section {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 18px;
+        border-radius: var(--border-radius);
+        border: 1px solid var(--border-color);
+    }
+
+    .bio-text {
+        color: var(--text-light);
+        line-height: 1.5;
+        font-size: 0.95rem;
+        font-family: var(--font-family);
+        margin: 0;
+    }
+
+    .login-prompt {
+        text-align: center;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: var(--border-radius);
+        padding: 40px;
+        box-shadow: var(--box-shadow);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    .login-prompt i {
+        font-size: 3rem;
+        color: var(--text-muted);
+        margin-bottom: 15px;
+    }
+
+    .login-prompt h2 {
+        color: var(--text-light);
+        margin-bottom: 10px;
+        font-size: 1.5rem;
+        font-weight: 600;
+        font-family: var(--font-family);
+    }
+
+    .login-prompt p {
+        color: var(--text-muted);
+        font-size: 1rem;
+        font-family: var(--font-family);
+        margin: 0;
+    }
+
+    /* Status colors */
+    .status-yes {
+        color: var(--success-color);
+        font-weight: 500;
+    }
+
+    .status-no {
+        color: var(--text-muted);
+        font-weight: 400;
+    }
+
+    .status-admin {
+        color: var(--error-color);
+        font-weight: 500;
+    }
+
+    .status-special {
+        color: var(--warning-color);
+        font-weight: 500;
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+        .profile-content {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .profile-avatar, .default-avatar {
+            width: 140px;
+            height: 140px;
+        }
+
+        .default-avatar i {
+            font-size: 2.5rem;
+        }
+
+        .profile-title {
+            font-size: 1.8rem;
+        }
+
+        .detail-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .profile-container {
+            padding: 15px;
+        }
+
+        .profile-header, .profile-avatar-section, .profile-details {
+            padding: 20px;
+        }
+    }
+
+    /* Animation simple */
+    .fade-in {
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+{% endblock %}

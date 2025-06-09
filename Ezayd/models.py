@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from datetime import datetime
 from perso.models import UserAccount
+from notification.models import NotificationEnchaire,NotificationDemandeEnchaire
 
 
 
@@ -16,26 +17,94 @@ ETAT_ENCHAIRE_CHOICES = (
     ('finis', 'Terminé'),
 )
 
+from django.db import models
+from django.core.validators import MinValueValidator
 
+class EnchaireObjet(models.Model):
+    first_price = models.IntegerField(null=False, validators=[MinValueValidator(0)])
+    pas = models.IntegerField(null=False, validators=[MinValueValidator(0)])
+    reserved = models.BooleanField(default=False)
+    winner = models.ForeignKey(
+        "perso.UserAccount",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+    price_reserved = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0)])
+
+    def save(self, *args, **kwargs):
+        if self.pk is None and self.price_reserved is None:
+            self.price_reserved = self.first_price - self.pas
+        super().save(*args, **kwargs)        
+
+    def participer(self, user):
+        price_reserved = self.price_reserved 
+        self.price_reserved = price_reserved + self.pas
+        self.winner = user
+        ParticipationEnchaire.objects.create(
+            enchaireObjet=self,
+            user=user,
+            montant=self.price_reserved,
+        )
+        self.save()
+
+    def get_type(self):
+
+        if hasattr(self, 'voiture'):
+            type_objet = 'vehicules'
+        elif hasattr(self, 'immobilier'):
+            type_objet = 'immobilier'
+        elif hasattr(self, 'materielProfessionnel'):
+            type_objet = 'materiel_pro'
+        elif hasattr(self, 'informatiqueElectronique'):
+            type_objet = 'informatique_electronique'
+        elif hasattr(self, 'mobilierEquipement'):
+            type_objet = 'mobilier_equipements'
+        elif hasattr(self, 'bijouxObjetValeur'):
+            type_objet = 'bijoux_objets_valeur'
+        elif hasattr(self, 'stockInvendu'):
+            type_objet = 'stocks_invendus'
+        elif hasattr(self, 'oeuvreCollection'):
+            type_objet = 'oeuvres_collections'
+        else:
+            type_objet = False
+
+        return type_objet
+
+    def __str__(self):
+
+        avec_objet = True
+
+        if hasattr(self, 'voiture'):
+            objet = self.voiture
+        elif hasattr(self, 'immobilier'):
+            objet = self.immobilier
+        elif hasattr(self, 'materielProfessionnel'):
+            objet = self.materiel_pro
+        elif hasattr(self, 'informatiqueElectronique'):
+            objet = self.informatiqueElectronique
+        elif hasattr(self, 'mobilierEquipement'):
+            objet = self.mobilierEquipement
+        elif hasattr(self, 'bijouxObjetValeur'):
+            objet = self.bijouxObjetValeur
+        elif hasattr(self, 'stockInvendu'):
+            objet = self.stockInvendu
+        elif hasattr(self, 'oeuvreCollection'):
+            objet = self.oeuvreCollection
+        else:
+            avec_objet = False
+        
+        return str(objet) if avec_objet else f"EnchaireObjet #{self.id} (sans objet)"
+    
 class Enchaire(models.Model):
     date_debut = models.DateField(default=timezone.now, null=False)
     date_fin = models.DateField(default=timezone.now, null=False)
-    first_price = models.IntegerField(null=False)
-    pas = models.IntegerField(null=False)
     
     seller = models.ForeignKey(
         "perso.UserAccount",
         null=False,
         on_delete=models.CASCADE,
         related_name="enchaires_proprietes"
-    )
-
-    winner = models.ForeignKey(
-        "perso.UserAccount",
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        related_name="enchères_gagnées"
     )
 
     text_highlight = models.TextField(null=True, blank=True)
@@ -45,16 +114,6 @@ class Enchaire(models.Model):
         max_length=10,
         default='upcoming'
     )
-
-    lot = models.OneToOneField(
-        "Lot",
-        related_name="enchaire",
-        null=False,
-        on_delete=models.CASCADE
-    )
-
-    is_reserved = models.BooleanField(default=False)
-    price_reserved = models.IntegerField(null=True, blank=True)
 
     savers = models.ManyToManyField(
         "perso.UserAccount",
@@ -69,8 +128,26 @@ class Enchaire(models.Model):
     )
 
     def __str__(self):
-        return f"{self.lot}"
+        return str(self.lot.nom) if hasattr(self, 'lot') else f"Enchaire #{self.id} (sans lot)"
 
+    def save(self, *args, **kwargs):
+        # Detect if etat has changed
+        if self.pk:  # object already exists
+            old_etat = Enchaire.objects.get(pk=self.pk).etat
+            if old_etat != self.etat:
+                super().save(*args, **kwargs)  # save first to ensure FK integrity
+                self.notify_savers(old_etat, self.etat)
+                return
+        super().save(*args, **kwargs)
+
+    # methode pour notifier les utilisateur de changement d'etat
+    def notify_savers(self, old_etat, new_etat):
+        for user in self.savers.all():
+            NotificationEnchaire.objects.create(
+                user=user,
+                enchaire=self,
+                message=f"L'état de l'enchère a changé de '{old_etat}' à '{new_etat}'."
+            )
 
     def is_active(self):
         today = timezone.now().date()
@@ -83,7 +160,16 @@ class Enchaire(models.Model):
         ]
 
 
+from django.db import models
+from django.utils import timezone
+from django.urls import reverse
+
 class DemandeEnchaire(models.Model):
+    class State(models.TextChoices):
+        UNREAD = 'unread', 'Non lu'
+        APPROVED = 'Approuvée', 'Approuvée'
+        REJECTED = 'Rejetée', 'Rejetée'
+
     enchaire = models.ForeignKey(
         "Enchaire",
         null=False,
@@ -93,22 +179,91 @@ class DemandeEnchaire(models.Model):
 
     user = models.ForeignKey(
         "perso.UserAccount",
-        null=False,
         on_delete=models.CASCADE,
         related_name="demandes_enchere"
     )
 
-    date = models.DateTimeField(default=timezone.now)
-    approved = models.BooleanField(default=False)
-    seen = models.BooleanField(default=False)
-    deleted = models.BooleanField(default=False)
+    date_demande = models.DateTimeField(default=timezone.now)
+    date_accepte = models.DateTimeField(blank=True, null=True)
+    state = models.CharField(
+        max_length=10,
+        choices=State.choices,
+        default=State.UNREAD
+    )
+
+    def save(self, *args, **kwargs):
+        # Detect if etat has changed
+        if self.pk:  # object already exists
+            if self.state != self.State.UNREAD:
+                super().save(*args, **kwargs)  # save first to ensure FK integrity
+                self.notify_user(self.state,self.user,self.enchaire)
+                self.delete_notif(self.user,self.enchaire)
+                 
+        super().save(*args, **kwargs)
+
+    def notify_user(self, new_etat, user ,enchaire):
+        NotificationEnchaire.objects.create(
+            user=user,
+            enchaire=enchaire,
+            message=f"La demande de l'enchaire {enchaire} a ete {new_etat}."
+        )
+    
+    def delete_notif(self, user, enchaire):
+        try:
+            notification = NotificationDemandeEnchaire.objects.get(
+                user=user,
+                enchaire=enchaire,  
+            )
+            notification.delete()
+        except NotificationDemandeEnchaire.DoesNotExist:
+            pass 
 
     def __str__(self):
         return f"Demande de l'enchère '{self.enchaire}'"
 
-
     def get_absolute_url(self):
         return reverse('demande_enchaire_detail', args=[self.pk])
+ 
+# ---------------------------------------- PARTICIPATION ENCHERE ----------------------------------------
+class ParticipationEnchaire(models.Model):
+    enchaireObjet = models.ForeignKey(
+        "EnchaireObjet",
+        on_delete=models.CASCADE,
+        related_name="participations"
+    )
+
+    user = models.ForeignKey(
+        "perso.UserAccount",
+        on_delete=models.CASCADE,
+        related_name="participations_enchères"
+    )
+    
+    montant = models.IntegerField(
+        null=False,
+        validators=[MinValueValidator(0)],
+        help_text="Montant de la participation",
+        default=0,
+    )
+    date_participation = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        users = ParticipationEnchaire.objects.filter(enchaireObjet=self.enchaireObjet).values('user').distinct()
+        super().save(*args, **kwargs)  # save first to ensure FK integrity
+        for user in users:
+            if user['user'] == self.user.id:
+                continue  # Skip if the user already exists in the participation list
+
+            self.notify_user(self.montant,user,self.enchaireObjet)
+
+    def notify_user(self, montant, user ,enchaireObjet):
+        NotificationEnchaire.objects.create(
+            user=UserAccount.objects.get(id=user['user']),
+            enchaireObjet=enchaireObjet,
+            message=f"L\'utilisateur {self.user.username} a participer a l'enchere {enchaireObjet} avec un montant de {montant}."
+        )
+
+    def __str__(self):
+        return f"Participation de {self.user} à l'enchère {self.enchaireObjet}."
 
 # ----------------------------------------LOTS -----------------------------------------------
 
@@ -128,6 +283,12 @@ class Lot(models.Model):
     type = models.CharField(max_length=30, choices=TYPE_CHOICES)
     description = models.TextField(null=True, blank=True)
     date_ajout = models.DateTimeField(auto_now_add=True)
+    enchaire = models.OneToOneField(
+        "Enchaire",
+        related_name="lot",
+        null=False,
+        on_delete=models.CASCADE
+    )
 
     def __str__(self):
         return self.nom
@@ -151,6 +312,15 @@ class Voiture(models.Model):
     capteurs_stationnement = models.BooleanField(default=False)
     regulateur_vitesse = models.BooleanField(default=False)
     regulateur_vitesse_adaptatif = models.BooleanField(default=False)
+    enchaireObjet = models.OneToOneField(
+        "EnchaireObjet",
+        related_name="voiture",
+        null=False,
+        on_delete=models.CASCADE,
+    )
+
+    def get_images(self):
+        return [img.image.url for img in self.images.all()]
 
     def clean(self):
         # S'assurer que le lot est de type 'vehicules'
@@ -199,7 +369,6 @@ class Immobilier(models.Model):
     adresse = models.TextField()
     ville = models.CharField(max_length=50)
     code_postal = models.CharField(max_length=10)
-    prix = models.DecimalField(max_digits=12, decimal_places=2)
     description = models.TextField()
     nombre_pieces = models.IntegerField(null=True, blank=True)
     nombre_chambres = models.IntegerField(null=True, blank=True)
@@ -208,6 +377,15 @@ class Immobilier(models.Model):
     jardin = models.BooleanField(default=False)
     piscine = models.BooleanField(default=False)
     date_construction = models.DateField(null=True, blank=True)
+    enchaireObjet = models.OneToOneField(
+        "EnchaireObjet",
+        related_name="immobilier",
+        null=False,
+        on_delete=models.CASCADE
+    )
+
+    def get_images(self):
+        return [img.image.url for img in self.images.all()]
 
     def clean(self):
         if self.lot and self.lot.type != 'immobilier':
@@ -256,6 +434,15 @@ class MaterielProfessionnel(models.Model):
     poids = models.FloatField(null=True, blank=True, help_text="Poids en kg")
     description = models.TextField()
     disponibilite = models.BooleanField(default=True)
+    enchaireObjet = models.OneToOneField(
+        "EnchaireObjet",
+        related_name="materielProfessionnel",
+        null=False,
+        on_delete=models.CASCADE
+    )
+
+    def get_images(self):
+        return [img.image.url for img in self.images.all()]
 
     def clean(self):
         if self.lot and self.lot.type != 'materiel_pro':
@@ -302,6 +489,15 @@ class InformatiqueElectronique(models.Model):
     description = models.TextField()
     etat = models.CharField(max_length=100, null=True, blank=True)
     garantie = models.BooleanField(default=False)
+    enchaireObjet = models.OneToOneField(
+        "EnchaireObjet",
+        related_name="informatiqueElectronique",
+        null=False,
+        on_delete=models.CASCADE
+    )
+
+    def get_images(self):
+        return [img.image.url for img in self.images.all()]
 
     def clean(self):
         if self.lot.type != 'informatique_electronique':
@@ -310,6 +506,16 @@ class InformatiqueElectronique(models.Model):
     def save(self, *args, **kwargs):
         self.full_clean()
         super().save(*args, **kwargs)
+    def __str__(self):
+        parts = []
+        if self.marque:
+            parts.append(self.marque)
+        if self.modele:
+            parts.append(self.modele)
+        if self.type_objet:
+            parts.append(f"({self.get_type_objet_display()})")  # Affiche le label lisible du choix
+        return " ".join(parts) if parts else f"Informatique #{self.id}"
+
 
 class InformatiqueImage(models.Model):
     objet = models.ForeignKey(InformatiqueElectronique, related_name='images', on_delete=models.CASCADE)
@@ -329,6 +535,15 @@ class MobilierEquipement(models.Model):
     dimensions = models.CharField(max_length=100, null=True, blank=True)
     description = models.TextField()
     etat = models.CharField(max_length=100, null=True, blank=True)
+    enchaireObjet = models.OneToOneField(
+        "EnchaireObjet",
+        related_name="mobilierEquipement",
+        null=False,
+        on_delete=models.CASCADE
+    )
+
+    def get_images(self):
+        return [img.image.url for img in self.images.all()]
 
     def clean(self):
         if self.lot.type != 'mobilier_equipements':
@@ -356,7 +571,16 @@ class BijouxObjetValeur(models.Model):
     poids = models.FloatField(help_text="Poids en grammes")
     carats = models.IntegerField(null=True, blank=True)
     description = models.TextField()
+    enchaireObjet = models.OneToOneField(
+        "EnchaireObjet",
+        related_name="bijouxObjetValeur",
+        null=False,
+        on_delete=models.CASCADE
+    )
 
+    def get_images(self):
+        return [img.image.url for img in self.images.all()]
+    
     def clean(self):
         if self.lot.type != 'bijoux_objets_valeur':
             raise ValidationError("Cet objet doit appartenir à un lot de type 'Bijoux & objets de valeur'.")
@@ -382,7 +606,15 @@ class StockInvendu(models.Model):
     quantite = models.IntegerField()
     unite = models.CharField(max_length=20, default="pièces")
     description = models.TextField()
-    prix_unitaire = models.DecimalField(max_digits=10, decimal_places=2)
+    enchaireObjet = models.OneToOneField(
+        "EnchaireObjet",
+        related_name="stockInvendu",
+        null=False,
+        on_delete=models.CASCADE
+    )
+
+    def get_images(self):
+        return [img.image.url for img in self.images.all()]
 
     def clean(self):
         if self.lot.type != 'stocks_invendus':
@@ -411,6 +643,15 @@ class OeuvreCollection(models.Model):
     dimensions = models.CharField(max_length=100, null=True, blank=True)
     technique = models.CharField(max_length=100, null=True, blank=True)
     description = models.TextField()
+    enchaireObjet = models.OneToOneField(
+        "EnchaireObjet",
+        related_name="oeuvreCollection",
+        null=False,
+        on_delete=models.CASCADE
+    )
+
+    def get_images(self):
+        return [img.image.url for img in self.images.all()]
 
     def clean(self):
         if self.lot.type != 'oeuvres_collections':

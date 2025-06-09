@@ -1,0 +1,624 @@
+{% extends "../base.html" %}
+
+{% load static %}
+
+{% block title %}Ezayd - {{ lot.nom }}{% endblock %}
+{% block content %}
+<div style="min-height: 100vh; padding-top: 80px; color: #fff;">
+    <!-- Breadcrumb Navigation -->
+    <nav style="margin-bottom: 16px;">
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #adb5bd;">
+            <a href="{% url 'accueil' %}" style="color: #ff6b35; text-decoration: none; transition: color 0.2s ease;" onmouseover="this.style.color='#f7931e'" onmouseout="this.style.color='#ff6b35'">
+                <i class="fas fa-home" style="margin-right: 4px;"></i>Accueil
+            </a>
+            <i class="fas fa-chevron-right" style="font-size: 12px; color: #6c757d;"></i>
+            <i class="fas fa-gavel"></i><span>Détails de l'enchère</span>
+        </div>
+    </nav>
+
+    <!-- Main Auction Card - Compact Version -->
+    <div style="background: linear-gradient(135deg, #2d2d2d 0%, #1e1e1e 100%); border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #404040; box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3);">
+        
+        <!-- Compact Header: Title + Badges + Timer/Actions in one row -->
+        <div style="display: grid; grid-template-columns: 1fr auto auto; gap: 20px; align-items: start; margin-bottom: 16px;">
+            
+            <!-- Left: Title + Description -->
+            <div style="min-width: 0;">
+                <!-- Title and Badges -->
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px; flex-wrap: wrap;">
+                    <h1 style="margin: 0; font-size: 26px; font-weight: 700; color: #fff; line-height: 1.2;">{{ lot.nom }}</h1>
+                    <div style="padding: 6px 12px; font-size: 0.7rem; font-weight: 600; border-radius: 16px; color: #fff; background: #555; text-transform: uppercase;">
+                        {{ lot.get_type_display }}
+                    </div>
+                    <div style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 16px; font-weight: 600; font-size: 12px; text-transform: uppercase; {% if enchaire.etat == 'active' %}background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white;{% elif enchaire.etat == 'en_attente' %}background: linear-gradient(135deg, #6f42c1 0%, #8e44ad 100%); color: white;{% elif enchaire.etat == 'terminee' %}background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white;{% else %}background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%); color: #000;{% endif %}">
+                        {% if enchaire.etat == 'active' %}
+                            <i class="fas fa-play-circle" style="font-size: 14px;"></i>
+                            <span>Active</span>
+                        {% elif enchaire.etat == 'en_attente' %}
+                            <i class="fas fa-hourglass-half" style="font-size: 14px;"></i>
+                            <span>En Attente</span>
+                        {% elif enchaire.etat == 'terminee' %}
+                            <i class="fas fa-flag-checkered" style="font-size: 14px;"></i>
+                            <span>Terminée</span>
+                        {% else %}
+                            <i class="fas fa-info-circle" style="font-size: 14px;"></i>
+                            <span>{{ enchaire.etat }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Compact Description -->
+                <p style="color: #e0e0e0; line-height: 1.5; margin: 0; font-size: 15px; max-width: 500px;">
+                    {{ lot.description }}
+                </p>
+            </div>
+
+            <!-- Center: Timer (only for active and upcoming auctions) -->
+            {% if enchaire.etat == 'active' or enchaire.etat == 'en_attente' %}
+            <div style="min-width: 220px;">
+                <div style="background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%); border-radius: 10px; padding: 18px; border: 1px solid #404040; text-align: center;">
+                    {% if enchaire.etat == 'active' %}
+                        <h3 style="margin: 0 0 10px 0; font-size: 14px; font-weight: 600; color: #ff6b35; text-transform: uppercase; letter-spacing: 0.5px;">
+                            <i class="fas fa-clock" style="margin-right: 6px;"></i>Temps Restant
+                        </h3>
+                    {% elif enchaire.etat == 'en_attente' %}
+                        <h3 style="margin: 0 0 10px 0; font-size: 14px; font-weight: 600; color: #6f42c1; text-transform: uppercase; letter-spacing: 0.5px;">
+                            <i class="fas fa-hourglass-start" style="margin-right: 6px;"></i>Début Dans
+                        </h3>
+                    {% endif %}
+                    <div id="countdown" style="font-size: 24px; font-weight: 700; color: #fff; margin-bottom: 8px; font-family: 'Courier New', monospace; line-height: 1.2;">
+                        --j :--h :--min :--s
+                    </div>
+                </div>
+            </div>
+            {% elif enchaire.etat == 'terminee' %}
+            <div style="min-width: 220px;">
+                <div style="background: linear-gradient(135deg, #2d1a1a 0%, #1a1a1a 100%); border-radius: 10px; padding: 18px; border: 1px solid #5d4040; text-align: center;">
+                    <h3 style="margin: 0 0 10px 0; font-size: 14px; font-weight: 600; color: #dc3545; text-transform: uppercase; letter-spacing: 0.5px;">
+                        <i class="fas fa-flag-checkered" style="margin-right: 6px;"></i>Enchère Terminée
+                    </h3>
+                    <div style="font-size: 24px; font-weight: 700; color: #dc3545; margin-bottom: 8px; font-family: 'Courier New', monospace; line-height: 1.2;">
+                        0j :0h :0min :0s
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Right: Action Buttons -->
+            <div style="display: flex; flex-direction: column; gap: 8px; min-width: 160px;">
+                <!-- Favorite Button -->
+                {% if user.is_authenticated %}
+                <form method="POST" action="{% url 'toggle_favori' enchaire.id %}" style="margin: 0;">
+                    {% csrf_token %}
+                    <button type="submit" style="width: 100%; height: 36px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: none; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.3s ease; {% if user in enchaire.savers.all %}background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white;{% else %}background: #333; color: #fff; border: 1px solid #555;{% endif %}"
+                            onmouseover="this.style.transform='translateY(-1px)'"
+                            onmouseout="this.style.transform='translateY(0)'">
+                        {% if user in enchaire.savers.all %}
+                            <i class="fas fa-heart" style="font-size: 14px;"></i>
+                            <span>Favoris</span>
+                        {% else %}
+                            <i class="far fa-heart" style="font-size: 14px;"></i>
+                            <span>Favoris</span>
+                        {% endif %}
+                    </button>
+                </form>
+                {% endif %}
+
+                <!-- Request Status/Button -->
+                {% if user.is_authenticated %}
+                    {% if demande %}
+                        <div style="width: 100%; height: 36px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border-radius: 8px; font-weight: 600; font-size: 13px; {% if demande.state == 'Approuvée' %}background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white;{% elif demande.state == 'Rejetée' %}background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white;{% else %}background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%); color: #000;{% endif %}">
+                            {% if demande.state == 'Approuvée' %}
+                                <i class="fas fa-check-circle" style="font-size: 14px;"></i>
+                                <span>Approuvée</span>
+                            {% elif demande.state == 'Rejetée' %}
+                                <i class="fas fa-times-circle" style="font-size: 14px;"></i>
+                                <span>Rejetée</span>
+                            {% elif demande.state == 'unread' %}
+                                <i class="fas fa-clock" style="font-size: 14px;"></i>
+                                <span>En attente</span>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <form method="post" action="{% url 'demande' %}" style="margin: 0;">
+                            {% csrf_token %}
+                            <input type="hidden" name="user" value="{{ user.id }}">
+                            <input type="hidden" name="enchaire" value="{{ enchaire.id }}">
+                            <button type="submit" style="width: 100%; height: 36px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: none; border-radius: 8px; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: white; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.3s ease;"
+                                    onmouseover="this.style.transform='translateY(-1px)'"
+                                    onmouseout="this.style.transform='translateY(0)'">
+                                <i class="fas fa-paper-plane" style="font-size: 14px;"></i>
+                                <span>Demander</span>
+                            </button>
+                        </form>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Compact Information Grid -->
+        <div style="border-top: 1px solid #404040; padding-top: 16px;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;">
+                <!-- Type du lot -->
+                <div style="display: flex; align-items: center; padding: 12px; background-color: rgba(51, 51, 51, 0.6); border-radius: 8px;">
+                    <i class="fas fa-tag" style="width: 18px; margin-right: 12px; color: #ff6b35; font-size: 16px;"></i>
+                    <div>
+                        <span style="color: #adb5bd; font-size: 12px; text-transform: uppercase;">Type</span>
+                        <div style="color: #fff; font-weight: 500; font-size: 14px;">{{ lot.get_type_display }}</div>
+                    </div>
+                </div>
+                
+                <!-- Date d'ajout -->
+                <div style="display: flex; align-items: center; padding: 12px; background-color: rgba(51, 51, 51, 0.6); border-radius: 8px;">
+                    <i class="fas fa-calendar-plus" style="width: 18px; margin-right: 12px; color: #ff6b35; font-size: 16px;"></i>
+                    <div>
+                        <span style="color: #adb5bd; font-size: 12px; text-transform: uppercase;">Ajouté</span>
+                        <div style="color: #fff; font-weight: 500; font-size: 14px;">{{ lot.date_ajout|date:"d/m/Y" }}</div>
+                    </div>
+                </div>
+                
+                <!-- Date de début -->
+                <div style="display: flex; align-items: center; padding: 12px; background-color: rgba(51, 51, 51, 0.6); border-radius: 8px;">
+                    <i class="fas fa-play" style="width: 18px; margin-right: 12px; color: #28a745; font-size: 16px;"></i>
+                    <div>
+                        <span style="color: #adb5bd; font-size: 12px; text-transform: uppercase;">Début</span>
+                        <div style="color: #fff; font-weight: 500; font-size: 14px;">{{ enchaire.date_debut}}</div>
+                    </div>
+                </div>
+                
+                <!-- Date de fin -->
+                <div style="display: flex; align-items: center; padding: 12px; background-color: rgba(51, 51, 51, 0.6); border-radius: 8px;">
+                    <i class="fas fa-stop" style="width: 18px; margin-right: 12px; color: #dc3545; font-size: 16px;"></i>
+                    <div>
+                        <span style="color: #adb5bd; font-size: 12px; text-transform: uppercase;">Fin</span>
+                        <div style="color: #fff; font-weight: 500; font-size: 14px;">{{ enchaire.date_fin}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Objects Section with Carousel -->
+    <div style="background-color: #2d2d2d; border-radius: 12px; padding: 24px; border: 1px solid #404040; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);">
+        <!-- Header with Title and Search Bar -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 20px; flex-wrap: wrap;">
+            <h2 style="margin: 0; font-size: 22px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-boxes" style="color: #ff6b35; font-size: 20px;"></i>
+                Objets de l'enchère
+            </h2>
+            
+            <!-- Search Bar -->
+            <div style="position: relative; min-width: 300px; max-width: 400px; flex: 1;">
+                <div style="position: relative; background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%); border-radius: 25px; border: 1px solid #404040; overflow: hidden; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);">
+                    <input 
+                        type="text" 
+                        id="objectSearch"
+                        placeholder="Rechercher dans les objets..." 
+                        style="width: 100%; padding: 12px 50px 12px 20px; background: transparent; border: none; color: #fff; font-size: 14px; outline: none; font-family: inherit;"
+                        onkeyup="filterObjects()"
+                    >
+                    <button 
+                        type="button" 
+                        style="position: absolute; right: 0; top: 0; height: 100%; width: 45px; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;"
+                        onmouseover="this.style.background='linear-gradient(135deg, #f7931e 0%, #ff6b35 100%)'"
+                        onmouseout="this.style.background='linear-gradient(135deg, #ff6b35 0%, #f7931e 100%)'"
+                        onclick="filterObjects()"
+                    >
+                        <i class="fas fa-search" style="color: white; font-size: 14px;"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Objects with Enhanced Image Display -->
+        {% if objets %}
+            <div class="objects-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+                {% for objet in objets %}
+                    <div data-object-card style="background-color: #333; border-radius: 12px; overflow: hidden; transition: all 0.3s ease; border: 1px solid #404040; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.2);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 25px rgba(0,0,0,0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0,0,0,0.2)'">
+                        <!-- Badge du type -->
+                        <div style="position: absolute; top: 10px; left: 10px; padding: 6px 12px; font-size: 0.7rem; font-weight: 600; border-radius: 16px; color: #fff; z-index: 10; background: rgba(85, 85, 85, 0.9); text-transform: uppercase; backdrop-filter: blur(10px);">
+                            {{ lot.get_type_display }}
+                        </div>
+                        
+                        <!-- Images avec carrousel -->
+                        <div style="position: relative; height: 250px; overflow: hidden;">
+                            {% for image in objet.get_images %}
+                                <img src="{{ image }}" alt="Image de l'objet" 
+                                     style="width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; opacity: {% if forloop.first %}1{% else %}0{% endif %}; transition: opacity 0.3s ease; cursor: pointer;"
+                                     class="carousel-image-{{ forloop.parentloop.counter0 }}"
+                                     onclick="openImageModal('{{ image }}', {{ forloop.parentloop.counter0 }}, {{ forloop.counter0 }})">
+                            {% empty %}
+                                <div style="width: 100%; height: 100%; background-color: #444; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-image" style="font-size: 48px; color: #666;"></i>
+                                </div>
+                            {% endfor %}
+                            
+                            <!-- Navigation du carrousel si plusieurs images -->
+                            {% if objet.get_images|length > 1 %}
+                                <button onclick="previousImage({{ forloop.counter0 }}, {{ objet.get_images|length }})" 
+                                        style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.7); border: none; color: white; padding: 8px 10px; border-radius: 50%; cursor: pointer; transition: all 0.3s ease;"
+                                        onmouseover="this.style.background='rgba(0,0,0,0.9)'" onmouseout="this.style.background='rgba(0,0,0,0.7)'">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <button onclick="nextImage({{ forloop.counter0 }}, {{ objet.get_images|length }})" 
+                                        style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.7); border: none; color: white; padding: 8px 10px; border-radius: 50%; cursor: pointer; transition: all 0.3s ease;"
+                                        onmouseover="this.style.background='rgba(0,0,0,0.9)'" onmouseout="this.style.background='rgba(0,0,0,0.7)'">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                                
+                                <!-- Indicateurs -->
+                                <div style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px;">
+                                    {% for image in objet.get_images %}
+                                        <div onclick="showImage({{ forloop.parentloop.counter0 }}, {{ forloop.counter0 }})" 
+                                             style="width: 8px; height: 8px; border-radius: 50%; background: {% if forloop.first %}white{% else %}rgba(255,255,255,0.5){% endif %}; cursor: pointer; transition: all 0.3s ease;"
+                                             class="indicator-{{ forloop.parentloop.counter0 }}-{{ forloop.counter0 }}"></div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Contenu -->
+                        <div style="padding: 16px;">
+                            <!-- Titre -->
+                            <a href="{% url 'details_objet' lot.type objet.id %}" style="text-decoration: none; color: #fff;">
+                                <h3 style="margin: 0 0 12px 0; font-size: 18px; font-weight: 600; color: #fff; line-height: 1.3;">
+                                    {% if lot.type == 'vehicules' %}
+                                        {{ objet.nom }} {{ objet.model }}
+                                    {% elif lot.type == 'immobilier' %}
+                                        Bien immobilier à {{ objet.adresse }}
+                                    {% elif lot.type == 'materiel_pro' %}
+                                        {{ objet.nom }}
+                                    {% elif lot.type == 'informatique_electronique' %}
+                                        {{ objet.marque }} {{ objet.type_objet }}
+                                    {% elif lot.type == 'mobilier_equipements' %}
+                                        {{ objet.categorie }}
+                                    {% elif lot.type == 'bijoux_objets_valeur' %}
+                                        {{ objet.type_objet }}
+                                    {% elif lot.type == 'stocks_invendus' %}
+                                        {{ objet.nom_produit }}
+                                    {% elif lot.type == 'oeuvres_collections' %}
+                                        {{ objet.titre }} par {{ objet.artiste }}
+                                    {% else %}
+                                        Objet
+                                    {% endif %}
+                                </h3>
+                            </a>
+                            
+                            <!-- Caractéristiques -->
+                            <div class="object-characteristics" style="color: #e0e0e0; font-size: 14px; margin-bottom: 16px;">
+                                {% if lot.type == 'vehicules' %}
+                                    <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                        <i class="fas fa-car" style="width: 18px; margin-right: 10px; color: #ff6b35;"></i>
+                                        <strong style="margin-right: 6px;">Marque:</strong> {{ objet.nom }}
+                                    </div>
+                                    <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                        <i class="fas fa-tag" style="width: 18px; margin-right: 10px; color: #ff6b35;"></i>
+                                        <strong style="margin-right: 6px;">Modèle:</strong> {{ objet.model }}
+                                    </div>
+                                    <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                        <i class="fas fa-calendar-alt" style="width: 18px; margin-right: 10px; color: #ff6b35;"></i>
+                                        <strong style="margin-right: 6px;">Année:</strong> {{ objet.year }}
+                                    </div>
+                                {% elif lot.type == 'immobilier' %}
+                                    <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                        <i class="fas fa-map-marker-alt" style="width: 18px; margin-right: 10px; color: #ff6b35;"></i>
+                                        <strong style="margin-right: 6px;">Adresse:</strong> {{ objet.adresse }}
+                                    </div>
+                                    <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                        <i class="fas fa-ruler-combined" style="width: 18px; margin-right: 10px; color: #ff6b35;"></i>
+                                        <strong style="margin-right: 6px;">Surface:</strong> {{ objet.surface }} m²
+                                    </div>
+                                    <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                        <i class="fas fa-door-open" style="width: 18px; margin-right: 10px; color: #ff6b35;"></i>
+                                        <strong style="margin-right: 6px;">Pièces:</strong> {{ objet.nombre_pieces }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Bouton Voir détails -->
+                            <a href="{% url 'details_objet' lot.type objet.id %}" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: white; text-decoration: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 14px; transition: all 0.3s ease; width: 100%;"
+                               onmouseover="this.style.transform='translateY(-1px)'"
+                               onmouseout="this.style.transform='translateY(0)'">
+                                <i class="fas fa-eye" style="font-size: 14px;"></i>
+                                <span>Voir les détails</span>
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div style="background-color: #333; border-radius: 12px; padding: 30px; text-align: center; color: #e0e0e0;">
+                <i class="fas fa-search" style="font-size: 48px; color: #555; margin-bottom: 16px;"></i>
+                <p style="font-size: 18px; margin: 0;">Aucun objet trouvé pour ce lot.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal plein écran pour les images -->
+<div id="imageModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999; justify-content: center; align-items: center;">
+    <div style="position: relative; max-width: 90%; max-height: 90%;">
+        <img id="modalImage" src="/placeholder.svg" alt="Image en plein écran" style="max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px;">
+        
+        <!-- Bouton fermer -->
+        <button onclick="closeImageModal()" style="position: absolute; top: -40px; right: 0; background: rgba(255,255,255,0.2); border: none; color: white; font-size: 20px; cursor: pointer; padding: 8px; border-radius: 50%;">
+            <i class="fas fa-times"></i>
+        </button>
+        
+        <!-- Navigation -->
+        <button id="modalPrev" onclick="modalPreviousImage()" style="position: absolute; left: -60px; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.2); border: none; color: white; padding: 12px 16px; border-radius: 50%; cursor: pointer; font-size: 18px;">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <button id="modalNext" onclick="modalNextImage()" style="position: absolute; right: -60px; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.2); border: none; color: white; padding: 12px 16px; border-radius: 50%; cursor: pointer; font-size: 18px;">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+    </div>
+</div>
+
+<script>
+// Variables globales pour le carrousel
+let currentImageIndex = {};
+let allImages = {};
+let currentModalObject = null;
+let currentModalImageIndex = 0;
+
+// Variables pour le countdown
+let countdownInterval;
+
+// Initialiser les images pour chaque objet
+{% for objet in objets %}
+    allImages[{{ forloop.counter0 }}] = [
+        {% for image in objet.get_images %}
+            "{{ image }}"{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+    currentImageIndex[{{ forloop.counter0 }}] = 0;
+{% endfor %}
+
+// Fonction de countdown améliorée avec format personnalisé
+function startCountdown() {
+    const auctionState = "{{ enchaire.etat }}";
+    
+    // Pour les enchères terminées, afficher 0j :0h :0min :0s en rouge
+    if (auctionState === 'terminee') {
+        const countdownElement = document.getElementById("countdown");
+        if (countdownElement) {
+            countdownElement.innerHTML = "0j :0h :0min :0s";
+            countdownElement.style.color = "#dc3545";
+        }
+        return;
+    }
+    
+    let targetDate;
+    
+    if (auctionState === 'active') {
+        // Pour les enchères actives, compter jusqu'à la date de fin
+        targetDate = new Date("{{ enchaire.date_fin }}").getTime();
+    } else if (auctionState === 'en_attente') {
+        // Pour les enchères en attente, compter jusqu'à la date de début
+        targetDate = new Date("{{ enchaire.date_debut }}").getTime();
+    } else {
+        return;
+    }
+    
+    function updateCountdown() {
+        const now = new Date().getTime();
+        const distance = targetDate - now;
+        const countdownElement = document.getElementById("countdown");
+        
+        if (!countdownElement) return;
+        
+        if (distance < 0) {
+            clearInterval(countdownInterval);
+            countdownElement.innerHTML = "0j :0h :0min :0s";
+            countdownElement.style.color = "#dc3545";
+            
+            // Changer la couleur du titre et du fond si l'enchère vient de se terminer
+            const titleElement = countdownElement.parentElement.querySelector('h3');
+            if (titleElement && auctionState === 'active') {
+                titleElement.innerHTML = '<i class="fas fa-flag-checkered" style="margin-right: 6px;"></i>Enchère Terminée';
+                titleElement.style.color = "#dc3545";
+                countdownElement.parentElement.style.background = "linear-gradient(135deg, #2d1a1a 0%, #1a1a1a 100%)";
+                countdownElement.parentElement.style.borderColor = "#5d4040";
+            }
+            return;
+        }
+        
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        
+        // Format personnalisé : 39j :20h :39min :13s
+        countdownElement.innerHTML = 
+            days + "j :" + 
+            String(hours).padStart(2, '0') + "h :" + 
+            String(minutes).padStart(2, '0') + "min :" + 
+            String(seconds).padStart(2, '0') + "s";
+        
+        // Changer la couleur selon le temps restant
+        if (distance < 300000) { // Moins de 5 minutes
+            countdownElement.style.color = "#dc3545"; // Rouge
+        } else if (distance < 3600000) { // Moins d'1 heure
+            countdownElement.style.color = "#ffc107"; // Jaune
+        } else {
+            countdownElement.style.color = "#fff"; // Blanc
+        }
+    }
+    
+    // Mise à jour immédiate puis toutes les secondes
+    updateCountdown();
+    countdownInterval = setInterval(updateCountdown, 1000);
+}
+
+// Démarrer le countdown au chargement de la page
+document.addEventListener('DOMContentLoaded', function() {
+    startCountdown();
+});
+
+// Navigation du carrousel
+function nextImage(objectIndex, totalImages) {
+    currentImageIndex[objectIndex] = (currentImageIndex[objectIndex] + 1) % totalImages;
+    showImage(objectIndex, currentImageIndex[objectIndex] + 1);
+}
+
+function previousImage(objectIndex, totalImages) {
+    currentImageIndex[objectIndex] = (currentImageIndex[objectIndex] - 1 + totalImages) % totalImages;
+    showImage(objectIndex, currentImageIndex[objectIndex] + 1);
+}
+
+function showImage(objectIndex, imageIndex) {
+    const images = document.querySelectorAll('.carousel-image-' + objectIndex);
+    const indicators = document.querySelectorAll('[class*="indicator-' + objectIndex + '-"]');
+    
+    // Cacher toutes les images
+    images.forEach(img => img.style.opacity = '0');
+    
+    // Réinitialiser tous les indicateurs
+    indicators.forEach(indicator => indicator.style.background = 'rgba(255,255,255,0.5)');
+    
+    // Afficher l'image sélectionnée
+    if (images[imageIndex - 1]) {
+        images[imageIndex - 1].style.opacity = '1';
+        currentImageIndex[objectIndex] = imageIndex - 1;
+    }
+    
+    // Activer l'indicateur correspondant
+    const activeIndicator = document.querySelector('.indicator-' + objectIndex + '-' + imageIndex);
+    if (activeIndicator) {
+        activeIndicator.style.background = 'white';
+    }
+}
+
+// Modal plein écran
+function openImageModal(imageSrc, objectIndex, imageIndex) {
+    const modal = document.getElementById('imageModal');
+    const modalImage = document.getElementById('modalImage');
+    
+    modalImage.src = imageSrc;
+    modal.style.display = 'flex';
+    
+    currentModalObject = objectIndex;
+    currentModalImageIndex = imageIndex - 1;
+    
+    // Masquer les boutons de navigation s'il n'y a qu'une image
+    const totalImages = allImages[objectIndex] ? allImages[objectIndex].length : 0;
+    document.getElementById('modalPrev').style.display = totalImages > 1 ? 'block' : 'none';
+    document.getElementById('modalNext').style.display = totalImages > 1 ? 'block' : 'none';
+}
+
+function closeImageModal() {
+    document.getElementById('imageModal').style.display = 'none';
+}
+
+function modalNextImage() {
+    if (currentModalObject !== null && allImages[currentModalObject]) {
+        const totalImages = allImages[currentModalObject].length;
+        currentModalImageIndex = (currentModalImageIndex + 1) % totalImages;
+        document.getElementById('modalImage').src = allImages[currentModalObject][currentModalImageIndex];
+    }
+}
+
+function modalPreviousImage() {
+    if (currentModalObject !== null && allImages[currentModalObject]) {
+        const totalImages = allImages[currentModalObject].length;
+        currentModalImageIndex = (currentModalImageIndex - 1 + totalImages) % totalImages;
+        document.getElementById('modalImage').src = allImages[currentModalObject][currentModalImageIndex];
+    }
+}
+
+// Fermer le modal avec Escape
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeImageModal();
+    }
+});
+
+// Navigation avec les flèches du clavier
+document.addEventListener('keydown', function(event) {
+    const modal = document.getElementById('imageModal');
+    if (modal.style.display === 'flex') {
+        if (event.key === 'ArrowRight') {
+            modalNextImage();
+        } else if (event.key === 'ArrowLeft') {
+            modalPreviousImage();
+        }
+    }
+});
+
+// Fonction de recherche pour les objets
+function filterObjects() {
+    const searchTerm = document.getElementById('objectSearch').value.toLowerCase();
+    const objectCards = document.querySelectorAll('[data-object-card]');
+    let visibleCount = 0;
+    
+    objectCards.forEach(card => {
+        const title = card.querySelector('h3').textContent.toLowerCase();
+        const characteristics = card.querySelector('.object-characteristics');
+        const characteristicsText = characteristics ? characteristics.textContent.toLowerCase() : '';
+        
+        if (title.includes(searchTerm) || characteristicsText.includes(searchTerm)) {
+            card.style.display = 'block';
+            visibleCount++;
+        } else {
+            card.style.display = 'none';
+        }
+    });
+    
+    // Afficher/masquer le message "aucun résultat"
+    const noResultsMessage = document.getElementById('noResultsMessage');
+    const objectsGrid = document.querySelector('.objects-grid');
+    
+    if (visibleCount === 0 && searchTerm.length > 0) {
+        if (!noResultsMessage) {
+            const message = document.createElement('div');
+            message.id = 'noResultsMessage';
+            message.style.cssText = `
+                background-color: #333; 
+                border-radius: 12px; 
+                padding: 30px; 
+                text-align: center; 
+                color: #e0e0e0; 
+                grid-column: 1 / -1;
+            `;
+            message.innerHTML = `
+                <i class="fas fa-search" style="font-size: 48px; color: #555; margin-bottom: 16px;"></i>
+                <p style="font-size: 18px; margin: 0;">Aucun objet trouvé pour "${searchTerm}".</p>
+            `;
+            objectsGrid.appendChild(message);
+        }
+    } else if (noResultsMessage) {
+        noResultsMessage.remove();
+    }
+}
+
+// Réinitialiser la recherche quand l'input est vide
+document.getElementById('objectSearch').addEventListener('input', function() {
+    if (this.value === '') {
+        filterObjects();
+    }
+});
+</script>
+
+<style>
+/* Responsive design */
+@media (max-width: 1024px) {
+    .main-grid {
+        grid-template-columns: 1fr auto !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-grid {
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+    }
+    
+    .compact-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 12px !important;
+    }
+}
+</style>
+{% endblock %}
