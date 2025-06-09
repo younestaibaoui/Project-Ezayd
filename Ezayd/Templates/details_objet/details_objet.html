@@ -201,7 +201,7 @@
     .price-item {
         display: flex;
         justify-content: space-between;
-        align-items: center;
+        align-items: flex-start;  /* or center */
         padding: 12px 0;
         border-bottom: 1px solid #404040;
     }
@@ -210,16 +210,47 @@
         border-bottom: none;
     }
 
+    .price-value-container {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;  /* align right if needed */
+    }
+
+    .price-value {
+        font-weight: bold;
+        font-size: 19px;
+    }
+
+    .status-item-right {
+        color: #adb5bd;
+        font-size: 12px;
+        margin-top: 2px;
+    }
+
+    {% comment %} -------- {% endcomment %}
+
+    {% comment %} .price-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid #404040;
+    }
+
+    .price-item:last-child {
+        border-bottom: none;
+    } {% endcomment %}
+
     .price-label {
         color: #adb5bd;
         font-weight: 600;
     }
 
-    .price-value {
+    {% comment %} .price-value {
         color: #fff;
         font-weight: 700;
         font-size: 18px;
-    }
+    } {% endcomment %}
 
     .price-value.highlight {
         color: #ff6b35;
@@ -229,9 +260,9 @@
     /* Images Section */
     .images-section {
         background-color: #2d2d2d;
+        border: 1px solid #404040;
         border-radius: 12px;
         padding: 18px;
-        border: 1px solid #404040;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
         margin-top: 24px;
     }
@@ -317,8 +348,7 @@
     }
 
     .modal-image {
-        max-width: 100%;
-        max-height: 100%;
+        max-height: 80vh;
         object-fit: contain;
         border-radius: 8px;
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
@@ -509,7 +539,7 @@
 
     .participate-btn-en-tete {
         width: 100%;
-        background: linear-gradient(135deg, #e60000 0%, #b30000 100%);
+        background-color: #333;
         color: white;
         border: none;
         padding: 16px 20px;
@@ -521,8 +551,6 @@
         align-items: center;
         justify-content: center;
         gap: 8px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
     }
 
     .participate-btn:active {
@@ -541,7 +569,6 @@
     .auction-status {
         margin-top: 16px;
         padding-top: 16px;
-        border-top: 1px solid #404040;
         display: flex;
         flex-direction: column;
         gap: 8px;
@@ -549,32 +576,28 @@
 
     .status-item {
         display: flex;
-        align-items: center;
+        align-items: top;
         gap: 8px;
         color: #adb5bd;
         font-size: 14px;
     }
 
+    {% comment %} .price-value-container {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    } {% endcomment %}
+
+    {% comment %} .status-item-right {
+        margin-left: auto;
+        color: #adb5bd;
+        font-size: 12px;
+    } {% endcomment %}
+
     .status-item i {
         color: #ff0000;
         width: 16px;
         text-align: center;
-    }
-
-    /* Animation pour le prix actuel */
-    .price-value.highlight {
-        animation: pulse-price 2s infinite;
-    }
-
-    @keyframes pulse-price {
-        0%, 100% {
-            color: #ff0000;
-            text-shadow: 0 0 5px rgba(255, 0, 0, 0.3);
-        }
-        50% {
-            color: #ff3333;
-            text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
-        }
     }
 
     /* Responsive pour le bouton */
@@ -738,6 +761,144 @@
 
 <!-- Main Content Grid -->
 <div class="content-grid">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+     
+        <!-- Section Prix Actuel et Participation -->
+        <div class="auction-info">
+            <h3 class="section-title">
+                <i class="fas fa-gavel"></i>
+                Action et Informations d'enchère
+            </h3>
+            
+            <div>
+                <div class="price-item">
+                    <span class="price-label">Prix de départ</span>
+                    <span class="price-value">{{ enchaireObjet.first_price }} DA</span>
+                </div>
+                {% if enchaireObjet.price_reserved < enchaireObjet.first_price %}
+                    <div class="price-item">
+                        <span class="price-label">Prix actuel</span>
+                        <span class="price-value highlight">
+                            {{ enchaireObjet.price_reserved }} DA
+                        </span>
+                    </div>
+                    
+                    <div class="price-item last-child">
+                        <span class="price-label">
+                                Prochaine enchère
+                        </span>
+
+                        <div class="price-value-container">
+                            <p class="price-value">
+                                {% with effective_price=next_bid_price|default:enchaireObjet.price_reserved %}
+                                    {{ effective_price|add:enchaireObjet.pas }} DA
+                                {% endwith %}
+                            </p>
+
+                            {% if enchaireObjet.price_reserved > enchaireObjet.first_price %}
+                                <p class="status-item-right">Pas: {{ enchaireObjet.pas }} DA</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+
+            </div>
+
+            {% if  not is_winner %}
+                {% if demande_state == 'Approuvée' %}
+                    <form method="POST" action="{% url 'participer' %}" style="margin-top: 1px;">
+                        {% csrf_token %}
+                        <input type="hidden" name="type_objet" value="{{ type_objet }}">
+                        <input type="hidden" name="objet_id" value="{{ objet.id }}">
+                        <input type="hidden" name="enchaireObjet_id" value="{{ enchaireObjet.id }}">
+                        <button type="submit" class="participate-btn">
+                            <i class="fas fa-gavel"></i>
+                            Participer pour {{ next_bid_price|default:enchaireObjet.price_reserved|add:enchaireObjet.pas }} DA
+                        </button>
+                    </form>
+                {% else %}
+                    {% if demande_state %}
+                        <div style="padding: 12px 20px; border-radius: 8px; text-align: center; font-weight: 600; {% if demande_state == 'Rejetée' %}background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white;{% else %}background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%); color: white;{% endif %}">
+                            {% if demande_state == 'Rejetée' %}
+                                <i class="fas fa-times-circle" style="margin-right: 8px;"></i>Demande rejetée
+                            {% elif demande_state == 'unread' %}
+                                <i class="fas fa-clock" style="margin-right: 8px;"></i>Demande en attente
+                            {% endif %}
+                        </div>
+                    {% else %}
+                                
+                        <form method="post" action="{% url 'demande' %}" style="margin: 0;">
+                        {% csrf_token %}
+                        <input type="hidden" name="user" value="{{ user.id }}">
+                        <input type="hidden" name="enchaire" value="{{ enchaire_id }}">
+                        <button type="submit"
+                            style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; border: none; border-radius: 8px; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: white; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 3px 12px rgba(255, 107, 53, 0.3);"
+                            onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 15px rgba(255, 107, 53, 0.4)'"
+                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 3px 12px rgba(255, 107, 53, 0.3)'">
+                            <i class="fas fa-paper-plane"></i>
+                            <span>Faire une demande</span>
+                        </button>
+                    </form>
+
+                    {% endif %}
+                {% endif %}
+            {% else %}
+                <button type="submit" class="participate-btn-en-tete" style="margin-top: 20px; cursor: default;" disabled>
+                    Vous Etes Leader
+                </button>
+            {% endif %}
+            
+            <div class="auction-status">
+                <div class="status-item">
+                    <i class="fas fa-users"></i>
+                    <span>{{ participation_count|default:0 }} participant{{ participation_count|default:0|pluralize }}</span>
+                </div>
+                <div class="status-item">
+                    <i class="fas fa-clock"></i>
+                    <span>Temps restant: {{ time_remaining|default:"--:--:--" }}</span>
+                </div>
+            </div>
+        </div>
+        <!-- Participants Card Section -->
+        <div class="participants-card">
+            <h3 class="section-title">
+                <i class="fas fa-gavel"></i>
+                Participations à l'enchère
+            </h3>
+            
+            <div class="participant-list">
+                {% if participations %}
+                    {% for participation in participations %}
+                        <div class="participant-item">
+                            <div class="participant-info">
+                                {% if participation.user.pfp %}
+                                    <div class="participant-avatar">
+                                        <img src="{{ participation.user.pfp.url }}" alt="Photo de profil" class="profile-avatar">
+                                    </div>
+                                {% else %}
+                                    <div class="participant-avatar">
+                                        {{ participation.user.username|slice:":1"|upper }}
+                                    </div>
+                                {% endif %}
+
+                                <div>
+                                    <div class="participant-name">{{ participation.user.username }}</div>
+                                    <div class="participant-date">{{ participation.date_participation|date:"H:i \l\e d/m/Y" }}</div>
+                                </div>
+                            </div>
+                            <div class="participant-amount">{{ participation.montant }} DA</div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-participants">
+                        <i class="fas fa-info-circle"></i> Aucun participant pour le moment
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
     <!-- Object Details -->
     <div class="details-section">
         <h2 class="section-title">
@@ -798,7 +959,7 @@
                     <i class="fas fa-ruler-combined"></i>
                     <div class="detail-content">
                         <div class="detail-label">Surface</div>
-                        <div class="detail-value">{{ objet.surface }} m²</div>
+                        <div class="detail-value">{{ objet.surface }} m&sup2;</div>
                     </div>
                 </div>
                 <div class="detail-item">
@@ -1203,158 +1364,7 @@
         
     </div>
 
-    <!-- Sidebar -->
-    <div class="sidebar">
-     
-        <!-- Section Prix Actuel et Participation -->
-        <div class="auction-info">
-                <h3 class="section-title">
-                <i class="fas fa-gavel"></i>
-                Action et Informations d'enchère
-            </h3>
-            
-            <div class="price-item">
-                <span class="price-label">Prix de départ</span>
-                <span class="price-value highlight">{{ enchaireObjet.first_price }} DA</span>
-            </div>
-            
-            <div class="price-item">
-                <span class="price-label">Pas d'enchère</span>
-                <span class="price-value">{{ enchaireObjet.pas }} DA</span>
-            </div>
-            
-            {% if enchaireObjet.reserved %}
-                <div class="price-item">
-                    <span class="price-label">Prix de réserve</span>
-                    <span class="price-value">{{ enchaireObjet.price_reserved }} DA</span>
-                </div>
-                {% if enchaireObjet.winner %}
-                    <div class="price-item">
-                        <span class="price-label">Gagnant</span>
-                        <span class="price-value">{{ enchaireObjet.winner }}</span>
-                    </div>
-                {% endif %}
-            {% else %}
-            
-            {% endif %}
-         
-            
-            <div class="price-item">
-                <span class="price-label">Prix actuel</span>
-                <span class="price-value highlight">
-                    {% if enchaireObjet.price_reserved < enchaireObjet.first_price %}
-                        {{ enchaireObjet.first_price }} DA
-                    {% else %}
-                        {{ enchaireObjet.price_reserved }} DA
-                    {% endif %}
-                </span>
-            </div>
-            
-            <div class="price-item">
-                <span class="price-label">
-                    {% if enchaireObjet.price_reserved < enchaireObjet.first_price %}
-                        Première enchère
-                    {% else %}
-                        Prochaine enchère
-                    {% endif %}
-                </span>
-                <span class="price-value">{{ next_bid_price|default:enchaireObjet.price_reserved|add:enchaireObjet.pas }} DA</span>
-            </div>
-            
-            {% if  not is_winner %}
-                {% if demande_state == 'Approuvée' %}
-                    <form method="POST" action="{% url 'participer' %}" style="margin-top: 20px;">
-                        {% csrf_token %}
-                        <input type="hidden" name="type_objet" value="{{ type_objet }}">
-                        <input type="hidden" name="objet_id" value="{{ objet.id }}">
-                        <input type="hidden" name="enchaireObjet_id" value="{{ enchaireObjet.id }}">
-                        <button type="submit" class="participate-btn">
-                            <i class="fas fa-gavel"></i>
-                            Participer pour {{ next_bid_price|default:enchaireObjet.price_reserved|add:enchaireObjet.pas }} DA
-                        </button>
-                    </form>
-                {% else %}
-                    {% if demande_state %}
-                        <div style="padding: 12px 20px; border-radius: 8px; text-align: center; font-weight: 600; {% if demande_state == 'Rejetée' %}background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white;{% else %}background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%); color: white;{% endif %}">
-                            {% if demande_state == 'Rejetée' %}
-                                <i class="fas fa-times-circle" style="margin-right: 8px;"></i>Demande rejetée
-                            {% elif demande_state == 'unread' %}
-                                <i class="fas fa-clock" style="margin-right: 8px;"></i>Demande en attente
-                            {% endif %}
-                        </div>
-                    {% else %}
-                                
-                        <form method="post" action="{% url 'demande' %}" style="margin: 0;">
-                        {% csrf_token %}
-                        <input type="hidden" name="user" value="{{ user.id }}">
-                        <input type="hidden" name="enchaire" value="{{ enchaire_id }}">
-                        <button type="submit"
-                            style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; border: none; border-radius: 8px; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: white; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 3px 12px rgba(255, 107, 53, 0.3);"
-                            onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 15px rgba(255, 107, 53, 0.4)'"
-                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 3px 12px rgba(255, 107, 53, 0.3)'">
-                            <i class="fas fa-paper-plane"></i>
-                            <span>Faire une demande</span>
-                        </button>
-                    </form>
-
-                    {% endif %}
-                {% endif %}
-            {% else %}
-                <button type="submit" class="participate-btn-en-tete" style="margin-top: 20px; cursor: default;" disabled>
-                    En tete
-                </button>
-            {% endif %}
-            
-            <div class="auction-status">
-                <div class="status-item">
-                    <i class="fas fa-users"></i>
-                    <span>{{ participation_count|default:0 }} participant{{ participation_count|default:0|pluralize }}</span>
-                </div>
-                <div class="status-item">
-                    <i class="fas fa-clock"></i>
-                    <span>Temps restant: {{ time_remaining|default:"--:--:--" }}</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-     <!-- Participants Card Section -->
-    <div class="participants-card">
-        <h3 class="section-title">
-            <i class="fas fa-gavel"></i>
-            Participations à l'enchère
-        </h3>
-        
-        <div class="participant-list">
-            {% if participations %}
-                {% for participation in participations %}
-                    <div class="participant-item">
-                        <div class="participant-info">
-                            {% if participation.user.pfp %}
-                                <div class="participant-avatar">
-                                    <img src="{{ participation.user.pfp.url }}" alt="Photo de profil" class="profile-avatar">
-                                </div>
-                            {% else %}
-                                <div class="participant-avatar">
-                                    {{ participation.user.username|slice:":1"|upper }}
-                                </div>
-                            {% endif %}
-
-                            <div>
-                                <div class="participant-name">{{ participation.user.username }}</div>
-                                <div class="participant-date">{{ participation.date_participation|date:"H:i \l\e d/m/Y" }}</div>
-                            </div>
-                        </div>
-                        <div class="participant-amount">{{ participation.montant }} DA</div>
-                    </div>
-                {% endfor %}
-            {% else %}
-                <div class="no-participants">
-                    <i class="fas fa-info-circle"></i> Aucun participant pour le moment
-                </div>
-            {% endif %}
-        </div>
-    </div>
+    
 </div>
 
 <!-- Modal amélioré pour les images en plein écran -->
@@ -1593,9 +1603,6 @@
                 // Rediriger vers la page de participation ou envoyer une requête AJAX
                 
             }
-        {% else %}
-            alert('Vous devez être connecté pour participer aux enchères.');
-            window.location.href = "{% url 'connexion' %}";
         {% endif %}
     }
 

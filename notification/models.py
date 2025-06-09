@@ -2,9 +2,20 @@ from django.db import models
 
 class NotificationEnchaire(models.Model):
     enchaire = models.ForeignKey(
-        'Ezayd.Enchaire',  # app_label.ModelName as a string
+        'Ezayd.Enchaire', 
         on_delete=models.CASCADE,
-        related_name='notifications'
+        related_name='notifications',
+        null=True,            
+        blank=True,             
+        default=None,
+    )
+    enchaireObjet = models.ForeignKey(
+        'Ezayd.EnchaireObjet', 
+        on_delete=models.CASCADE,
+        related_name='notifications',
+        null=True,            
+        blank=True,             
+        default=None,
     )
     user = models.ForeignKey(
         'perso.UserAccount',
@@ -16,7 +27,10 @@ class NotificationEnchaire(models.Model):
     is_read = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"Notification for {self.user} about Enchaire #{self.enchaire.id}"
+        if self.enchaire:
+            return f"Notification for {self.user} about Enchaire #{self.enchaire.id if self.enchaire else 'Unknown'}"
+        else: 
+            return f"Notification for {self.user} about EnchaireObjet #{self.enchaireObjet.id if self.enchaireObjet else 'Unknown'}"
 
 class NotificationDemandeEnchaire(models.Model):
     user = models.ForeignKey(

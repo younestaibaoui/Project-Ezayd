@@ -35,7 +35,7 @@ class EnchaireObjet(models.Model):
     def save(self, *args, **kwargs):
         if self.pk is None and self.price_reserved is None:
             self.price_reserved = self.first_price - self.pas
-        super().save(*args, **kwargs)
+        super().save(*args, **kwargs)        
 
     def participer(self, user):
         price_reserved = self.price_reserved 
@@ -48,6 +48,54 @@ class EnchaireObjet(models.Model):
         )
         self.save()
 
+    def get_type(self):
+
+        if hasattr(self, 'voiture'):
+            type_objet = 'vehicules'
+        elif hasattr(self, 'immobilier'):
+            type_objet = 'immobilier'
+        elif hasattr(self, 'materielProfessionnel'):
+            type_objet = 'materiel_pro'
+        elif hasattr(self, 'informatiqueElectronique'):
+            type_objet = 'informatique_electronique'
+        elif hasattr(self, 'mobilierEquipement'):
+            type_objet = 'mobilier_equipements'
+        elif hasattr(self, 'bijouxObjetValeur'):
+            type_objet = 'bijoux_objets_valeur'
+        elif hasattr(self, 'stockInvendu'):
+            type_objet = 'stocks_invendus'
+        elif hasattr(self, 'oeuvreCollection'):
+            type_objet = 'oeuvres_collections'
+        else:
+            type_objet = False
+
+        return type_objet
+
+    def __str__(self):
+
+        avec_objet = True
+
+        if hasattr(self, 'voiture'):
+            objet = self.voiture
+        elif hasattr(self, 'immobilier'):
+            objet = self.immobilier
+        elif hasattr(self, 'materielProfessionnel'):
+            objet = self.materiel_pro
+        elif hasattr(self, 'informatiqueElectronique'):
+            objet = self.informatiqueElectronique
+        elif hasattr(self, 'mobilierEquipement'):
+            objet = self.mobilierEquipement
+        elif hasattr(self, 'bijouxObjetValeur'):
+            objet = self.bijouxObjetValeur
+        elif hasattr(self, 'stockInvendu'):
+            objet = self.stockInvendu
+        elif hasattr(self, 'oeuvreCollection'):
+            objet = self.oeuvreCollection
+        else:
+            avec_objet = False
+        
+        return str(objet) if avec_objet else f"EnchaireObjet #{self.id} (sans objet)"
+    
 class Enchaire(models.Model):
     date_debut = models.DateField(default=timezone.now, null=False)
     date_fin = models.DateField(default=timezone.now, null=False)
@@ -197,6 +245,22 @@ class ParticipationEnchaire(models.Model):
         default=0,
     )
     date_participation = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        users = ParticipationEnchaire.objects.filter(enchaireObjet=self.enchaireObjet).values('user').distinct()
+        super().save(*args, **kwargs)  # save first to ensure FK integrity
+        for user in users:
+            if user['user'] == self.user.id:
+                continue  # Skip if the user already exists in the participation list
+
+            self.notify_user(self.montant,user,self.enchaireObjet)
+
+    def notify_user(self, montant, user ,enchaireObjet):
+        NotificationEnchaire.objects.create(
+            user=UserAccount.objects.get(id=user['user']),
+            enchaireObjet=enchaireObjet,
+            message=f"L\'utilisateur {self.user.username} a participer a l'enchere {enchaireObjet} avec un montant de {montant}."
+        )
 
     def __str__(self):
         return f"Participation de {self.user} à l'enchère {self.enchaireObjet}."

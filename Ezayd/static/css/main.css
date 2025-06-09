@@ -84,12 +84,6 @@
   backdrop-filter: blur(10px);
 }
 
-.price-value {
-  font-weight: 700;
-  color: var(--primary-color);
-  text-shadow: 0 0 10px rgba(222, 13, 51, 0.5);
-}
-
 .badge {
   position: absolute;
   top: 1rem;

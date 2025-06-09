@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.http import Http404
 
 @login_required
 def notifications_view(request):
@@ -23,10 +24,14 @@ def mark_as_read(request, notification_id):
         notification = user.notifications.get(id=notification_id)
         notification.is_read = True
         notification.save()
-    except user.notifications.model.DoesNotExist:
-        pass
 
-    return redirect('details_enchaire',notification.enchaire.id)
+        if notification.enchaire:
+            return redirect('details_enchaire',notification.enchaire.id)
+        else:
+            return redirect('details_objet',notification.enchaireObjet.get_type(),notification.enchaireObjet.id)
+    
+    except user.notifications.model.DoesNotExist:
+        return Http404('details_enchaire',notification.enchaire.id)
 
 
 # mark all notifications as read

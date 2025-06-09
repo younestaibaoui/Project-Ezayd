@@ -7,7 +7,7 @@ from .models import (
 
 @admin.register(NotificationEnchaire)
 class NotificationEnchaireAdmin(admin.ModelAdmin):
-    list_display = ('enchaire', 'user', 'message', 'created_at', 'is_read')
+    list_display = ('enchaire','enchaireObjet', 'user', 'message', 'created_at', 'is_read')
     list_filter = ('is_read', 'created_at')
     search_fields = ('message', 'user__username', 'enchaire__id')
 
