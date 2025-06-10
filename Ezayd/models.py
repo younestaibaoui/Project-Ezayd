@@ -139,8 +139,12 @@ class EnchaireObjet(models.Model):
         return objet
 
     def __str__(self):
-        objet = self.get_objet()
-        return str(objet) if objet else f"EnchaireObjet #{self.id} (sans objet)"
+        try:
+            objet = self.get_objet()
+        except:
+            objet = f"EnchaireObjet #{self.id} (sans objet)"
+
+        return str(objet) 
     
 class Enchaire(models.Model):
     date_debut = models.DateField(default=timezone.now, null=False)
@@ -385,9 +389,8 @@ class Voiture(models.Model):
 
     def save(self, *args, **kwargs):
         self.full_clean()  # Appelle clean() et lève une exception si invalide
-        if not self.pk:  # object already exists
-            self.update_enchaireObjet()
         super().save(*args, **kwargs)
+        self.update_enchaireObjet()
 
     def __str__(self):
         return f"{self.nom}-{self.model}-{self.year}" if self.pk else "Objet supprimé ou introuvable"

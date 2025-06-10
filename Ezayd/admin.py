@@ -35,7 +35,7 @@ class DemandeEnchaireAdmin(admin.ModelAdmin):
 # ---------- Admin pour EnchaireObjet ----------
 @admin.register(EnchaireObjet)
 class EnchaireObjetAdmin(admin.ModelAdmin):
-    list_display = ('id', 'first_price', 'pas', 'price_reserved', 'winner')
+    list_display = ('__str__', 'first_price', 'pas', 'price_reserved', 'winner')
     list_filter = ('winner',)
     search_fields = ('winner__username',)
 
@@ -57,13 +57,29 @@ class LotAdmin(admin.ModelAdmin):
 
 
 # ---------- Admin pour Voiture et Images ----------
+from django.forms.models import BaseInlineFormSet
+from django.core.exceptions import ValidationError
+
+
+class VoitureImageInlineFormSet(BaseInlineFormSet):
+    def clean(self):
+        super().clean()
+        count = 0
+        for form in self.forms:
+            if not form.cleaned_data.get('DELETE', False) and form.cleaned_data:
+                count += 1
+        if count < 3:
+            raise ValidationError("Vous devez ajouter au moins 3 images pour chaque voiture.")
+
 class VoitureImageInline(admin.TabularInline):
     model = VoitureImage
     extra = 1
+    formset = VoitureImageInlineFormSet
+
 
 @admin.register(Voiture)
 class VoitureAdmin(admin.ModelAdmin):
-    list_display = ('nom', 'model', 'year', 'lot')
+    list_display = ('id','nom', 'model', 'year', 'lot')
     search_fields = ('nom', 'model', 'numero_chassis')
     list_filter = ('year', 'couleur')
     inlines = [VoitureImageInline]

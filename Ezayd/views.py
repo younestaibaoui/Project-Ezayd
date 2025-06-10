@@ -645,11 +645,8 @@ def demande(request):
 @login_required
 def profil_view(request):
 
-    if request.user.is_authenticated:
-        context = {}
-        context['user'] = request.user
-    else:
-        redirect('connexion')  
+
+    user = request.user
     
     if request.user.is_authenticated:
         notifications = request.user.notifications.all() if request.user.is_authenticated else None
@@ -657,11 +654,20 @@ def profil_view(request):
             unread_count = notifications.filter(is_read=False).count()
         else:
             unread_count = 0
-    
-        # Récupérer les notifications de l'utilisateur connecté
-        notifications = request.user.notifications.all().order_by('-created_at')    
-        context['unread_count'] = unread_count
-        context['notifications'] = notifications
+
+    participations = user.participations_encheres.all()
+    statistique_participation = {
+        'total' : participations.count(),
+        'remporte': participations.filter(enchaireObjet__reserved=True, enchaireObjet__winner=user),
+        'en_tete': participations.filter(enchaireObjet__reserved=False, enchaireObjet__winner=user),
+    }
+
+    context = {
+        'user': user,
+        'unread_count': unread_count,
+        'participations': statistique_participation,
+    }
+
 
     return render(request, 'profil.html', context)
 
@@ -752,8 +758,6 @@ def mes_participations(request):
             objet = enchaireObjet.oeuvreCollection
         else:
             objet = None
-
-
 
         if objet:
         
@@ -1184,3 +1188,9 @@ def search_api(request):
     
     print(f"Total résultats: {len(results)}")
     return JsonResponse({'results': results[:10]})
+
+@require_POST
+@login_required
+def change_pfp(request):
+    user_id = request.POST.get('pfp')
+    

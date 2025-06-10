@@ -3,12 +3,16 @@
 <div class="participants-card">
     <div class="card-header">
         <h3 class="section-title">
-            <i class="fas fa-gavel"></i> 
-            <span>Participations à l'enchère</span>
+            <i class="fas fa-receipt"></i> 
+            <span>Mes participations</span>
         </h3>
         {% if participations %}
             <div class="participants-count">
                 {{ participations|length }} participation{{ participations|length|pluralize }}
+            </div>
+            {% else %}
+            <div class="participants-count">
+                0 participation
             </div>
         {% endif %}
     </div>
