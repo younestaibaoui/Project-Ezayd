@@ -476,88 +476,6 @@ def details_view(request, enchere_id):
     return render(request, 'details_enchaire/details_enchaire.html', context)
   
 
-
-# ------------------------------------------------------------------------
-
-
-
-     
-    enchaire = get_object_or_404(Enchaire, id=enchere_id)
-    lot = enchaire.lot
-
-    if request.user.is_authenticated:
-        demande = DemandeEnchaire.objects.filter(user=request.user, enchaire=enchaire).first()
-
-    lot_type = lot.type
-
-    objets = {}
-
-    if lot_type == 'vehicules':
-        objets = lot.voitures.select_related('enchaireObjet').prefetch_related('enchaireObjet__participations').all()
-
-        object_results = []
-
-        for voiture in objets:
-            enchaire_objet = voiture.enchaireObjet  # OneToOneField, use directly
-
-            if enchaire_objet:
-                participation_count = (
-                    enchaire_objet.participations.values('user').distinct().count()
-                )
-            else:
-                participation_count = 0
-
-            object_results.append({
-                'id': voiture.id,
-                'nom': voiture.nom,
-
-                'enchaireObjet': enchaire_objet,
-                'get_images': voiture.get_images(),  # assuming this returns a list or URL
-                'participation_count': str(participation_count),
-            })
-
-    elif lot_type == 'immobilier':
-        objets = lot.immobiliers.all()
-    elif lot_type == 'materiel_pro':
-        objets = lot.materiels.all()
-    elif lot_type == 'informatique_electronique':
-        objets = lot.informatique.all()
-    elif lot_type == 'mobilier_equipements':
-        objets = lot.mobilier.all()
-    elif lot_type == 'bijoux_objets_valeur':
-        objets = lot.bijoux.all()
-    elif lot_type == 'stocks_invendus':
-        objets = lot.stocks.all()
-    elif lot_type == 'oeuvres_collections':
-        objets = lot.oeuvres.all()
-
-    participations = ParticipationEnchaire.objects.filter(
-        enchaireObjet__in=[obj.enchaireObjet for obj in objets if obj.enchaireObjet]
-    ).values('user').distinct()
-
-    participation_count = participations.count()
-
-    context = {
-        'enchaire' : enchaire,
-        'demande' : demande if request.user.is_authenticated else None,
-        'lot' : lot,
-        'objets' : object_results,
-        'participation_count': participation_count,
-    }
-    
-    if request.user.is_authenticated:
-        notifications = request.user.notifications.all() if request.user.is_authenticated else None
-        if notifications:
-            unread_count = notifications.filter(is_read=False).count()
-        else:
-            unread_count = 0
-    
-        # Récupérer les notifications de l'utilisateur connecté
-        notifications = request.user.notifications.all().order_by('-created_at')    
-        context['unread_count'] = unread_count
-        context['notifications'] = notifications
-
-    return render(request, 'details_enchaire/details_enchaire.html', context)
 # --------------------------------------------------------------------
 
 def details_objet_view(request, type_objet, objet_id):
@@ -594,7 +512,9 @@ def details_objet_view(request, type_objet, objet_id):
    
     participations = enchaireObjet.participations.all().order_by('-date_participation') if enchaireObjet else None
     participation_count = participations.values('user').distinct().count() if participations else 0
-
+    
+    
+     
     context = {
         'enchaire': enchaire,
         'type_objet': type_objet,
@@ -655,17 +575,17 @@ def profil_view(request):
         else:
             unread_count = 0
 
-    participations = user.participations_encheres.all()
+    participations = ParticipationEnchaire.objects.filter(user=user)
     statistique_participation = {
-        'total' : participations.count(),
-        'remporte': participations.filter(enchaireObjet__reserved=True, enchaireObjet__winner=user),
-        'en_tete': participations.filter(enchaireObjet__reserved=False, enchaireObjet__winner=user),
+        'total' : participations.values('enchaireObjet').distinct().count(),
+        'remporte': participations.filter(enchaireObjet__reserved=True, enchaireObjet__winner=user).count(),
+        'en_tete': participations.filter(enchaireObjet__reserved=False, enchaireObjet__winner=user).count(),
     }
 
     context = {
         'user': user,
         'unread_count': unread_count,
-        'participations': statistique_participation,
+        'statistique_participation': statistique_participation,
     }
 
 
