@@ -288,31 +288,24 @@ def details_view(request, enchere_id):
     objets = {}
 
     if lot_type == 'vehicules':
-        objets = lot.voitures.all().values()
-
+        objets = lot.voitures.all()
     elif lot_type == 'immobilier':
-        objets = lot.voitures.prefetch_related('enchaireObjet').all().values()
+        objets = lot.immobiliers.all()
     elif lot_type == 'materiel_pro':
-        objets = lot.materiels.all().values()
+        objets = lot.materiels.all()
     elif lot_type == 'informatique_electronique':
-        objets = lot.informatique.all().values()
+        objets = lot.informatique.all()
     elif lot_type == 'mobilier_equipements':
-        objets = lot.mobilier.all().values()
+        objets = lot.mobilier.all()
     elif lot_type == 'bijoux_objets_valeur':
-        objets = lot.bijoux.all().values()
+        objets = lot.bijoux.all()
     elif lot_type == 'stocks_invendus':
-        objets = lot.stocks.all().values()
+        objets = lot.stocks.all()
     elif lot_type == 'oeuvres_collections':
-        objets = lot.oeuvres.all().values()
-
-    for objet in objets:
-        enchaireObjet = objet.get('enchaireObjet')
-        participations = enchaireObjet.participations.all().order_by('-date_participation') if enchaireObjet else None
-        participation_count = participations.values('user').distinct().count() if participations else 0
-        objet['participation_count'] = participation_count
+        objets = lot.oeuvres.all()
 
     participations = ParticipationEnchaire.objects.filter(
-        enchaireObjet__in=[obj.get('enchaireObjet') for obj in objets if obj.get('enchaireObjet')]
+        enchaireObjet__in=[obj.enchaireObjet for obj in objets if obj.enchaireObjet]
     ).values('user').distinct()
 
     participation_count = participations.count()
@@ -323,6 +316,7 @@ def details_view(request, enchere_id):
         'lot' : lot,
         'objets' : objets,
         'participation_count': participation_count,
+
     }
     
     if request.user.is_authenticated:
@@ -559,7 +553,6 @@ def mes_participations(request):
     }
 
     return render(request, 'mes_participations/mes_participations.html', context)
-
 
 # ---------------------- search API ----------------------
 from django.http import JsonResponse
