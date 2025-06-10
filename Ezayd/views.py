@@ -288,7 +288,29 @@ def details_view(request, enchere_id):
     objets = {}
 
     if lot_type == 'vehicules':
-        objets = lot.voitures.all()
+        objets = lot.voitures.select_related('enchaireObjet').prefetch_related('enchaireObjet__participations').all()
+
+        object_results = []
+
+        for voiture in objets:
+            enchaire_objet = voiture.enchaireObjet  # OneToOneField, use directly
+
+            if enchaire_objet:
+                participation_count = (
+                    enchaire_objet.participations.values('user').distinct().count()
+                )
+            else:
+                participation_count = 0
+
+            object_results.append({
+                'id': voiture.id,
+                'nom': voiture.nom,
+                'model': voiture.model
+                'enchaireObjet': enchaire_objet,
+                'get_images': voiture.get_images(),  # assuming this returns a list or URL
+                'participation_count': str(participation_count),
+            })
+
     elif lot_type == 'immobilier':
         objets = lot.immobiliers.all()
     elif lot_type == 'materiel_pro':
@@ -314,9 +336,8 @@ def details_view(request, enchere_id):
         'enchaire' : enchaire,
         'demande' : demande if request.user.is_authenticated else None,
         'lot' : lot,
-        'objets' : objets,
+        'objets' : object_results,
         'participation_count': participation_count,
-
     }
     
     if request.user.is_authenticated:

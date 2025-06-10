@@ -4,7 +4,7 @@
             <div class="object-card" style="background-color: #2d2d2d; border-radius: 12px; overflow: hidden; transition: all 0.3s ease; border: 1px solid #404040; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
                 <!-- Badge du type -->
                 <div class="lot-type-badge {{ lot.type }}" style="position: absolute; top: 10px; left: 10px; padding: 6px 14px; font-size: 0.7rem; font-weight: 600; border-radius: 16px; color: #fff; z-index: 10; background: #555; text-transform: uppercase; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);">
-                    {{ lot.get_type_display }} {{ objet.participation_count }}
+                    {{ lot.get_type_display }} 
                 </div>
                 
                 <!-- Images -->
@@ -26,7 +26,7 @@
                     <a href="{% url 'details_objet' lot.type objet.id %}" style="text-decoration: none; color: #fff;">
                         <h3 style="margin: 0 0 12px 0; font-size: 18px; font-weight: 600; color: #fff;">
                             {% if lot.type == 'vehicules' %}
-                                {{ objet.nom }} {{ objet.model }}
+                                {{ objet.nom }} {{ objet.model }} 
                             {% elif lot.type == 'immobilier' %}
                                 Bien immobilier à {{ objet.adresse }}
                             {% elif lot.type == 'materiel_pro' %}
@@ -56,7 +56,7 @@
                             </div>
                             <div style="display: flex; align-items: center; margin-bottom: 8px;">
                                 <i class="fas fa-tag" style="width: 20px; margin-right: 8px; color: #ff6b35;"></i>
-                                <strong style="margin-right: 5px;">Modèle:</strong> {{ objet.model }}
+                                <strong style="margin-right: 5px;">Modèle:</strong> {{ objet.participation_count }}
                             </div>
                             <div style="display: flex; align-items: center; margin-bottom: 8px;">
                                 <i class="fas fa-calendar-alt" style="width: 20px; margin-right: 8px; color: #ff6b35;"></i>
