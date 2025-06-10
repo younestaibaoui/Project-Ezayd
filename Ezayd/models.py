@@ -390,7 +390,7 @@ class Voiture(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.nom}-{self.model}-{self.year}"
+        return f"{self.nom}-{self.model}-{self.year}" if self.pk else "Objet supprimé ou introuvable"
 
 class VoitureImage(models.Model):
     type=(
