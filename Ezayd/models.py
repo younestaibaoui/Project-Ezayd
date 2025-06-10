@@ -333,7 +333,7 @@ class Lot(models.Model):
 
     nom = models.CharField(max_length=100, null=False)
     type = models.CharField(max_length=30, choices=TYPE_CHOICES)
-    description = models.TextField(null=True, blank=True)
+    description = models.TextField(null=True, blank=True, max_length=150)
     date_ajout = models.DateTimeField(auto_now_add=True)
     enchaire = models.OneToOneField(
         "Enchaire",
