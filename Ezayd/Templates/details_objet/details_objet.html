@@ -564,6 +564,78 @@
         box-shadow: none;
     }
 
+    /* New styles for different auction states */
+    .participate-btn.upcoming {
+        background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+        box-shadow: 0 4px 15px rgba(23, 162, 184, 0.3);
+    }
+
+    .participate-btn.upcoming:hover {
+        background: linear-gradient(135deg, #138496 0%, #117a8b 100%);
+        box-shadow: 0 6px 25px rgba(23, 162, 184, 0.4);
+    }
+
+    .participate-btn.winner {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        cursor: default;
+    }
+
+    .participate-btn.winner:hover {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        transform: none;
+    }
+
+    .participate-btn.finished-reserved {
+        background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+        box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+        cursor: default;
+    }
+
+    .participate-btn.finished-not-reserved {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+        cursor: default;
+    }
+
+    .participate-btn.finished-reserved:hover,
+    .participate-btn.finished-not-reserved:hover {
+        transform: none;
+    }
+
+    /* Status message styles */
+    .status-message {
+        padding: 12px 16px;
+        border-radius: 8px;
+        text-align: center;
+        font-weight: 600;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .status-message.active {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+    }
+
+    .status-message.upcoming {
+        background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+        color: white;
+    }
+
+    .status-message.winner {
+        background: linear-gradient(135deg,rgb(255, 191, 0) 0%, #e0a800 100%);
+        color: white;
+    }
+
+    .status-message.finished {
+        background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+        color: white;
+    }
+
     /* Statut de l'enchère */
     .auction-status {
         padding-top: 16px;
@@ -712,7 +784,7 @@
         <i class="fas fa-home"></i>Accueil
     </a>
     <i class="fas fa-chevron-right separator"></i>
-    <a href="{% url 'details_enchaire' enchaire_id %}">
+    <a href="{% url 'details_enchaire' enchaire.id %}">
         <i class="fas fa-gavel"></i>Détails de l'enchère
     </a>
     <i class="fas fa-chevron-right separator"></i>
@@ -787,82 +859,167 @@
                     <span class="price-label">Prix de départ</span>
                     <span class="price-value">{{ enchaireObjet.first_price }} DA</span>
                 </div>
-                {% if enchaireObjet.price_reserved < enchaireObjet.first_price %}
-                    <div class="price-item">
-                        <span class="price-label">Prix actuel</span>
-                        <span class="price-value highlight">
-                            {{ enchaireObjet.price_reserved|add:enchaireObjet.pas }} DA
-                        </span>
-                    </div>
-                {% else %}
-                    {% with price_reserved=enchaireObjet.price_reserved %}
+                {% if enchaire.is_active %}
+                {% comment %} ----------------------- ENCHAIRE ACTIVE ---------------------------- {% endcomment %}
+                    {% if enchaireObjet.price_reserved < enchaireObjet.first_price %}
                         <div class="price-item">
                             <span class="price-label">Prix actuel</span>
                             <span class="price-value highlight">
-                                {{ price_reserved }} DA
+                                {{ enchaireObjet.price_reserved|add:enchaireObjet.pas }} DA
                             </span>
                         </div>
-                        <div class="price-item last-child">
-                            <span class="price-label">
-                                Prochaine enchère
-                            </span>
-
-                            <div class="price-value-container">
-                                <p class="price-value">
-                                    {{ price_reserved|add:enchaireObjet.pas }} DA
-                                </p>
-
-                                {% if price_reserved >= enchaireObjet.first_price %}
-                                    <p class="status-item-right">Pas: {{ enchaireObjet.pas }} DA</p>
-                                {% endif %}
+                        {% else %}
+                        {% with price_reserved=enchaireObjet.price_reserved %}
+                            <div class="price-item">
+                                <span class="price-label">Prix actuel</span>
+                                <span class="price-value highlight">
+                                    {{ price_reserved }} DA
+                                </span>
                             </div>
-                        </div>
-                    {% endwith %}
-                {% endif %}
+                            <div class="price-item last-child">
+                                <span class="price-label">
+                                    Prochaine enchère
+                                </span>
 
+                                <div class="price-value-container">
+                                    <p class="price-value">
+                                        {{ price_reserved|add:enchaireObjet.pas }} DA
+                                    </p>
+
+                                    {% if price_reserved >= enchaireObjet.first_price %}
+                                        <p class="status-item-right">Pas: {{ enchaireObjet.pas }} DA</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endwith %}
+                    {% endif %}
+                    {% elif enchaire.etat == 'upcoming' %}
+                    {% comment %} ----------------------- ENCHAIRE UPCOMING ---------------------------- {% endcomment %}
+                        <div class="price-item">
+                            <span class="price-label">Pas</span>
+                            <span class="price-value">{{ enchaireObjet.pas }} DA</span>
+                        </div>
+                    {% elif enchaireObjet.reserved %}
+                    {% comment %} ----------------------- ENCHAIRE FINI ET OBJET RESERVE ---------------------------- {% endcomment %}
+                        <div class="price-item">
+                            <span class="price-label">Prix final</span>
+                            <span class="price-value highlight">
+                                {{ enchaireObjet.price_reserved }} DA
+                            </span>
+                        </div>
+                    {% comment %} ----------------------- ENCHAIRE FINI ET OBJET NON RESERVE (AFFICHER RIEN) ---------------------------- {% endcomment %} 
+                {% endif %}
             </div>
 
-            {% if not is_winner %}
-                {% if demande_state == 'Approuvée' %}
-                    <form method="POST" action="{% url 'participer' %}" style="margin-top: 1px;">
-                        {% csrf_token %}
-                        <input type="hidden" name="type_objet" value="{{ type_objet }}">
-                        <input type="hidden" name="objet_id" value="{{ objet.id }}">
-                        <input type="hidden" name="enchaireObjet_id" value="{{ enchaireObjet.id }}">
-                        <button type="submit" class="participate-btn">
-                            <i class="fas fa-gavel"></i>
-                            Participer pour {{ next_bid_price|default:enchaireObjet.price_reserved|add:enchaireObjet.pas }} DA
-                        </button>
-                    </form>
-                {% else %}
-                    {% if demande_state %}
-                        <div style="padding: 12px 20px; border-radius: 8px; text-align: center; font-weight: 600; {% if demande_state == 'Rejetée' %}background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white;{% else %}background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%); color: white;{% endif %}">
-                            {% if demande_state == 'Rejetée' %}
-                                <i class="fas fa-times-circle" style="margin-right: 8px;"></i>Demande rejetée
-                            {% elif demande_state == 'unread' %}
-                                <i class="fas fa-clock" style="margin-right: 8px;"></i>Demande en attente
-                            {% endif %}
-                        </div>
+            {% if enchaire.is_active %}
+                {% if not is_winner %}
+                    <!-- Status message for active auction -->
+                    {% comment %} <div class="status-message active">
+                        <i class="fas fa-fire"></i>
+                        <span>Enchère en cours - Participez maintenant!</span>
+                    </div> {% endcomment %}
+                    {% if demande_state == 'Approuvée' %}
+                        <form method="POST" action="{% url 'participer' %}" style="margin-top: 1px;">
+                            {% csrf_token %}
+                            <input type="hidden" name="type_objet" value="{{ type_objet }}">
+                            <input type="hidden" name="objet_id" value="{{ objet.id }}">
+                            <input type="hidden" name="enchaireObjet_id" value="{{ enchaireObjet.id }}">
+                            <button type="submit" class="participate-btn">
+                                <i class="fas fa-gavel"></i>
+                                Participer pour {{ next_bid_price|default:enchaireObjet.price_reserved|add:enchaireObjet.pas }} DA
+                            </button>
+                        </form>
                     {% else %}
-                                
-                        <form method="post" action="{% url 'demande' %}" style="margin: 0;">
-                        {% csrf_token %}
-                        <input type="hidden" name="user" value="{{ user.id }}">
-                        <input type="hidden" name="enchaire" value="{{ enchaire_id }}">
-                        <button type="submit"
-                            style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; border: none; border-radius: 8px; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: white; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 3px 12px rgba(255, 107, 53, 0.3);"
-                            onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 15px rgba(255, 107, 53, 0.4)'"
-                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 3px 12px rgba(255, 107, 53, 0.3)'">
-                            <i class="fas fa-paper-plane"></i>
-                            <span>Faire une demande</span>
-                        </button>
-                    </form>
-
+                        {% if demande_state %}
+                            <div style="padding: 12px 20px; border-radius: 8px; text-align: center; font-weight: 600; {% if demande_state == 'Rejetée' %}background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white;{% else %}background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%); color: white;{% endif %}">
+                                {% if demande_state == 'Rejetée' %}
+                                    <i class="fas fa-times-circle" style="margin-right: 8px;"></i>Demande rejetée
+                                {% elif demande_state == 'unread' %}
+                                    <i class="fas fa-clock" style="margin-right: 8px;"></i>Demande en attente
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <form method="post" action="{% url 'demande' %}" style="margin: 0;">
+                                {% csrf_token %}
+                                <input type="hidden" name="user" value="{{ user.id }}">
+                                <input type="hidden" name="enchaire" value="{{ enchaire.id }}">
+                                <button type="submit"
+                                    style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; border: none; border-radius: 8px; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: white; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 3px 12px rgba(255, 107, 53, 0.3);"
+                                    onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 15px rgba(255, 107, 53, 0.4)'"
+                                    onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 3px 12px rgba(255, 107, 53, 0.3)'">
+                                    <i class="fas fa-paper-plane"></i>
+                                    <span>Faire une demande</span>
+                                </button>
+                            </form>
+                        {% endif %}
                     {% endif %}
+                {% else %}
+                    {% comment %} <div class="status-message winner">
+                        <i class="fas fa-crown"></i>
+                        <span>Vous êtes en tête!</span>
+                    </div> {% endcomment %}
+                    <button type="submit" class="participate-btn winner" disabled>
+                        <i class="fas fa-trophy"></i>
+                        Vous êtes en tête!
+                    </button>
                 {% endif %}
+                
+            {% elif enchaire.etat == 'upcoming' %}
+                <!-- Status message for upcoming auction -->
+                {% comment %} <div class="status-message upcoming">
+                    <i class="fas fa-clock"></i>
+                    <span>Enchère à venir - Ajoutez aux favoris</span>
+                </div>
+                 {% endcomment %}
+                <form method="POST" action="{% url 'toggle_favori' enchaire.id %}" style="margin: 0;">
+                    {% csrf_token %}
+                    <button type="submit" class="participate-btn upcoming"
+                            onmouseover="this.style.transform='translateY(-1px)'"
+                            onmouseout="this.style.transform='translateY(0)'">
+                        {% if user in enchaire.savers.all %}
+                            <i class="fas fa-heart"></i>
+                            <span>Enchère à venir - Dans les favoris</span>
+                        {% else %}
+                            <i class="far fa-heart"></i>
+                            <span>Enchère à venir - Ajoutez aux favoris</span>
+                        {% endif %}
+                    </button>
+                </form>
+                
+            {% elif is_winner %}
+                <!-- Status message for winner -->
+                {% comment %} <div class="status-message winner">
+                    <i class="fas fa-trophy"></i>
+                    <span>Félicitations! Vous avez remporté cette enchère!</span>
+                </div> {% endcomment %}
+                
+                <button type="submit" class="participate-btn winner" disabled>
+                    <i class="fas fa-medal"></i>
+                    Vous avez remporté cette enchère!
+                </button>
+                
+            {% elif enchaireObjet.reserved %}
+                <!-- Status message for finished and reserved -->
+                {% comment %} <div class="status-message finished">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Enchère terminée - Objet réservé</span>
+                </div> {% endcomment %}
+                
+                <button type="submit" class="participate-btn finished-reserved" disabled>
+                    <i class="fas fa-handshake"></i>
+                    Enchère terminée - Objet réservé
+                </button>
+                
             {% else %}
-                <button type="submit" class="participate-btn-en-tete" style="cursor: default;" disabled>
-                    En Tete
+                <!-- Status message for finished and not reserved -->
+                {% comment %} <div class="status-message finished">
+                    <i class="fas fa-times-circle"></i>
+                    <span>Enchère terminée - Objet non réservé</span>
+                </div> {% endcomment %}
+                
+                <button type="submit" class="participate-btn finished-not-reserved" disabled>
+                    <i class="fas fa-ban"></i>
+                    Enchère terminée - Objet non réservé
                 </button>
             {% endif %}
             

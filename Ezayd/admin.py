@@ -38,7 +38,7 @@ class DemandeEnchaireAdmin(admin.ModelAdmin):
 # ---------- Admin pour EnchaireObjet ----------
 @admin.register(EnchaireObjet)
 class EnchaireObjetAdmin(admin.ModelAdmin):
-    list_display = ('objet_id','type', 'first_price', 'pas', 'price_reserved', 'winner')
+    list_display = ('__str__','type', 'first_price', 'pas', 'price_reserved', 'winner')
     list_filter = ('objet_id',)
     search_fields = ('winner__username',)
     readonly_fields = ('objet_id', 'type',)
@@ -79,7 +79,6 @@ class VoitureAdmin(admin.ModelAdmin):
     search_fields = ('nom', 'model', 'numero_chassis')
     list_filter = ('year', 'couleur')
     inlines = [VoitureImageInline]
-
 
 # ---------- Admin pour Immobilier et Images ----------
 class ImmobilierImageInlineFormSet(BaseInlineFormSet):

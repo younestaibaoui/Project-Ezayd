@@ -4,7 +4,7 @@
             <div class="object-card" style="background-color: #2d2d2d; border-radius: 12px; overflow: hidden; transition: all 0.3s ease; border: 1px solid #404040; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
                 <!-- Badge du type -->
                 <div class="lot-type-badge {{ lot.type }}" style="position: absolute; top: 10px; left: 10px; padding: 6px 14px; font-size: 0.7rem; font-weight: 600; border-radius: 16px; color: #fff; z-index: 10; background: #555; text-transform: uppercase; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);">
-                    {{ lot.get_type_display }}
+                    {{ lot.get_type_display }} {{ objet.participation_count }}
                 </div>
                 
                 <!-- Images -->

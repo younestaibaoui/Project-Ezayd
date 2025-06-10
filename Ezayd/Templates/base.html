@@ -82,20 +82,7 @@
 
 </div>
 
-        <!-- Barre de recherche -->
-        <div style="flex: 1; display: flex; justify-content: center;">
-          <form method="get" action="#" role="search" style="position: relative; width: 100%; max-width: 600px;">
-            <input type="text" name="q" placeholder="Rechercher un véhicule ou un équipement..."
-                  style="width: 100%; padding: 0.75rem 2.5rem 0.75rem 1rem; background: #333; color: white; border: 1px solid #555; border-radius: 20px; transition: all 0.3s ease; font-size: 14px;"
-                  onfocus="this.style.borderColor='#777'; this.style.boxShadow='0 0 0 2px rgba(255,255,255,0.1)'"
-                  onblur="this.style.borderColor='#555'; this.style.boxShadow='none'">
-            <button type="submit" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #fff; cursor: pointer; transition: color 0.2s ease;"
-                    onmouseover="this.style.color='#ccc'" onmouseout="this.style.color='#fff'">
-              <i class="fas fa-search"></i>
-            </button>
-          </form>
-        </div>
-
+        {% include "./searchbar.html" %}
         <!-- Icônes à droite -->
         <div style="display: flex; align-items: center; gap: 20px; flex-shrink: 0;">
           

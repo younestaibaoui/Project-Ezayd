@@ -288,24 +288,31 @@ def details_view(request, enchere_id):
     objets = {}
 
     if lot_type == 'vehicules':
-        objets = lot.voitures.all()
+        objets = lot.voitures.all().values()
+
     elif lot_type == 'immobilier':
-        objets = lot.immobiliers.all()
+        objets = lot.voitures.prefetch_related('enchaireObjet').all().values()
     elif lot_type == 'materiel_pro':
-        objets = lot.materiels.all()
+        objets = lot.materiels.all().values()
     elif lot_type == 'informatique_electronique':
-        objets = lot.informatique.all()
+        objets = lot.informatique.all().values()
     elif lot_type == 'mobilier_equipements':
-        objets = lot.mobilier.all()
+        objets = lot.mobilier.all().values()
     elif lot_type == 'bijoux_objets_valeur':
-        objets = lot.bijoux.all()
+        objets = lot.bijoux.all().values()
     elif lot_type == 'stocks_invendus':
-        objets = lot.stocks.all()
+        objets = lot.stocks.all().values()
     elif lot_type == 'oeuvres_collections':
-        objets = lot.oeuvres.all()
+        objets = lot.oeuvres.all().values()
+
+    for objet in objets:
+        enchaireObjet = objet.get('enchaireObjet')
+        participations = enchaireObjet.participations.all().order_by('-date_participation') if enchaireObjet else None
+        participation_count = participations.values('user').distinct().count() if participations else 0
+        objet['participation_count'] = participation_count
 
     participations = ParticipationEnchaire.objects.filter(
-        enchaireObjet__in=[obj.enchaireObjet for obj in objets if obj.enchaireObjet]
+        enchaireObjet__in=[obj.get('enchaireObjet') for obj in objets if obj.get('enchaireObjet')]
     ).values('user').distinct()
 
     participation_count = participations.count()
@@ -316,7 +323,6 @@ def details_view(request, enchere_id):
         'lot' : lot,
         'objets' : objets,
         'participation_count': participation_count,
-
     }
     
     if request.user.is_authenticated:
@@ -352,7 +358,7 @@ def details_objet_view(request, type_objet, objet_id):
     elif type_objet == 'oeuvres_collections':
         objet = get_object_or_404(OeuvreCollection, id=objet_id)
 
-    enchaire = objet.lot.enchaire.id
+    enchaire = objet.lot.enchaire
     enchaireObjet = objet.enchaireObjet
 
     is_winner = False
@@ -369,7 +375,7 @@ def details_objet_view(request, type_objet, objet_id):
     participation_count = participations.values('user').distinct().count() if participations else 0
 
     context = {
-        'enchaire_id': enchaire,
+        'enchaire': enchaire,
         'type_objet': type_objet,
         'objet': objet, 
         'enchaireObjet': enchaireObjet,
@@ -536,8 +542,10 @@ def mes_participations(request):
                 'enchere': objet.lot.enchaire,
                 'montant': participation.montant,
                 'first_price': participation.enchaireObjet.price_reserved,
-
+                'enchereObjet': enchaireObjet,
+                'date_participation': participation.date_participation
             }
+
             participations_detaillees.append(participation_info)
 
     # Notifications
@@ -551,3 +559,408 @@ def mes_participations(request):
     }
 
     return render(request, 'mes_participations/mes_participations.html', context)
+
+
+# ---------------------- search API ----------------------
+from django.http import JsonResponse
+from django.db.models import Q
+from .models import (
+    Voiture, Immobilier, MaterielProfessionnel, 
+    InformatiqueElectronique, MobilierEquipement, 
+    BijouxObjetValeur, StockInvendu, OeuvreCollection
+)
+
+def search_api(request):
+    query = request.GET.get('q', '')
+    results = []
+    
+    print(f"Recherche pour: '{query}'")  # Pour debug
+    
+    if query and len(query) >= 2:
+        # Voitures
+        try:
+            voitures = Voiture.objects.all()[:5]
+            print(f"Voitures trouvées: {voitures.count()}")
+            
+            for voiture in voitures:
+                if query.lower() in voiture.nom.lower() or (voiture.model and query.lower() in voiture.model.lower()) or (voiture.marque and query.lower() in voiture.marque.lower()):
+                    # Nom de la voiture
+                    name = f"{voiture.nom} {voiture.model}" if voiture.model else voiture.nom
+                    
+                    # Image
+                    image_url = None
+                    try:
+                        if hasattr(voiture, 'images') and voiture.images.exists():
+                            image_url = voiture.images.first().image.url
+                    except:
+                        pass
+                    
+                    price = 150000  # Prix par défaut
+                    try:
+                        if hasattr(voiture, 'enchaireObjet') and voiture.enchaireObjet:
+                            if voiture.enchaireObjet.price_reserved:
+                                price = voiture.enchaireObjet.price_reserved
+                    except:
+                        pass
+                    
+                    # Nom d'enchère
+                    auction_name = "Enchère non spécifiée"
+                    try:
+                        if hasattr(voiture, 'lot') and voiture.lot and hasattr(voiture.lot, 'enchaire') and voiture.lot.enchaire:
+                            auction_name = voiture.lot.nom if hasattr(voiture.lot, 'nom') else f"Enchère #{voiture.lot.enchaire.id}"
+                    except:
+                        pass
+                    
+                    results.append({
+                        'id': voiture.id,
+                        'name': name,
+                        'type': 'vehicules',
+                        'category_name': 'Véhicules',
+                        'auction_name': auction_name,
+                        'price': price,
+                        'image_url': image_url,
+                        'ending_soon': False
+                    })
+                    print(f"Voiture ajoutée: {name}")
+        except Exception as e:
+            print(f"Erreur voitures: {e}")
+        
+        # Immobilier
+        try:
+            immobiliers = Immobilier.objects.all()[:5]
+            print(f"Immobiliers trouvés: {immobiliers.count()}")
+            
+            for immobilier in immobiliers:
+                if query.lower() in immobilier.titre.lower() or (immobilier.ville and query.lower() in immobilier.ville.lower()) or (immobilier.adresse and query.lower() in immobilier.adresse.lower()):
+                    # Image
+                    image_url = None
+                    try:
+                        if hasattr(immobilier, 'images') and immobilier.images.exists():
+                            image_url = immobilier.images.first().image.url
+                    except:
+                        pass
+                    
+                    price = 250000  # Prix par défaut
+                    try:
+                        if hasattr(immobilier, 'enchaireObjet') and immobilier.enchaireObjet:
+                            if immobilier.enchaireObjet.price_reserved:
+                                price = immobilier.enchaireObjet.price_reserved
+                    except:
+                        pass
+                    
+                    # Nom d'enchère
+                    auction_name = "Enchère non spécifiée"
+                    try:
+                        if hasattr(immobilier, 'lot') and immobilier.lot and hasattr(immobilier.lot, 'enchaire') and immobilier.lot.enchaire:
+                            auction_name = immobilier.lot.nom if hasattr(immobilier.lot, 'nom') else f"Enchère #{immobilier.lot.enchaire.id}"
+                    except:
+                        pass
+                    
+                    results.append({
+                        'id': immobilier.id,
+                        'name': immobilier.titre,
+                        'type': 'immobilier',
+                        'category_name': 'Immobilier',
+                        'auction_name': auction_name,
+                        'price': price,
+                        'image_url': image_url,
+                        'ending_soon': False
+                    })
+                    print(f"Immobilier ajouté: {immobilier.titre}")
+        except Exception as e:
+            print(f"Erreur immobiliers: {e}")
+        
+        # Matériel Professionnel
+        try:
+            materiels = MaterielProfessionnel.objects.all()[:5]
+            print(f"Matériels trouvés: {materiels.count()}")
+            
+            for materiel in materiels:
+                if query.lower() in materiel.nom.lower() or (materiel.marque and query.lower() in materiel.marque.lower()) or (materiel.modele and query.lower() in materiel.modele.lower()): 
+                    # Image
+                    image_url = None
+                    try:
+                        if hasattr(materiel, 'images') and materiel.images.exists():
+                            image_url = materiel.images.first().image.url
+                    except:
+                        pass
+                    
+                    price = 80000  # Prix par défaut
+                    try:
+                        if hasattr(materiel, 'enchaireObjet') and materiel.enchaireObjet:
+                            if materiel.enchaireObjet.price_reserved:
+                                price = materiel.enchaireObjet.price_reserved
+                    except:
+                        pass
+                    
+                    # Nom
+                    name = materiel.nom
+                    try:
+                        if hasattr(materiel, 'marque') and materiel.marque:
+                            name = f"{materiel.marque} {name}"
+                    except:
+                        pass
+                    
+                    # Nom d'enchère
+                    auction_name = "Enchère non spécifiée"
+                    try:
+                        if hasattr(materiel, 'lot') and materiel.lot and hasattr(materiel.lot, 'enchaire') and materiel.lot.enchaire:
+                            auction_name = materiel.lot.nom if hasattr(materiel.lot, 'nom') else f"Enchère #{materiel.lot.enchaire.id}"
+                    except:
+                        pass
+                    
+                    results.append({
+                        'id': materiel.id,
+                        'name': name,
+                        'type': 'materiel_pro',
+                        'category_name': 'Matériel Professionnel',
+                        'auction_name': auction_name,
+                        'price': price,
+                        'image_url': image_url,
+                        'ending_soon': False
+                    })
+                    print(f"Matériel ajouté: {name}")
+        except Exception as e:
+            print(f"Erreur matériels: {e}")
+
+        # Informatique & Électronique
+        try:
+            informatiques = InformatiqueElectronique.objects.all()[:5]
+            print(f"Informatiques trouvés: {informatiques.count()}")
+            
+            for info in informatiques:
+                if (info.marque and query.lower() in info.marque.lower()) or (info.modele and query.lower() in info.modele.lower()) or (info.type_objet and query.lower() in info.type_objet.lower()):
+                    # Image
+                    image_url = None
+                    try:
+                        if hasattr(info, 'images') and info.images.exists():
+                            image_url = info.images.first().image.url
+                    except:
+                        pass
+                    
+                    price = 50000  # Prix par défaut
+                    try:
+                        if hasattr(info, 'enchaireObjet') and info.enchaireObjet:
+                            if info.enchaireObjet.price_reserved:
+                                price = info.enchaireObjet.price_reserved
+                    except:
+                        pass
+                    
+                    # Nom
+                    name_parts = []
+                    if info.marque:
+                        name_parts.append(info.marque)
+                    if info.modele:
+                        name_parts.append(info.modele)
+                    name = " ".join(name_parts) if name_parts else f"Informatique #{info.id}"
+                    
+                    # Nom d'enchère
+                    auction_name = "Enchère non spécifiée"
+                    try:
+                        if hasattr(info, 'lot') and info.lot and hasattr(info.lot, 'enchaire') and info.lot.enchaire:
+                            auction_name = info.lot.nom if hasattr(info.lot, 'nom') else f"Enchère #{info.lot.enchaire.id}"
+                    except:
+                        pass
+                    
+                    results.append({
+                        'id': info.id,
+                        'name': name,
+                        'type': 'informatique_electronique',
+                        'category_name': 'Informatique & Électronique',
+                        'auction_name': auction_name,
+                        'price': price,
+                        'image_url': image_url,
+                        'ending_soon': False
+                    })
+                    print(f"Informatique ajouté: {name}")
+        except Exception as e:
+            print(f"Erreur informatiques: {e}")
+
+        # Mobilier & Équipements
+        try:
+            mobiliers = MobilierEquipement.objects.all()[:5]
+            print(f"Mobiliers trouvés: {mobiliers.count()}")
+            
+            for mobilier in mobiliers:
+                if query.lower() in mobilier.categorie.lower() or (mobilier.materiau and query.lower() in mobilier.materiau.lower()) or (mobilier.couleur and query.lower() in mobilier.couleur.lower()):
+                    # Image
+                    image_url = None
+                    try:
+                        if hasattr(mobilier, 'images') and mobilier.images.exists():
+                            image_url = mobilier.images.first().image.url
+                    except:
+                        pass
+                    
+                    price = 30000  # Prix par défaut
+                    try:
+                        if hasattr(mobilier, 'enchaireObjet') and mobilier.enchaireObjet:
+                            if mobilier.enchaireObjet.price_reserved:
+                                price = mobilier.enchaireObjet.price_reserved
+                    except:
+                        pass
+                    
+                    # Nom d'enchère
+                    auction_name = "Enchère non spécifiée"
+                    try:
+                        if hasattr(mobilier, 'lot') and mobilier.lot and hasattr(mobilier.lot, 'enchaire') and mobilier.lot.enchaire:
+                            auction_name = mobilier.lot.nom if hasattr(mobilier.lot, 'nom') else f"Enchère #{mobilier.lot.enchaire.id}"
+                    except:
+                        pass
+                    
+                    results.append({
+                        'id': mobilier.id,
+                        'name': mobilier.categorie,
+                        'type': 'mobilier_equipements',
+                        'category_name': 'Mobilier & Équipements',
+                        'auction_name': auction_name,
+                        'price': price,
+                        'image_url': image_url,
+                        'ending_soon': False
+                    })
+                    print(f"Mobilier ajouté: {mobilier.categorie}")
+        except Exception as e:
+            print(f"Erreur mobiliers: {e}")
+
+        # Bijoux & Objets de Valeur
+        try:
+            bijoux = BijouxObjetValeur.objects.all()[:5]
+            print(f"Bijoux trouvés: {bijoux.count()}")
+            
+            for bijou in bijoux:
+                if query.lower() in bijou.type_objet.lower() or (bijou.matiere and query.lower() in bijou.matiere.lower()):
+                    # Image
+                    image_url = None
+                    try:
+                        if hasattr(bijou, 'images') and bijou.images.exists():
+                            image_url = bijou.images.first().image.url
+                    except:
+                        pass
+                    
+                    price = 100000  # Prix par défaut
+                    try:
+                        if hasattr(bijou, 'enchaireObjet') and bijou.enchaireObjet:
+                            if bijou.enchaireObjet.price_reserved:
+                                price = bijou.enchaireObjet.price_reserved
+                    except:
+                        pass
+                    
+                    # Nom d'enchère
+                    auction_name = "Enchère non spécifiée"
+                    try:
+                        if hasattr(bijou, 'lot') and bijou.lot and hasattr(bijou.lot, 'enchaire') and bijou.lot.enchaire:
+                            auction_name = bijou.lot.nom if hasattr(bijou.lot, 'nom') else f"Enchère #{bijou.lot.enchaire.id}"
+                    except:
+                        pass
+                    
+                    results.append({
+                        'id': bijou.id,
+                        'name': bijou.type_objet,
+                        'type': 'bijoux_objets_valeur',
+                        'category_name': 'Bijoux & Objets de Valeur',
+                        'auction_name': auction_name,
+                        'price': price,
+                        'image_url': image_url,
+                        'ending_soon': False
+                    })
+                    print(f"Bijou ajouté: {bijou.type_objet}")
+        except Exception as e:
+            print(f"Erreur bijoux: {e}")
+
+        # Stocks & Invendus
+        try:
+            stocks = StockInvendu.objects.all()[:5]
+            print(f"Stocks trouvés: {stocks.count()}")
+            
+            for stock in stocks:
+                if query.lower() in stock.nom_produit.lower():
+                    # Image
+                    image_url = None
+                    try:
+                        if hasattr(stock, 'images') and stock.images.exists():
+                            image_url = stock.images.first().image.url
+                    except:
+                        pass
+                    
+                    price = 20000  # Prix par défaut
+                    try:
+                        if hasattr(stock, 'enchaireObjet') and stock.enchaireObjet:
+                            if stock.enchaireObjet.price_reserved:
+                                price = stock.enchaireObjet.price_reserved
+                    except:
+                        pass
+                    
+                    name = f"{stock.nom_produit} (x{stock.quantite})"
+                    
+                    # Nom d'enchère
+                    auction_name = "Enchère non spécifiée"
+                    try:
+                        if hasattr(stock, 'lot') and stock.lot and hasattr(stock.lot, 'enchaire') and stock.lot.enchaire:
+                            auction_name = stock.lot.nom if hasattr(stock.lot, 'nom') else f"Enchère #{stock.lot.enchaire.id}"
+                    except:
+                        pass
+                    
+                    results.append({
+                        'id': stock.id,
+                        'name': name,
+                        'type': 'stocks_invendus',
+                        'category_name': 'Stocks & Invendus',
+                        'auction_name': auction_name,
+                        'price': price,
+                        'image_url': image_url,
+                        'ending_soon': False
+                    })
+                    print(f"Stock ajouté: {name}")
+        except Exception as e:
+            print(f"Erreur stocks: {e}")
+
+        # Œuvres & Collections
+        try:
+            oeuvres = OeuvreCollection.objects.all()[:5]
+            print(f"Œuvres trouvées: {oeuvres.count()}")
+            
+            for oeuvre in oeuvres:
+                if query.lower() in oeuvre.titre.lower() or (oeuvre.artiste and query.lower() in oeuvre.artiste.lower()) or (oeuvre.type_oeuvre and query.lower() in oeuvre.type_oeuvre.lower()):
+                    # Image
+                    image_url = None
+                    try:
+                        if hasattr(oeuvre, 'images') and oeuvre.images.exists():
+                            image_url = oeuvre.images.first().image.url
+                    except:
+                        pass
+                    
+                    price = 75000  # Prix par défaut
+                    try:
+                        if hasattr(oeuvre, 'enchaireObjet') and oeuvre.enchaireObjet:
+                            if oeuvre.enchaireObjet.price_reserved:
+                                price = oeuvre.enchaireObjet.price_reserved
+                    except:
+                        pass
+                    
+                    name = oeuvre.titre
+                    if oeuvre.artiste:
+                        name = f"{oeuvre.titre} - {oeuvre.artiste}"
+                    
+                    # Nom d'enchère
+                    auction_name = "Enchère non spécifiée"
+                    try:
+                        if hasattr(oeuvre, 'lot') and oeuvre.lot and hasattr(oeuvre.lot, 'enchaire') and oeuvre.lot.enchaire:
+                            auction_name = oeuvre.lot.nom if hasattr(oeuvre.lot, 'nom') else f"Enchère #{oeuvre.lot.enchaire.id}"
+                    except:
+                        pass
+                    
+                    results.append({
+                        'id': oeuvre.id,
+                        'name': name,
+                        'type': 'oeuvres_collections',
+                        'category_name': 'Œuvres & Collections',
+                        'auction_name': auction_name,
+                        'price': price,
+                        'image_url': image_url,
+                        'ending_soon': False
+                    })
+                    print(f"Œuvre ajoutée: {name}")
+        except Exception as e:
+            print(f"Erreur œuvres: {e}")
+    
+    print(f"Total résultats: {len(results)}")
+    return JsonResponse({'results': results[:10]})

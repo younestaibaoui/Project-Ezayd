@@ -790,7 +790,7 @@
   border: 1px solid var(--border-color);
   border-radius: 12px;
   box-shadow: var(--shadow-heavy);
-  z-index: 1002;
+  z-index: 1000;
   opacity: 0;
   visibility: hidden;
   transform: translateX(-50%) translateY(-8px);
@@ -835,7 +835,7 @@
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.7);
-  z-index: 998;
+  z-index: 9998;
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -854,7 +854,7 @@
   width: 280px;
   height: 100vh;
   background: linear-gradient(180deg, var(--sidebar-bg) 0%, #1a1a1a 100%);
-  z-index: 999;
+  z-index: 9999;
   transition: left 0.3s ease;
   overflow-y: auto;
   box-shadow: 3px 0 20px rgba(0, 0, 0, 0.8);
@@ -923,6 +923,8 @@
   animation: slideIn 0.3s ease forwards;
   border-bottom: 1px solid var(--border-color);
   padding-bottom: 16px;
+  position: relative;
+  z-index: 1;
 }
 
 .filter-group:last-child {
@@ -1534,12 +1536,12 @@
   }
 }
 
-/* ===== DROPDOWN WILAYAS ===== */
+/* ===== DROPDOWN WILAYAS - Z-INDEX ULTRA ÉLEVÉ ===== */
 .wilaya-dropdown-wrapper,
 .category-dropdown-wrapper {
   position: relative;
   width: 100%;
-  z-index: 1001;
+  z-index: 100;
 }
 
 .wilaya-dropdown-btn {
@@ -1586,7 +1588,7 @@
   border: 1px solid var(--border-color);
   border-radius: 8px;
   box-shadow: var(--shadow-heavy);
-  z-index: 1001;
+  z-index: 99999;
   opacity: 0;
   visibility: hidden;
   transform: translateY(-8px);
@@ -1757,13 +1759,7 @@
   border-radius: 2px;
 }
 
-/* ===== DROPDOWN CATÉGORIES ===== */
-.category-dropdown-wrapper {
-  position: relative;
-  width: 100%;
-  z-index: 1001;
-}
-
+/* ===== DROPDOWN CATÉGORIES - Z-INDEX ULTRA ÉLEVÉ ===== */
 .category-dropdown-btn {
   width: 100%;
   padding: 10px 12px;
@@ -1808,7 +1804,7 @@
   border: 1px solid var(--border-color);
   border-radius: 8px;
   box-shadow: var(--shadow-heavy);
-  z-index: 1002;
+  z-index: 99999;
   opacity: 0;
   visibility: hidden;
   transform: translateY(-8px);
@@ -1825,6 +1821,7 @@
 
 .category-dropdown-content {
   padding: 8px;
+  z-index: 99999
 }
 
 .category-dropdown-header {
@@ -1973,9 +1970,6 @@
   background: var(--border-color);
   border-radius: 2px;
 }
-
-/* ===== TOAST NOTIFICATION ===== */
-
 </style>
 
 <script>
