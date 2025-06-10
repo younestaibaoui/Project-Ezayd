@@ -28,7 +28,7 @@ def mark_as_read(request, notification_id):
         if notification.enchaire:
             return redirect('details_enchaire',notification.enchaire.id)
         else:
-            return redirect('details_objet',notification.enchaireObjet.get_type(),notification.enchaireObjet.id)
+            return redirect('details_objet',notification.enchaireObjet.type,notification.enchaireObjet.id)
     
     except user.notifications.model.DoesNotExist:
         return Http404('details_enchaire',notification.enchaire.id)
