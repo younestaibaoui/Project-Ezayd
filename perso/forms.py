@@ -206,19 +206,9 @@ class UserRegistrationForm(forms.ModelForm):
         
         # Divider and Google signin
         output.append(
-            '<div class="divider">'
-            '<span class="divider-line"></span>'
-            '<span class="divider-text">Or continue with</span>'
-            '</div>'
-            '<div class="google-signin">'
-            '<button class="btn btn-google">'
-            '<i class="fab fa-google"></i>'
-            'Sign up with Google'
-            '</button>'
-            '</div>'
             '<p class="form-switch">'
-            'Already have an account?'
-            f'<a class="link-btn" href="{reverse("connexion")}"> Login here </a>'
+                'Already have an account?'
+                f'<a class="link-btn" href="{reverse("connexion")}"> Login here </a>'
             '</p>'
         )
         

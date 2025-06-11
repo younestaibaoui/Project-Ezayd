@@ -800,71 +800,7 @@
     document.body.classList.add("loaded")
     })
 
-    // Add scroll-to-top functionality
-    const scrollToTop = () => {
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-    })
-    }
-
-    // Create scroll-to-top button
-    const createScrollToTopButton = () => {
-    const button = document.createElement("button")
-    button.innerHTML = '<i class="fas fa-chevron-up"></i>'
-    button.className = "scroll-to-top"
-    button.onclick = scrollToTop
-
-    // Add styles
-    Object.assign(button.style, {
-        position: "fixed",
-        bottom: "30px",
-        right: "30px",
-        width: "50px",
-        height: "50px",
-        borderRadius: "50%",
-        background: "var(--primary-color)",
-        color: "white",
-        border: "none",
-        cursor: "pointer",
-        fontSize: "1.2rem",
-        boxShadow: "0 4px 12px rgba(222, 13, 51, 0.3)",
-        transition: "all 0.3s ease",
-        opacity: "0",
-        visibility: "hidden",
-        zIndex: "1000",
-    })
-
-    document.body.appendChild(button)
-
-    // Show/hide button based on scroll position
-    window.addEventListener(
-        "scroll",
-        Utils.throttle(() => {
-        if (window.scrollY > 500) {
-            button.style.opacity = "1"
-            button.style.visibility = "visible"
-        } else {
-            button.style.opacity = "0"
-            button.style.visibility = "hidden"
-        }
-        }, 100),
-    )
-
-    // Hover effects
-    button.addEventListener("mouseenter", () => {
-        button.style.transform = "scale(1.1)"
-        button.style.boxShadow = "0 6px 16px rgba(222, 13, 51, 0.4)"
-    })
-
-    button.addEventListener("mouseleave", () => {
-        button.style.transform = "scale(1)"
-        button.style.boxShadow = "0 4px 12px rgba(222, 13, 51, 0.3)"
-    })
-    }
-
-    // Initialize scroll-to-top button
-    createScrollToTopButton()
+    
 
 </script>
 
@@ -873,7 +809,7 @@
     /* CSS Variables */
     :root {
     --primary-color: #de0d33;
-    --secondary-color: #b9243f;
+    --secondary-color: #ff6b35;
     --background-dark: #111;
     --background-light: #222;
     --text-light: #eee;
@@ -999,7 +935,7 @@
 
     /* Welcome Section */
     .welcome-section {
-    padding: 80px 0;
+    padding: 100px 20px;
     background: linear-gradient(135deg, rgba(222, 13, 51, 0.1) 0%, transparent 50%);
     }
 
