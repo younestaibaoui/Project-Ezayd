@@ -792,7 +792,3 @@ class OeuvreImage(models.Model):
 
     def __str__(self):
         return f"Image de l’œuvre '{self.oeuvre.titre}' - {self.date.strftime('%Y-%m-%d')}"
-
-
-
-

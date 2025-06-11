@@ -606,7 +606,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(0, 0, 0, 0.36);
   border-radius: var(--radius-sm);
   padding: 4px 3px;
   min-width: 26px;
@@ -629,7 +629,7 @@
 }
 
 .time-label-small {
-  font-size: 0.5rem;
+  font-size: 0.7rem;
   color: var(--text-muted);
   font-weight: 700;
   text-transform: uppercase;
@@ -1162,70 +1162,49 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Initialiser les comptes à rebours
   function initCountdowns() {
-      const countdowns = document.querySelectorAll('.countdown-timer');
-      
-      countdowns.forEach(countdown => {
-          const endDate = countdown.getAttribute('data-end-date');
-          const joursRestants = parseInt(countdown.getAttribute('data-jours-restants'), 10);
-          
-          if (!endDate || isNaN(joursRestants)) return;
-          
-          const daysElement = countdown.querySelector('.days');
-          if (daysElement) {
-              daysElement.textContent = joursRestants.toString().padStart(2, '0');
-          }
-          
-          const now = new Date();
-          const end = new Date(endDate);
-          end.setHours(23, 59, 59, 999);
-          
-          if (end <= now) {
-              const hoursElement = countdown.querySelector('.hours');
-              const minutesElement = countdown.querySelector('.minutes');
-              const secondsElement = countdown.querySelector('.seconds');
-              
-              if (hoursElement) hoursElement.textContent = '00';
-              if (minutesElement) minutesElement.textContent = '00';
-              if (secondsElement) secondsElement.textContent = '00';
-              return;
-          }
-          
-          function updateCountdown() {
-              const now = new Date();
-              const diff = end - now;
-              
-              if (diff <= 0) {
-                  const hoursElement = countdown.querySelector('.hours');
-                  const minutesElement = countdown.querySelector('.minutes');
-                  const secondsElement = countdown.querySelector('.seconds');
-                  
-                  if (hoursElement) hoursElement.textContent = '00';
-                  if (minutesElement) minutesElement.textContent = '00';
-                  if (secondsElement) secondsElement.textContent = '00';
-                  return;
-              }
-              
-              const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-              const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-              const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-              
-              
-              const hoursElement = countdown.querySelector('.hours');
-              const minutesElement = countdown.querySelector('.minutes');
-              const secondsElement = countdown.querySelector('.seconds');
-              
-              if (hoursElement) hoursElement.textContent = hours.toString().padStart(2, '0');
-              if (minutesElement) minutesElement.textContent = minutes.toString().padStart(2, '0');
-              if (secondsElement) secondsElement.textContent = seconds.toString().padStart(2, '0');
-          }
-          
-          updateCountdown();
-          setInterval(updateCountdown, 1000);
-      });
-  }
-  
-  // Initialiser les comptes à rebours
-  initCountdowns();
+    const countdowns = document.querySelectorAll('.countdown-timer');
+    
+    countdowns.forEach(countdown => {
+        const endDate = countdown.getAttribute('data-end-date');
+        
+        if (!endDate) return;
+        
+        const daysElement = countdown.querySelector('.days');
+        const hoursElement = countdown.querySelector('.hours');
+        const minutesElement = countdown.querySelector('.minutes');
+        const secondsElement = countdown.querySelector('.seconds');
+        
+        // Convert end date to a proper Date object
+        const end = new Date(endDate);
+        
+        function updateCountdown() {
+            const now = new Date();
+            const diff = end - now;
+            
+            if (diff <= 0) {
+                if (daysElement) daysElement.textContent = '00';
+                if (hoursElement) hoursElement.textContent = '00';
+                if (minutesElement) minutesElement.textContent = '00';
+                if (secondsElement) secondsElement.textContent = '00';
+                return;
+            }
+            
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            
+            if (daysElement) daysElement.textContent = days.toString().padStart(2, '0');
+            if (hoursElement) hoursElement.textContent = hours.toString().padStart(2, '0');
+            if (minutesElement) minutesElement.textContent = minutes.toString().padStart(2, '0');
+            if (secondsElement) secondsElement.textContent = seconds.toString().padStart(2, '0');
+        }
+        
+        // Update immediately and then every second
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+    });
+}
   
   // Gestion des images de la galerie
   galleryItems.forEach(item => {
@@ -1349,6 +1328,8 @@ document.addEventListener('DOMContentLoaded', function() {
       carousel.style.opacity = '1';
       carousel.style.transform = 'translateY(0)';
   }, 100);
+
+  initCountdowns();
 });
 </script>
 

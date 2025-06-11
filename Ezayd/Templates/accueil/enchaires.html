@@ -34,22 +34,6 @@
           <span id="filter-count" class="filter-count">0</span>
         </button>
 
-        <!-- Bouton Trier -->
-        <div class="filter-dropdown">
-          <button class="filter-btn filter-btn-dark dropdown-btn" onclick="toggleDropdown('sort-dropdown')">
-            <i class="fas fa-sort" aria-hidden="true"></i>
-            TRIER
-            <i class="fas fa-chevron-down dropdown-arrow" aria-hidden="true"></i>
-          </button>
-          <div id="sort-dropdown" class="dropdown-menu">
-            <a href="?sort=price_asc" class="dropdown-item">Prix croissant</a>
-            <a href="?sort=price_desc" class="dropdown-item">Prix décroissant</a>
-            <a href="?sort=date_asc" class="dropdown-item">Date croissante</a>
-            <a href="?sort=date_desc" class="dropdown-item">Date décroissante</a>
-            <a href="?sort=popular" class="dropdown-item">Plus populaires</a>
-          </div>
-        </div>
-
         <!-- Bouton État -->
         <div class="filter-dropdown">
           <button class="filter-btn filter-btn-dark dropdown-btn" onclick="toggleDropdown('status-dropdown')">
@@ -83,73 +67,55 @@
       </div>
 
       <div class="sidebar-content">
-        <!-- Catégories compactes -->
+        <!-- Catégories avec checkboxes multiples -->
         <div class="filter-group" data-filter="categories">
-  <label class="filter-group-title">
-    <i class="fas fa-tags"></i>
-    Catégories
-  </label>
-  <div class="category-dropdown-wrapper">
-    <button class="category-dropdown-btn" onclick="toggleCategoryDropdown()">
-      <span id="category-selected-text">Toutes les catégories</span>
-      <i class="fas fa-chevron-down category-dropdown-arrow"></i>
-    </button>
-    
-    <div id="category-dropdown-menu" class="category-dropdown-menu">
-      <div class="category-dropdown-content">
-        <div class="category-dropdown-header">
-          <span>Sélectionnez les catégories</span>
-          <button class="category-clear-btn" onclick="clearCategorySelection(event)">Effacer</button>
+          <div class="categories-checkboxes">
+            <label class="filter-group-title">
+              <i class="fas fa-tags"></i>
+              Catégories
+            </label>
+            <label class="category-checkbox-item">
+              <input type="checkbox" name="category" value="vehicules" onchange="updateCategorySelection(this)">
+              <span class="category-checkmark"></span>
+              <span class="category-text">Véhicules</span>
+            </label>
+            <label class="category-checkbox-item">
+              <input type="checkbox" name="category" value="immobilier" onchange="updateCategorySelection(this)">
+              <span class="category-checkmark"></span>
+              <span class="category-text">Immobilier</span>
+            </label>
+            <label class="category-checkbox-item">
+              <input type="checkbox" name="category" value="materiel_pro" onchange="updateCategorySelection(this)">
+              <span class="category-checkmark"></span>
+              <span class="category-text">Matériel professionnel</span>
+            </label>
+            <label class="category-checkbox-item">
+              <input type="checkbox" name="category" value="informatique" onchange="updateCategorySelection(this)">
+              <span class="category-checkmark"></span>
+              <span class="category-text">Informatique & électronique</span>
+            </label>
+            <label class="category-checkbox-item">
+              <input type="checkbox" name="category" value="mobilier" onchange="updateCategorySelection(this)">
+              <span class="category-checkmark"></span>
+              <span class="category-text">Mobilier & équipements</span>
+            </label>
+            <label class="category-checkbox-item">
+              <input type="checkbox" name="category" value="bijoux" onchange="updateCategorySelection(this)">
+              <span class="category-checkmark"></span>
+              <span class="category-text">Bijoux & objets de valeur</span>
+            </label>
+            <label class="category-checkbox-item">
+              <input type="checkbox" name="category" value="stocks" onchange="updateCategorySelection(this)">
+              <span class="category-checkmark"></span>
+              <span class="category-text">Stocks et invendus</span>
+            </label>
+            <label class="category-checkbox-item">
+              <input type="checkbox" name="category" value="oeuvres" onchange="updateCategorySelection(this)">
+              <span class="category-checkmark"></span>
+              <span class="category-text">Œuvres & collections</span>
+            </label>
+          </div>
         </div>
-        <div class="category-dropdown-search">
-          <input type="text" placeholder="Rechercher une catégorie..." onkeyup="filterCategories(this.value)">
-        </div>
-        <div class="category-dropdown-items">
-          <label class="category-dropdown-item">
-            <input type="checkbox" name="category" value="vehicules" onchange="updateCategorySelection(this)">
-            <span class="category-checkmark"></span>
-            <span class="category-text">🚗 Véhicules</span>
-          </label>
-          <label class="category-dropdown-item">
-            <input type="checkbox" name="category" value="immobilier" onchange="updateCategorySelection(this)">
-            <span class="category-checkmark"></span>
-            <span class="category-text">🏠 Immobilier</span>
-          </label>
-          <label class="category-dropdown-item">
-            <input type="checkbox" name="category" value="materiel_pro" onchange="updateCategorySelection(this)">
-            <span class="category-checkmark"></span>
-            <span class="category-text">🔧 Matériel professionnel</span>
-          </label>
-          <label class="category-dropdown-item">
-            <input type="checkbox" name="category" value="informatique" onchange="updateCategorySelection(this)">
-            <span class="category-checkmark"></span>
-            <span class="category-text">💻 Informatique & électronique</span>
-          </label>
-          <label class="category-dropdown-item">
-            <input type="checkbox" name="category" value="mobilier" onchange="updateCategorySelection(this)">
-            <span class="category-checkmark"></span>
-            <span class="category-text">🪑 Mobilier & équipements</span>
-          </label>
-          <label class="category-dropdown-item">
-            <input type="checkbox" name="category" value="bijoux" onchange="updateCategorySelection(this)">
-            <span class="category-checkmark"></span>
-            <span class="category-text">💎 Bijoux & objets de valeur</span>
-          </label>
-          <label class="category-dropdown-item">
-            <input type="checkbox" name="category" value="stocks" onchange="updateCategorySelection(this)">
-            <span class="category-checkmark"></span>
-            <span class="category-text">📦 Stocks et invendus</span>
-          </label>
-          <label class="category-dropdown-item">
-            <input type="checkbox" name="category" value="oeuvres" onchange="updateCategorySelection(this)">
-            <span class="category-checkmark"></span>
-            <span class="category-text">🎨 Œuvres & collections</span>
-          </label>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
         
         <!-- Date compacte -->
         <div class="filter-group" data-filter="date">
@@ -467,6 +433,7 @@
       data-category="{{ enchere.lot.type }}"
       data-wilaya="{{ enchere.lot.wilaya|default:'' }}"
       data-status="{% if enchere.date_fin|timeuntil|slice:':2' == '0 ' %}ending-soon{% elif enchere.etat == 'active' %}active{% elif enchere.etat == 'upcoming' %}upcoming{% else %}ended{% endif %}"
+      data-end-time="{{ enchere.date_fin|date:'c' }}"
       onclick="window.location.href = this.getAttribute('data-url')"
       style="cursor: pointer;"
     >
@@ -512,7 +479,10 @@
         <!-- Overlay avec timer -->
         <div class="card-overlay">
           <div class="time-remaining">
-            
+            <i class="fas fa-clock"></i>
+            <span class="countdown" data-end="{{ enchere.date_fin|date:'c' }}">
+              Calcul en cours...
+            </span>
           </div>
         </div>
       </div>
@@ -542,8 +512,8 @@
           <div class="time-remaining-inline">
             <span> | </span>
             <i class="fas fa-clock" aria-hidden="true"></i>
-            <span class="countdown" data-end="{{ enchere.date_fin }}">
-              {{ enchere.date_fin|timeuntil }} restantes
+            <span class="countdown-inline" data-end="{{ enchere.date_fin|date:'c' }}">
+              Calcul en cours...
             </span>
           </div>
         </div>
@@ -860,12 +830,12 @@
 
 .sidebar {
   position: fixed;
-  top: 0;
+  top: 60px; /* Position under navbar */
   left: -280px;
   width: 280px;
-  height: 100vh;
+  height: calc(100vh - 60px); /* Adjust height to account for navbar */
   background: linear-gradient(180deg, var(--sidebar-bg) 0%, #1a1a1a 100%);
-  z-index: 9999;
+  z-index: 12;
   transition: left 0.3s ease;
   overflow-y: auto;
   box-shadow: 3px 0 20px rgba(0, 0, 0, 0.8);
@@ -883,7 +853,7 @@
   padding: 16px;
   border-bottom: 1px solid var(--border-color);
   background-color: rgba(255, 107, 53, 0.1);
-  margin-top: 50px;
+  margin-top: 0; /* Remove margin-top since we're positioning under navbar */
 }
 
 .sidebar-title {
@@ -960,6 +930,87 @@
 
 .filter-group-title i {
   color: var(--primary-color);
+}
+
+/* ===== CATEGORIES CHECKBOXES ===== */
+.categories-checkboxes {
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+}
+
+.category-checkbox-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  position: relative;
+  border: 1px solid transparent;
+}
+
+.category-checkbox-item:hover {
+  background-color: rgba(255, 107, 53, 0.1);
+  border-color: rgba(255, 107, 53, 0.3);
+}
+
+.category-checkbox-item input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.category-checkmark {
+  width: 16px;
+  height: 16px;
+  background-color: var(--input-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  margin-right: 10px;
+  position: relative;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.category-checkbox-item:hover .category-checkmark {
+  border-color: var(--primary-color);
+}
+
+.category-checkbox-item input:checked ~ .category-checkmark {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.category-checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+  left: 5px;
+  top: 2px;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.category-checkbox-item input:checked ~ .category-checkmark:after {
+  display: block;
+}
+
+.category-text {
+  color: var(--text-light);
+  font-size: 12px;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.category-checkbox-item:hover .category-text,
+.category-checkbox-item input:checked ~ .category-text {
+  color: var(--white);
 }
 
 /* ===== SELECT COMPACTS ===== */
@@ -1348,6 +1399,11 @@
   color: var(--primary-color);
 }
 
+.countdown-inline {
+  font-family: 'Inter', monospace;
+  letter-spacing: 0.5px;
+}
+
 /* ===== STATISTIQUES AVEC ÉTAT ===== */
 .auction-stats {
   display: flex;
@@ -1548,13 +1604,15 @@
   .sidebar {
     width: 100%;
     left: -100%;
+    top: 50px; /* Adjust for mobile navbar height */
+    height: calc(100vh - 50px);
   }
   
   .sidebar-header {
-    margin-top: 40px;
+    margin-top: 0;
   }
 
-  .categories-compact {
+  .categories-checkboxes {
     grid-template-columns: 1fr;
   }
 }
@@ -1583,8 +1641,7 @@
 }
 
 /* ===== DROPDOWN WILAYAS - Z-INDEX ULTRA ÉLEVÉ ===== */
-.wilaya-dropdown-wrapper,
-.category-dropdown-wrapper {
+.wilaya-dropdown-wrapper {
   position: relative;
   width: 100%;
   z-index: 100;
@@ -1804,218 +1861,6 @@
   background: var(--border-color);
   border-radius: 2px;
 }
-
-/* ===== DROPDOWN CATÉGORIES - Z-INDEX ULTRA ÉLEVÉ ===== */
-.category-dropdown-btn {
-  width: 100%;
-  padding: 10px 12px;
-  background-color: var(--input-bg);
-  color: var(--white);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 13px;
-  font-weight: 500;
-}
-
-.category-dropdown-btn:hover {
-  border-color: var(--primary-color);
-  background-color: #333;
-}
-
-.category-dropdown-btn.active {
-  border-color: var(--primary-color);
-  background-color: rgba(255, 107, 53, 0.1);
-}
-
-.category-dropdown-arrow {
-  font-size: 10px;
-  transition: transform 0.3s ease;
-}
-
-.category-dropdown-btn.open .category-dropdown-arrow {
-  transform: rotate(180deg);
-}
-
-.category-dropdown-menu {
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 0;
-  right: 0;
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  box-shadow: var(--shadow-heavy);
-  z-index: 99999;
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(-8px);
-  transition: all 0.3s ease;
-  max-height: 300px;
-  overflow-y: auto;
-}
-
-.category-dropdown-menu.show {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
-}
-
-.category-dropdown-content {
-  padding: 8px;
-  z-index: 99999
-}
-
-.category-dropdown-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px;
-  border-bottom: 1px solid var(--border-color);
-  margin-bottom: 8px;
-}
-
-.category-dropdown-header span {
-  font-size: 11px;
-  color: var(--text-light);
-  font-weight: 500;
-}
-
-.category-clear-btn {
-  background: none;
-  border: none;
-  color: var(--primary-color);
-  font-size: 11px;
-  cursor: pointer;
-  padding: 2px 6px;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-}
-
-.category-clear-btn:hover {
-  background-color: rgba(255, 107, 53, 0.1);
-  text-decoration: underline;
-}
-
-.category-dropdown-search {
-  margin-bottom: 8px;
-  padding: 0 8px;
-}
-
-.category-dropdown-search input {
-  width: 100%;
-  padding: 8px 10px;
-  background-color: var(--input-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  color: var(--white);
-  font-size: 12px;
-}
-
-.category-dropdown-search input:focus {
-  outline: none;
-  border-color: var(--primary-color);
-}
-
-.category-dropdown-items {
-  max-height: 200px;
-  overflow-y: auto;
-}
-
-.category-dropdown-item {
-  display: flex;
-  align-items: center;
-  padding: 8px 12px;
-  cursor: pointer;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-  position: relative;
-  margin-bottom: 2px;
-}
-
-.category-dropdown-item:last-child {
-  margin-bottom: 0;
-}
-
-.category-dropdown-item:hover {
-  background-color: rgba(255, 107, 53, 0.1);
-}
-
-.category-dropdown-item input {
-  position: absolute;
-  opacity: 0;
-  cursor: pointer;
-  height: 0;
-  width: 0;
-}
-
-.category-checkmark {
-  width: 16px;
-  height: 16px;
-  background-color: var(--input-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 3px;
-  margin-right: 10px;
-  position: relative;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
-}
-
-.category-dropdown-item:hover .category-checkmark {
-  border-color: var(--primary-color);
-}
-
-.category-dropdown-item input:checked ~ .category-checkmark {
-  background-color: var(--primary-color);
-  border-color: var(--primary-color);
-}
-
-.category-checkmark:after {
-  content: "";
-  position: absolute;
-  display: none;
-  left: 5px;
-  top: 2px;
-  width: 4px;
-  height: 8px;
-  border: solid white;
-  border-width: 0 2px 2px 0;
-  transform: rotate(45deg);
-}
-
-.category-dropdown-item input:checked ~ .category-checkmark:after {
-  display: block;
-}
-
-.category-text {
-  color: var(--text-light);
-  font-size: 12px;
-  font-weight: 500;
-  transition: color 0.2s ease;
-}
-
-.category-dropdown-item:hover .category-text,
-.category-dropdown-item input:checked ~ .category-text {
-  color: var(--white);
-}
-
-/* Scrollbar pour le dropdown des catégories */
-.category-dropdown-items::-webkit-scrollbar {
-  width: 4px;
-}
-
-.category-dropdown-items::-webkit-scrollbar-track {
-  background: #2a2a2a;
-}
-
-.category-dropdown-items::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border-radius: 2px;
-}
 </style>
 
 <script>
@@ -2024,13 +1869,61 @@ let activeFilters = new Set();
 let isAnimating = false;
 let searchTimeout;
 let allCards = [];
+let countdownInterval;
 
 // ===== INITIALISATION =====
 document.addEventListener('DOMContentLoaded', function() {
   allCards = Array.from(document.querySelectorAll('.auction-card'));
   initializeEventListeners();
   updateFilters();
+  initializeCountdowns();
 });
+
+// ===== FONCTION DE COUNTDOWN =====
+function initializeCountdowns() {
+  // Démarrer le countdown pour tous les éléments
+  updateAllCountdowns();
+  
+  // Mettre à jour toutes les secondes
+  countdownInterval = setInterval(updateAllCountdowns, 1000);
+}
+
+function updateAllCountdowns() {
+  const countdownElements = document.querySelectorAll('.countdown, .countdown-inline');
+  
+  countdownElements.forEach(element => {
+    const endTime = element.getAttribute('data-end');
+    if (endTime) {
+      const timeLeft = calculateTimeLeft(endTime);
+      element.textContent = timeLeft;
+    }
+  });
+}
+
+function calculateTimeLeft(endTime) {
+  const now = new Date().getTime();
+  const end = new Date(endTime).getTime();
+  const difference = end - now;
+  
+  if (difference <= 0) {
+    return "Terminée";
+  }
+  
+  const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+  
+  if (days > 0) {
+    return `${days}j ${hours}h ${minutes}m`;
+  } else if (hours > 0) {
+    return `${hours}h ${minutes}m ${seconds}s`;
+  } else if (minutes > 0) {
+    return `${minutes}m ${seconds}s`;
+  } else {
+    return `${seconds}s`;
+  }
+}
 
 // ===== RECHERCHE LIVE =====
 function performLiveSearch(searchTerm) {
@@ -2246,10 +2139,6 @@ function clearAllFilters() {
   document.querySelectorAll('input[name="category"]').forEach(checkbox => {
     checkbox.checked = false;
   });
-  const categorySelectedText = document.getElementById('category-selected-text');
-  const categoryBtn = document.querySelector('.category-dropdown-btn');
-  categorySelectedText.textContent = 'Toutes les catégories';
-  categoryBtn.classList.remove('active');
   
   // Réinitialiser les wilayas
   document.querySelectorAll('input[name="wilaya"]').forEach(checkbox => {
@@ -2257,8 +2146,10 @@ function clearAllFilters() {
   });
   const wilayaSelectedText = document.getElementById('wilaya-selected-text');
   const wilayaBtn = document.querySelector('.wilaya-dropdown-btn');
-  wilayaSelectedText.textContent = 'Toutes les wilayas';
-  wilayaBtn.classList.remove('active');
+  if (wilayaSelectedText && wilayaBtn) {
+    wilayaSelectedText.textContent = 'Toutes les wilayas';
+    wilayaBtn.classList.remove('active');
+  }
 
   // Réinitialiser la recherche
   document.getElementById("live-search").value = "";
@@ -2401,63 +2292,9 @@ function filterWilayas(searchTerm) {
   });
 }
 
-// ===== GESTION DU DROPDOWN CATÉGORIES =====
-function toggleCategoryDropdown() {
-  const dropdown = document.getElementById('category-dropdown-menu');
-  const btn = document.querySelector('.category-dropdown-btn');
-
-  dropdown.classList.toggle('show');
-  btn.classList.toggle('open');
-}
-
+// ===== GESTION DES CATÉGORIES AVEC CHECKBOXES =====
 function updateCategorySelection(checkbox) {
-  const selectedCategories = document.querySelectorAll('input[name="category"]:checked');
-  const selectedText = document.getElementById('category-selected-text');
-  const btn = document.querySelector('.category-dropdown-btn');
-  
-  if (selectedCategories.length === 0) {
-    selectedText.textContent = 'Toutes les catégories';
-    btn.classList.remove('active');
-  } else if (selectedCategories.length === 1) {
-    const categoryText = selectedCategories[0].nextElementSibling.nextElementSibling.textContent;
-    selectedText.textContent = categoryText;
-    btn.classList.add('active');
-  } else {
-    selectedText.textContent = `${selectedCategories.length} catégories sélectionnées`;
-    btn.classList.add('active');
-  }
-
   updateFilters();
-}
-
-function clearCategorySelection(event) {
-  event.stopPropagation();
-  
-  document.querySelectorAll('input[name="category"]').forEach(checkbox => {
-    checkbox.checked = false;
-  });
-  
-  const selectedText = document.getElementById('category-selected-text');
-  const btn = document.querySelector('.category-dropdown-btn');
-  
-  selectedText.textContent = 'Toutes les catégories';
-  btn.classList.remove('active');
-  
-  updateFilters();
-}
-
-function filterCategories(searchTerm) {
-  const term = searchTerm.toLowerCase().trim();
-  const items = document.querySelectorAll('.category-dropdown-item');
-  
-  items.forEach(item => {
-    const text = item.querySelector('.category-text').textContent.toLowerCase();
-    if (text.includes(term) || term === '') {
-      item.style.display = 'flex';
-    } else {
-      item.style.display = 'none';
-    }
-  });
 }
 
 // ===== EVENT LISTENERS =====
@@ -2514,17 +2351,13 @@ function initializeEventListeners() {
       }
     }
   });
-
-  // Fermer le dropdown des catégories en cliquant à l'extérieur
-  document.addEventListener('click', function(event) {
-    if (!event.target.closest('.category-dropdown-wrapper')) {
-      const dropdown = document.getElementById('category-dropdown-menu');
-      const btn = document.querySelector('.category-dropdown-btn');
-      if (dropdown && btn) {
-        dropdown.classList.remove('show');
-        btn.classList.remove('open');
-      }
-    }
-  });
 }
+
+// ===== NETTOYAGE =====
+window.addEventListener('beforeunload', function() {
+  if (countdownInterval) {
+    clearInterval(countdownInterval);
+  }
+});
 </script>
+

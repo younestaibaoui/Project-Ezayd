@@ -1122,4 +1122,233 @@ def search_api(request):
 @login_required
 def change_pfp(request):
     user_id = request.POST.get('pfp')
+
+@login_required
+def favoris(request):
+    user = request.user
+    favoris = Enchaire.objects.filter(savers=user)
+
+    for enchere in favoris:
+        enchere.images = {
+            'voitures': [],
+            'immobiliers': [],
+            'materiels': [],
+            'informatique': [],
+            'mobilier': [],
+            'bijoux': [],
+            'stocks': [],
+            'oeuvres': [],
+        }
+
+        lot = enchere.lot
+        all_images = []
+
+        # Remplir images par catégorie
+        for voiture in lot.voitures.all():
+            for img in voiture.images.all():
+                url = img.image.url
+                enchere.images['voitures'].append(url)
+                all_images.append(url)
+
+        for immo in lot.immobiliers.all():
+            for img in immo.images.all():
+                url = img.image.url
+                enchere.images['immobiliers'].append(url)
+                all_images.append(url)
+
+        for materiel in lot.materiels.all():
+            for img in materiel.images.all():
+                url = img.image.url
+                enchere.images['materiels'].append(url)
+                all_images.append(url)
+
+        for info in lot.informatique.all():
+            for img in info.images.all():
+                url = img.image.url
+                enchere.images['informatique'].append(url)
+                all_images.append(url)
+
+        for mob in lot.mobilier.all():
+            for img in mob.images.all():
+                url = img.image.url
+                enchere.images['mobilier'].append(url)
+                all_images.append(url)
+
+        for bijou in lot.bijoux.all():
+            for img in bijou.images.all():
+                url = img.image.url
+                enchere.images['bijoux'].append(url)
+                all_images.append(url)
+
+        for stock in lot.stocks.all():
+            if hasattr(stock, 'images'):
+                for img in stock.images.all():
+                    url = img.image.url
+                    enchere.images['stocks'].append(url)
+                    all_images.append(url)
+
+        for oeuvre in lot.oeuvres.all():
+            for img in oeuvre.images.all():
+                url = img.image.url
+                enchere.images['oeuvres'].append(url)
+                all_images.append(url)
+
+        # Image principale aléatoire
+        enchere.main_image_url = random.choice(all_images) if all_images else None
+
+        # Récupérer tous les objets liés au lot pour récupérer les participations
+        objets = []
+        objets += list(lot.voitures.all())
+        objets += list(lot.immobiliers.all())
+        objets += list(lot.materiels.all())
+        objets += list(lot.informatique.all())
+        objets += list(lot.mobilier.all())
+        objets += list(lot.bijoux.all())
+        objets += list(lot.stocks.all())
+        objets += list(lot.oeuvres.all())
+
+        # Extraire les objets ayant un attribut enchaireObjet (sûr que tous les objets en ont ?)
+        objets_avec_enchaire = [obj.enchaireObjet for obj in objets if hasattr(obj, 'enchaireObjet') and obj.enchaireObjet]
+
+        # Récupérer les participations distinctes par user sur ces objets
+        participations = ParticipationEnchaire.objects.filter(enchaireObjet__in=objets_avec_enchaire).values_list('user', flat=True).distinct()
+
+        # Stocker le nombre de participants dans un attribut dynamique
+        enchere.participant_count = participations.count()
+
+    context = {
+        'favoris': favoris,
+        'user': user,
+    }
+
+    if request.user.is_authenticated:
+        notifications = request.user.notifications.all() if request.user.is_authenticated else None
+        if notifications:
+            unread_count = notifications.filter(is_read=False).count()
+        else:
+            unread_count = 0
     
+        # Récupérer les notifications de l'utilisateur connecté
+        notifications = request.user.notifications.all().order_by('-created_at')    
+        context['unread_count'] = unread_count
+        context['notifications'] = notifications
+
+    return render(request, 'favoris/favoris.html', context)
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
+from django.http import HttpResponse, JsonResponse
+from django.contrib import messages
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+import os
+from PIL import Image
+from io import BytesIO
+from django.core.files.uploadedfile import InMemoryUploadedFile
+import sys
+
+@require_POST
+@login_required
+def add_pfp(request):
+    if 'profile_picture' not in request.FILES:
+        messages.error(request, 'Aucun fichier sélectionné.')
+        return redirect('profil')
+    
+    uploaded_file = request.FILES['profile_picture']
+    
+    # Validate file type
+    allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
+    if uploaded_file.content_type not in allowed_types:
+        messages.error(request, 'Format de fichier non supporté. Utilisez JPG, PNG, GIF ou WebP.')
+        return redirect('profil')
+    
+    # Validate file size (max 5MB)
+    max_size = 5 * 1024 * 1024  # 5MB
+    if uploaded_file.size > max_size:
+        messages.error(request, 'Le fichier est trop volumineux. Taille maximale: 5MB.')
+        return redirect('profil')
+    
+    try:
+        # Remove old profile picture if exists
+        if request.user.pfp:
+            old_pfp_path = request.user.pfp.path
+            if os.path.exists(old_pfp_path):
+                os.remove(old_pfp_path)
+        
+        # Process and crop image to square
+        image = Image.open(uploaded_file)
+        
+        # Convert to RGB if necessary (for PNG with transparency)
+        if image.mode in ('RGBA', 'LA', 'P'):
+            background = Image.new('RGB', image.size, (255, 255, 255))
+            if image.mode == 'P':
+                image = image.convert('RGBA')
+            background.paste(image, mask=image.split()[-1] if image.mode == 'RGBA' else None)
+            image = background
+        
+        # Crop to square
+        width, height = image.size
+        size = min(width, height)
+        
+        # Calculate cropping coordinates (center crop)
+        left = (width - size) // 2
+        top = (height - size) // 2
+        right = left + size
+        bottom = top + size
+        
+        # Crop the image
+        image = image.crop((left, top, right, bottom))
+        
+        # Resize to 400x400
+        image = image.resize((400, 400), Image.Resampling.LANCZOS)
+        
+        # Save processed image
+        output = BytesIO()
+        image.save(output, format='JPEG', quality=85, optimize=True)
+        output.seek(0)
+        
+        # Create new file name
+        file_extension = 'jpg'
+        file_name = f'profile_pictures/{request.user.username}_{request.user.id}.{file_extension}'
+        
+        # Create InMemoryUploadedFile
+        processed_file = InMemoryUploadedFile(
+            output, 'ImageField', file_name, 'image/jpeg',
+            sys.getsizeof(output), None
+        )
+        
+        # Save to user profile
+        request.user.pfp.save(file_name, processed_file, save=True)
+        
+        messages.success(request, 'Photo de profil mise à jour avec succès!')
+        
+    except Exception as e:
+        messages.error(request, f'Erreur lors du traitement de l\'image: {str(e)}')
+    
+    return redirect('profil')
+
+@login_required
+def remove_pfp(request):
+    try:
+        if request.user.pfp:
+            # Get the file path before deleting
+            pfp_path = request.user.pfp.path
+            
+            # Remove the file from storage
+            if os.path.exists(pfp_path):
+                os.remove(pfp_path)
+            
+            # Clear the pfp field
+            request.user.pfp.delete(save=False)
+            request.user.pfp = None
+            request.user.save()
+            
+            messages.success(request, 'Photo de profil supprimée avec succès!')
+        else:
+            messages.info(request, 'Aucune photo de profil à supprimer.')
+            
+    except Exception as e:
+        messages.error(request, f'Erreur lors de la suppression: {str(e)}')
+    
+    return redirect('profil')

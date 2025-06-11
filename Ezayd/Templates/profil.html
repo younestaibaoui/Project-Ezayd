@@ -27,13 +27,18 @@
 {% if user %}
     <div class="profile-content fade-in">
         <div class="profile-avatar-section">
-            {% if user.pfp %}
-                <img src="{{ user.pfp.url }}" alt="Photo de profil" class="profile-avatar">
-            {% else %}
-                <div class="participant-avatar">
-                    {{ user.username|slice:":1"|upper }}
+            <div class="profile-avatar-container" onclick="handleProfilePictureClick()">
+                {% if user.pfp %}
+                    <img src="{{ user.pfp.url }}" alt="Photo de profil" class="profile-avatar">
+                {% else %}
+                    <div class="participant-avatar">
+                        {{ user.username|slice:":1"|upper }}
+                    </div>
+                {% endif %}
+                <div class="avatar-overlay">
+                    <i class="fas fa-camera"></i>
                 </div>
-            {% endif %}
+            </div>
             
             <div class="profile-name">{{ user.first_name }} {{ user.last_name }}</div>
             <div class="profile-username">@{{ user.username }}</div>
@@ -267,6 +272,31 @@
     </div>
 {% endif %}
 
+<!-- Hidden file input for profile picture upload -->
+<input type="file" id="profile-picture-input" accept="image/*" style="display: none;">
+
+<!-- Modal for profile picture options -->
+<div id="profile-picture-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h3>Photo de profil</h3>
+        <div class="modal-buttons">
+            <button id="change-picture-btn" class="modal-btn change-btn">
+                <i class="fas fa-camera"></i> Changer la photo
+            </button>
+            <button id="remove-picture-btn" class="modal-btn remove-btn">
+                <i class="fas fa-trash-alt"></i> Supprimer la photo
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden form for profile picture upload -->
+<form id="profile-picture-form" action="{% url 'add_pfp' %}" method="post" enctype="multipart/form-data" style="display: none;">
+    {% csrf_token %}
+    <input type="file" name="profile_picture" id="form-profile-picture">
+</form>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Animation simple au chargement
@@ -275,21 +305,184 @@
             el.style.animationDelay = `${index * 0.1}s`;
         });
         
-        {% comment %} // Effet hover léger
-        const detailItems = document.querySelectorAll('.detail-item');
-        detailItems.forEach(item => {
-            item.addEventListener('mouseenter', function() {
-                this.style.transform = 'translateY(-1px)';
-            });
-            
-            item.addEventListener('mouseleave', function() {
-                this.style.transform = 'translateY(0)';
-            });
-        }); {% endcomment %}
+        // Profile picture modal elements
+        const modal = document.getElementById('profile-picture-modal');
+        const closeModal = document.querySelector('.close-modal');
+        const changePictureBtn = document.getElementById('change-picture-btn');
+        const removePictureBtn = document.getElementById('remove-picture-btn');
+        const profilePictureInput = document.getElementById('profile-picture-input');
+        const formProfilePicture = document.getElementById('form-profile-picture');
+        const profilePictureForm = document.getElementById('profile-picture-form');
+        
+        // Close modal when clicking the X
+        closeModal.onclick = function() {
+            modal.style.display = "none";
+        }
+        
+        // Close modal when clicking outside of it
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+        
+        // Change picture button
+        changePictureBtn.onclick = function() {
+            profilePictureInput.click();
+            modal.style.display = "none";
+        }
+        
+        // Remove picture button
+        removePictureBtn.onclick = function() {
+            window.location.href = "{% url 'remove_pfp' %}";
+        }
+        
+        // Handle file selection
+        profilePictureInput.onchange = function() {
+            if (this.files && this.files[0]) {
+                // Copy the selected file to the form input
+                const fileList = new DataTransfer();
+                fileList.items.add(this.files[0]);
+                formProfilePicture.files = fileList.files;
+                
+                // Submit the form
+                profilePictureForm.submit();
+            }
+        }
     });
+    
+    // Function to handle profile picture click
+    function handleProfilePictureClick() {
+        const hasPfp = {% if user.pfp %}true{% else %}false{% endif %};
+        
+        if (hasPfp) {
+            // Show modal with options
+            document.getElementById('profile-picture-modal').style.display = "block";
+        } else {
+            // Directly open file selector
+            document.getElementById('profile-picture-input').click();
+        }
+    }
 </script>
 
 <style>
+    /* Profile picture upload styles */
+    .profile-avatar-container {
+        position: relative;
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        margin: 0 auto 15px;
+        cursor: pointer;
+        overflow: hidden;
+    }
+    
+    .avatar-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        border-radius: 50%;
+    }
+    
+    .avatar-overlay i {
+        color: white;
+        font-size: 2rem;
+    }
+    
+    .profile-avatar-container:hover .avatar-overlay {
+        opacity: 1;
+    }
+    
+    /* Modal styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.7);
+    }
+    
+    .modal-content {
+        background: #2d2d2d;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #444;
+        width: 300px;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        position: relative;
+    }
+    
+    .close-modal {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+        position: absolute;
+        top: 10px;
+        right: 15px;
+    }
+    
+    .close-modal:hover {
+        color: #ff6b35;
+    }
+    
+    .modal h3 {
+        color: white;
+        margin-top: 0;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    
+    .modal-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .modal-btn {
+        padding: 10px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.2s ease;
+    }
+    
+    .change-btn {
+        background: #ff6b35;
+        color: white;
+    }
+    
+    .change-btn:hover {
+        background: #ff844e;
+    }
+    
+    .remove-btn {
+        background: #444;
+        color: white;
+    }
+    
+    .remove-btn:hover {
+        background: #dc3545;
+    }
 
     .participant-avatar {
         background-color: #ff6b35;
@@ -614,6 +807,11 @@
 
         .profile-header, .profile-avatar-section, .profile-details {
             padding: 20px;
+        }
+        
+        .profile-avatar-container {
+            width: 140px;
+            height: 140px;
         }
     }
 
