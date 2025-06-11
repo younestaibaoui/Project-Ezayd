@@ -7,6 +7,7 @@ from datetime import datetime
 from perso.models import UserAccount
 from notification.models import NotificationEnchaire,NotificationDemandeEnchaire
 
+
 # Liste des wilayas d'Algérie (exemple, à adapter si besoin)
 WILAYAS_ALGERIE = [
     ('Adrar', 'Adrar'),

@@ -6,6 +6,9 @@ from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.db.models import Count, Q
+from Ezayd.utils import lancer_mise_a_jour_enchere_thread
+
+
 
 from perso.models import UserAccount
 
@@ -31,6 +34,8 @@ from django.shortcuts import render
 from .models import Enchaire, ParticipationEnchaire  # adapte les imports selon ton projet
 
 def accueil(request):
+    # Lancer la mise à jour des enchères en arrière-plan
+    lancer_mise_a_jour_enchere_thread() 
     # Récupérer le paramètre de recherche dans la requête GET
     search_query = request.GET.get('search', '')
 
