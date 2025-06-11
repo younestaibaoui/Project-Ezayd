@@ -775,6 +775,136 @@
         justify-content: space-between;
         margin-bottom: 16px;
     }
+
+    /* Confirmation Dialog Styles */
+    .confirmation-dialog {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+        z-index: 10001;
+        justify-content: center;
+        align-items: center;
+        backdrop-filter: blur(3px);
+    }
+
+    .confirmation-dialog.active {
+        display: flex;
+    }
+
+    .confirmation-content {
+        background: #2d2d2d;
+        border: 1px solid #404040;
+        border-radius: 12px;
+        padding: 24px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        animation: dialogFadeIn 0.3s ease-out;
+    }
+
+    @keyframes dialogFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .confirmation-title {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .confirmation-title i {
+        color: #ff6b35;
+    }
+
+    .confirmation-message {
+        margin-bottom: 20px;
+        color: #adb5bd;
+        line-height: 1.5;
+    }
+
+    .confirmation-details {
+        background-color: #333;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 20px;
+    }
+
+    .confirmation-detail {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+    }
+
+    .confirmation-detail:last-child {
+        margin-bottom: 0;
+    }
+
+    .confirmation-label {
+        color: #adb5bd;
+    }
+
+    .confirmation-value {
+        font-weight: 600;
+    }
+
+    .confirmation-value.highlight {
+        color: #ff6b35;
+    }
+
+    .confirmation-buttons {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+    }
+
+    .btn-cancel {
+        background-color: transparent;
+        border: 1px solid #6c757d;
+        color: #adb5bd;
+        padding: 10px 16px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .btn-cancel:hover {
+        background-color: #444;
+        border-color: #adb5bd;
+    }
+
+    .btn-confirm {
+        background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+        border: none;
+        color: white;
+        padding: 10px 16px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-confirm:hover {
+        background: linear-gradient(135deg, #e60000 0%, #b30000 100%);
+        transform: translateY(-1px);
+    }
 </style>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -920,12 +1050,12 @@
                         <span>Enchère en cours - Participez maintenant!</span>
                     </div> {% endcomment %}
                     {% if demande_state == 'Approuvée' %}
-                        <form method="POST" action="{% url 'participer' %}" style="margin-top: 1px;">
+                        <form method="POST" action="{% url 'participer' %}" id="participationForm" style="margin-top: 1px;">
                             {% csrf_token %}
                             <input type="hidden" name="type_objet" value="{{ type_objet }}">
                             <input type="hidden" name="objet_id" value="{{ objet.id }}">
                             <input type="hidden" name="enchaireObjet_id" value="{{ enchaireObjet.id }}">
-                            <button type="submit" class="participate-btn">
+                            <button type="button" onclick="showConfirmation()" class="participate-btn">
                                 <i class="fas fa-gavel"></i>
                                 Participer pour {{ next_bid_price|default:enchaireObjet.price_reserved|add:enchaireObjet.pas }} DA
                             </button>
@@ -1566,6 +1696,40 @@
     </div>
 </div>
 
+<!-- Confirmation Dialog -->
+<div id="confirmationDialog" class="confirmation-dialog">
+    <div class="confirmation-content">
+        <div class="confirmation-title">
+            <i class="fas fa-gavel"></i>
+            Confirmer la participation
+        </div>
+        <div class="confirmation-message">
+            Êtes-vous sûr de vouloir participer à cette enchère ?
+        </div>
+        <div class="confirmation-details">
+            <div class="confirmation-detail">
+                <span class="confirmation-label">Montant de votre enchère:</span>
+                <span class="confirmation-value highlight">{{ next_bid_price|default:enchaireObjet.price_reserved|add:enchaireObjet.pas }} DA</span>
+            </div>
+            <div class="confirmation-detail">
+                <span class="confirmation-label">Prix actuel:</span>
+                <span class="confirmation-value">{{ enchaireObjet.price_reserved }} DA</span>
+            </div>
+            <div class="confirmation-detail">
+                <span class="confirmation-label">Augmentation:</span>
+                <span class="confirmation-value">+{{ enchaireObjet.pas }} DA</span>
+            </div>
+        </div>
+        <div class="confirmation-buttons">
+            <button class="btn-cancel" onclick="hideConfirmation()">Annuler</button>
+            <button class="btn-confirm" onclick="confirmParticipation()">
+                <i class="fas fa-gavel"></i>
+                Confirmer
+            </button>
+        </div>
+    </div>
+</div>
+
 <script>
     // Images array for modal navigation
     const images = [
@@ -1819,6 +1983,36 @@
     if (document.querySelector('.status-item:nth-child(2) span')) {
         tempsRestant();
     }
+
+    // Confirmation dialog functions
+    function showConfirmation() {
+        document.getElementById('confirmationDialog').classList.add('active');
+        document.body.style.overflow = 'hidden'; // Prevent scrolling
+    }
+
+    function hideConfirmation() {
+        document.getElementById('confirmationDialog').classList.remove('active');
+        document.body.style.overflow = ''; // Re-enable scrolling
+    }
+
+    function confirmParticipation() {
+        // Submit the form
+        document.getElementById('participationForm').submit();
+    }
+
+    // Close confirmation dialog when clicking outside
+    document.getElementById('confirmationDialog').addEventListener('click', function(event) {
+        if (event.target === this) {
+            hideConfirmation();
+        }
+    });
+
+    // Close confirmation dialog with Escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && document.getElementById('confirmationDialog').classList.contains('active')) {
+            hideConfirmation();
+        }
+    });
 </script>
 
 {% endblock %}
