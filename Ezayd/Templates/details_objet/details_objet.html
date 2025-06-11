@@ -640,13 +640,14 @@
     .auction-status {
         padding-top: 16px;
         display: flex;
-        flex-direction: column;
+        flex-direction: row; /* Changed from 'line' to 'row' */
+        justify-content: space-between; /* This will push items to opposite ends */
         gap: 8px;
     }
 
     .status-item {
         display: flex;
-        align-items: top;
+        align-items: center;
         gap: 8px;
         color: #adb5bd;
         font-size: 14px;
@@ -894,7 +895,7 @@
                         {% endwith %}
                     {% endif %}
                     {% elif enchaire.etat == 'upcoming' %}
-                    {% comment %} ----------------------- ENCHAIRE UPCOMING ---------------------------- {% endcomment %}
+                    {% comment %} ----------------اريات ENCHAIRE UPCOMING ---------------------------- {% endcomment %}
                         <div class="price-item">
                             <span class="price-label">Pas</span>
                             <span class="price-value">{{ enchaireObjet.pas }} DA</span>
@@ -1024,13 +1025,13 @@
             {% endif %}
             
             <div class="auction-status">
-                <div class="status-item">
+               <div class="status-item">
                     <i class="fas fa-users"></i>
                     <span>{{ participation_count|default:0 }} participant{{ participation_count|default:0|pluralize }}</span>
                 </div>
                 <div class="status-item">
                     <i class="fas fa-clock"></i>
-                    <span>Temps restant: {{ enchaire.temps_restant|default:"N/A" }}</span>
+                    <span>Temps restant: {{ enchaire.date_fin|default:"N/A" }}</span>
                 </div>
             </div>
         </div>
@@ -1783,6 +1784,40 @@
     function updateTimeRemaining() {
         // Cette fonction peut être implémentée pour mettre à jour le temps en temps réel
         // Exemple avec WebSocket ou requêtes AJAX périodiques
+    }
+
+    // Countdown timer function
+    function tempsRestant() {
+    // Get the auction end date from Django template in ISO 8601 format
+    const dateFin = new Date("{{ enchaire.date_fin|date:'c' }}");
+
+    // Update the countdown every second
+    const countdownInterval = setInterval(function() {
+        const now = new Date();
+        const diff = dateFin - now;
+
+        if (diff <= 0) {
+            clearInterval(countdownInterval);
+            document.querySelector('.status-item:nth-child(2) span').innerHTML = "Enchère terminée";
+            return;
+        }
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+        // Format: 3j 04h 21m 09s
+        const countdownText = `${days}j:${hours.toString().padStart(2, '0')}h:${minutes.toString().padStart(2, '0')}m:${seconds.toString().padStart(2, '0')}s`;
+
+        document.querySelector('.status-item:nth-child(2) span').innerHTML = "Temps restant: " + countdownText;
+    }, 1000);
+}
+
+    
+    // Start the countdown when the page loads
+    if (document.querySelector('.status-item:nth-child(2) span')) {
+        tempsRestant();
     }
 </script>
 
