@@ -108,7 +108,7 @@
                 <!-- Request Status/Button -->
                 {% if user.is_authenticated %}
                     {% if demande %}
-                        <div style="width: 100%; height: 36px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border-radius: 8px; font-weight: 600; font-size: 13px; {% if demande.state == 'Approuvée' %}background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white;{% elif demande.state == 'Rejetée' %}background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white;{% else %}background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%); color: #000;{% endif %}">
+                        <div style="width: 100%; height: 36px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border-radius: 8px; font-weight: 600; font-size: 13px; {% if demande.state == 'Approuvée' %}background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white;{% elif demande.state == 'Rejetée' %}background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white;{% else %}background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%); color: white;{% endif %}">
                             {% if demande.state == 'Approuvée' %}
                                 <i class="fas fa-check-circle" style="font-size: 14px;"></i>
                                 <span>Approuvée</span>
@@ -131,6 +131,18 @@
                                         onmouseout="this.style.transform='translateY(0)'">
                                     <i class="fas fa-paper-plane" style="font-size: 14px;"></i>
                                     <span>Demander</span>
+                                </button>
+                            </form>
+                            {% elif enchaire.etat == 'upcoming' %}
+                            <form method="post" action="{% url 'demande' %}" style="margin: 0;">
+                                {% csrf_token %}
+                                <input type="hidden" name="user" value="{{ user.id }}">
+                                <input type="hidden" name="enchaire" value="{{ enchaire.id }}">
+                                <button type="submit" style="width: 100%; height: 36px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: none; border-radius: 8px; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: white; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.3s ease;"
+                                        onmouseover="this.style.transform='translateY(-1px)'"
+                                        onmouseout="this.style.transform='translateY(0)'">
+                                    <i class="fas fa-paper-plane" style="font-size: 14px;"></i>
+                                    <span>Reserver</span>
                                 </button>
                             </form>
                         {% endif %}

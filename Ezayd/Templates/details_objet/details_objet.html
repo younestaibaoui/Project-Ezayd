@@ -985,6 +985,31 @@
                             <span>Enchère à venir - Ajoutez aux favoris</span>
                         {% endif %}
                     </button>
+                    {% if demande_state %}
+                        <div style="margin-top:2%; padding: 12px 20px; border-radius: 8px; text-align: center; font-weight: 600; {% if demande_state == 'Rejetée' %}background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white;{% elif demande_state == 'Approuvée' %} background: linear-gradient(135deg,rgb(0, 216, 18) 0%,rgb(0, 255, 8) 100%); color: white; {% else %}background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%); color: white;{% endif %}">
+                            {% if demande_state == 'Rejetée' %}
+                                <i class="fas fa-times-circle" style="margin-right: 8px;"></i>Reservation rejetée
+                            {% elif demande_state == 'unread' %}
+                                <i class="fas fa-clock" style="margin-right: 8px;"></i>Reservation en attente
+                            {% else %}
+                                <i class="fas fa-check-circle" style="margin-right: 8px;"></i>Reservation Approuvée
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <form method="post" action="{% url 'demande' %}" style="margin: 0;">
+                            {% csrf_token %}
+                            <input type="hidden" name="user" value="{{ user.id }}">
+                            <input type="hidden" name="enchaire" value="{{ enchaire.id }}">
+                            <button type="submit"
+                                class= "participate-btn upcoming"
+                                style="margin-top: 2%; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); box-shadow: 0 3px 12px rgba(255, 107, 53, 0.3);"
+                                onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 15px rgba(255, 107, 53, 0.4)'"
+                                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 3px 12px rgba(255, 107, 53, 0.3)'">
+                                <i class="fas fa-paper-plane"></i>
+                                <span>Reserver</span>
+                            </button>
+                        </form>
+                    {% endif %}
                 </form>
                 
             {% elif is_winner %}
