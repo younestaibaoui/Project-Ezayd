@@ -374,13 +374,12 @@
 .footer {
   background: var(--background-dark);
   border-top: 2px solid var(--background-light);
-  padding: 3rem 0 1rem;
+  
   margin-top: 4rem;
 }
 
 .footer-container {
   max-width: 1200px;
-  margin: 0 auto;
   padding: 0 2rem;
 }
 

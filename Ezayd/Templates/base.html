@@ -191,16 +191,16 @@
         </div>
 
 
-        {% else %}
+      {% else %}
         
         <button 
           onclick="window.location.href='/connexion'" 
-          style="color: #fff; transition: color 0.2s ease;"
+          style="background: none; border: none; color: #fff; position: relative; cursor: pointer;"
           onmouseover="this.style.color='#ccc'" onmouseout="this.style.color='#fff'">
           <i class="fas fa-bell" style="font-size: 20px;"></i>
         </button>
 
-        {% endif %}
+      {% endif %}
 
         <!-- Mes Favoris -->
         <a href="{% url 'favoris' %}" style="color: #fff; transition: color 0.2s ease;"
@@ -376,36 +376,40 @@
     </main>
 
     <footer class="footer" role="contentinfo">
-        <div class="footer-container">
-            <div class="footer-grid">
-                <div class="footer-column">
-                    <h3>Entreprise</h3>
-                    <ul>
-                        <li><a href="/a-propos">À Propos de Nous</a></li>
-                        <li><a href="/services">Nos Services</a></li>
-                        <li><a href="/confidentialite">Politique de Confidentialité</a></li>
-                        <li><a href="/affiliation">Programme d'Affiliation</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Obtenir de l'Aide</h3>
-                    <ul>
-                        <li><a href="{% url 'FAQ' %}">FAQ</a></li>
-                        <li><a href="/support">Signaler un Problème</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Suivez-nous</h3>
-                    <div class="social-links">
-                        <a href="#" aria-label="Facebook" rel="noopener noreferrer" target="_blank"><i class="fab fa-facebook-f" aria-hidden="true"></i></a>
-                        <a href="#" aria-label="Twitter" rel="noopener noreferrer" target="_blank"><i class="fab fa-twitter" aria-hidden="true"></i></a>
-                        <a href="#" aria-label="Instagram" rel="noopener noreferrer" target="_blank"><i class="fab fa-instagram" aria-hidden="true"></i></a>
-                        <a href="#" aria-label="LinkedIn" rel="noopener noreferrer" target="_blank"><i class="fab fa-linkedin-in" aria-hidden="true"></i></a>
-                    </div>
+    <div class="footer-container">
+        <div class="footer-grid">
+            <div class="footer-column">
+                <h3>Entreprise</h3>
+                <ul>
+                    <li><a href="{% url 'FAQ' %}">À Propos de Nous</a></li>
+                    <li><a href="{% url 'FAQ' %}">Nos Services</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Obtenir de l'Aide</h3>
+                <ul>
+                    <li><a href="{% url 'FAQ' %}">FAQ</a></li>
+                    <li><a href=mailto:sofianebaaziz2211@gmail.com>Signaler un Problème</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Suivez-nous</h3>
+                <div class="social-links">
+                    <a href="#" aria-label="Facebook" rel="noopener noreferrer" target="_blank"><i class="fab fa-facebook-f" aria-hidden="true"></i></a>
+                    <a href="#" aria-label="Twitter" rel="noopener noreferrer" target="_blank"><i class="fab fa-twitter" aria-hidden="true"></i></a>
+                    <a href="#" aria-label="Instagram" rel="noopener noreferrer" target="_blank"><i class="fab fa-instagram" aria-hidden="true"></i></a>
+                    <a href="#" aria-label="LinkedIn" rel="noopener noreferrer" target="_blank"><i class="fab fa-linkedin-in" aria-hidden="true"></i></a>
                 </div>
             </div>
         </div>
-    </footer>
+       
+    </div>
+    
+</footer>
+ <div class="footer-copyright">
+            <p>Copyright &copy;  2024</p>
+        </div>
+
       <!-- Login Modal -->
       <div class="modal" id="login-modal" role="dialog" aria-labelledby="login-title" aria-hidden="true">
         <div class="modal-content">
@@ -501,6 +505,17 @@
 
 <style>
   /* CSS */
+
+  .footer-copyright
+  {
+      text-align: center;
+      padding: 15px;
+      font-size: 1.0rem;
+      color: #aaa;
+      background-color: #1f1f1f;
+      border-top: 1px solid #333;
+
+  }
   .scroll-to-top {
       position: fixed;
       bottom: 30px;

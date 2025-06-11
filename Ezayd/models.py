@@ -188,14 +188,26 @@ class Enchaire(models.Model):
     def __str__(self):
         return str(self.lot.nom) if hasattr(self, 'lot') else f"Enchaire #{self.id} (sans lot)"
 
+
+    def calculer_etat_auto(self):
+        today = timezone.now().date()
+        if today < self.date_debut:
+            return 'upcoming'
+        elif self.date_debut <= today <= self.date_fin:
+            return 'active'
+        else:
+            return 'finis'
+
     def save(self, *args, **kwargs):
-        # Detect if etat has changed
-        if self.pk:  # object already exists
+        new_etat = self.calculer_etat_auto()
+        if self.pk:
             old_etat = Enchaire.objects.get(pk=self.pk).etat
-            if old_etat != self.etat:
-                super().save(*args, **kwargs)  # save first to ensure FK integrity
-                self.notify_savers(old_etat, self.etat)
+            if old_etat != new_etat:
+                self.etat = new_etat
+                super().save(*args, **kwargs)
+                self.notify_savers(old_etat, new_etat)
                 return
+        self.etat = new_etat
         super().save(*args, **kwargs)
 
     # methode pour notifier les utilisateur de changement d'etat
