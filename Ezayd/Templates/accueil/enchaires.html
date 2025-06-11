@@ -524,16 +524,30 @@
         <!-- Titre de l'enchère -->
         <h3 class="auction-title">{{ enchere.lot.nom }}</h3>
         
-        <!-- Description -->
-        <p class="card-description">
-          {{ enchere.lot.description|truncatewords:15 }}
-        </p>
-        
-        <!-- Informations de localisation -->
+        <!-- Description avec hauteur fixe -->
+        <div class="card-description-container">
+          <p class="card-description">
+            {% if enchere.lot.description|wordcount > 50 %}
+              {{ enchere.lot.description|truncatewords:11 }}... 
+              <a href="{% url 'details_enchaire' enchere.id %}">Voir plus</a>
+            {% else %}
+              {{ enchere.lot.description }}
+            {% endif %}
+          </p>
+        </div>
+
+        <!-- Informations de localisation - position fixe -->
         <div class="location-info">
           <div class="wilaya-info">
             <i class="fas fa-map-marker-alt"></i>
             <span class="wilaya-name">{{ enchere.wilaya|default:"Non spécifié" }}</span>
+          </div>
+          <div class="time-remaining-inline">
+            <span> | </span>
+            <i class="fas fa-clock" aria-hidden="true"></i>
+            <span class="countdown" data-end="{{ enchere.date_fin }}">
+              {{ enchere.date_fin|timeuntil }} restantes
+            </span>
           </div>
         </div>
         
@@ -1105,6 +1119,7 @@
   cursor: pointer;
   display: flex;
   flex-direction: column;
+  height: 100%;
 }
 
 .auction-card:hover {
@@ -1263,10 +1278,15 @@
   overflow: hidden;
 }
 
+/* ===== CONTENEUR DE DESCRIPTION AVEC HAUTEUR FIXE ===== */
+.card-description-container {
+  margin-bottom: 16px;
+}
+
 .card-description {
   color: var(--text-light);
   line-height: 1.6;
-  margin: 0 0 16px;
+  margin: 0;
   font-size: 14px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -1274,7 +1294,18 @@
   overflow: hidden;
 }
 
-/* ===== INFORMATIONS DE LOCALISATION ===== */
+.card-description a {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.card-description a:hover {
+  filter: brightness(1.2);
+}
+
+/* ===== INFORMATIONS DE LOCALISATION - POSITION FIXE ===== */
 .location-info {
   display: flex;
   align-items: center;
@@ -1282,12 +1313,16 @@
   padding: 10px;
   background-color: rgba(0, 0, 0, 0.2);
   border-radius: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  margin-top: auto;
 }
 
 .wilaya-info {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-shrink: 0;
 }
 
 .wilaya-info i {
@@ -1301,12 +1336,26 @@
   color: var(--white);
 }
 
+.time-remaining-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--white);
+  font-size: 13px;
+  font-weight: 600;
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+
+.time-remaining-inline i {
+  color: var(--primary-color);
+}
+
 /* ===== STATISTIQUES AVEC ÉTAT ===== */
 .auction-stats {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: auto;
   padding-top: 12px;
   border-top: 1px solid var(--border-color);
 }

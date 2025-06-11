@@ -157,8 +157,6 @@ class Enchaire(models.Model):
         related_name="enchaires_proprietes"
     )
 
-    text_highlight = models.TextField(null=True, blank=True)
-
     etat = models.CharField(
         choices=ETAT_ENCHAIRE_CHOICES,
         max_length=10,

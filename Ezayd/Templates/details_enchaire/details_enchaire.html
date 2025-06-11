@@ -227,9 +227,10 @@
             <div class="objects-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
                 {% for objet in objets %}
                     <div data-object-card style="background-color: #333; border-radius: 12px; overflow: hidden; transition: all 0.3s ease; border: 1px solid #404040; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.2);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 25px rgba(0,0,0,0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0,0,0,0.2)'">
-                        <!-- Badge du type -->
-                        <div style="position: absolute; top: 10px; left: 10px; padding: 6px 12px; font-size: 0.7rem; font-weight: 600; border-radius: 16px; color: #fff; z-index: 10; background: rgba(85, 85, 85, 0.9); text-transform: uppercase; backdrop-filter: blur(10px);">
-                            {{ lot.get_type_display }}
+                        
+                        <!-- Participation count badge in orange circle (top right) -->
+                        <div style="opacity:0.9; position: absolute; top: 20px; right: 20px; width: 50px; height: 50px; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 60%); border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 10; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+                            <span style="color: white; font-weight: 700; font-size: 15px;"><i class="fas fa-users"></i> {{ objet.participation_count }}</span>
                         </div>
                         
                         <!-- Images avec carrousel -->
@@ -401,10 +402,6 @@
                                     {% else %}
                                         <p>Type de lot inconnu ou non supporté.</p>
                                 {% endif %}
-                                <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                                    <i class="fas fa-calendar-alt" style="width: 18px; margin-right: 10px; color: #ff6b35;"></i>
-                                    <strong style="margin-right: 6px;">Participant :</strong> {{ objet.participation_count }}
-                                </div>
                             </div>
 
                             
