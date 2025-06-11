@@ -30,11 +30,11 @@
                     <div style="padding: 6px 12px; font-size: 0.7rem; font-weight: 600; border-radius: 16px; color: #fff; background: #555; text-transform: uppercase;">
                         {{ lot.get_type_display }}
                     </div>
-                    <div style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 16px; font-weight: 600; font-size: 12px; text-transform: uppercase; {% if enchaire.etat == 'active' %}background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white;{% elif enchaire.etat == 'en_attente' %}background: linear-gradient(135deg, #6f42c1 0%, #8e44ad 100%); color: white;{% elif enchaire.etat == 'terminee' %}background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white;{% else %}background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%); color: #000;{% endif %}">
+                    <div style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 16px; font-weight: 600; font-size: 12px; text-transform: uppercase; {% if enchaire.etat == 'active' %}background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white;{% elif enchaire.etat == 'upcoming' %}background: linear-gradient(135deg, #6f42c1 0%, #8e44ad 100%); color: white;{% elif enchaire.etat == 'terminee' %}background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white;{% else %}background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%); color: #000;{% endif %}">
                         {% if enchaire.etat == 'active' %}
                             <i class="fas fa-play-circle" style="font-size: 14px;"></i>
                             <span>Active</span>
-                        {% elif enchaire.etat == 'en_attente' %}
+                        {% elif enchaire.etat == 'upcoming' %}
                             <i class="fas fa-hourglass-half" style="font-size: 14px;"></i>
                             <span>En Attente</span>
                         {% elif enchaire.etat == 'terminee' %}
@@ -54,14 +54,14 @@
             </div>
 
             <!-- Center: Timer (only for active and upcoming auctions) -->
-            {% if enchaire.etat == 'active' or enchaire.etat == 'en_attente' %}
+            {% if enchaire.etat == 'active' or enchaire.etat == 'upcoming' %}
             <div style="min-width: 220px;">
                 <div style="background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%); border-radius: 10px; padding: 18px; border: 1px solid #404040; text-align: center;">
                     {% if enchaire.etat == 'active' %}
                         <h3 style="margin: 0 0 10px 0; font-size: 14px; font-weight: 600; color: #ff6b35; text-transform: uppercase; letter-spacing: 0.5px;">
                             <i class="fas fa-clock" style="margin-right: 6px;"></i>Temps Restant
                         </h3>
-                    {% elif enchaire.etat == 'en_attente' %}
+                    {% elif enchaire.etat == 'upcoming' %}
                         <h3 style="margin: 0 0 10px 0; font-size: 14px; font-weight: 600; color: #6f42c1; text-transform: uppercase; letter-spacing: 0.5px;">
                             <i class="fas fa-hourglass-start" style="margin-right: 6px;"></i>Début Dans
                         </h3>
@@ -71,18 +71,19 @@
                     </div>
                 </div>
             </div>
-            {% elif enchaire.etat == 'terminee' %}
-            <div style="min-width: 220px;">
-                <div style="background: linear-gradient(135deg, #2d1a1a 0%, #1a1a1a 100%); border-radius: 10px; padding: 18px; border: 1px solid #5d4040; text-align: center;">
-                    <h3 style="margin: 0 0 10px 0; font-size: 14px; font-weight: 600; color: #dc3545; text-transform: uppercase; letter-spacing: 0.5px;">
-                        <i class="fas fa-flag-checkered" style="margin-right: 6px;"></i>Enchère Terminée
-                    </h3>
-                    <div style="font-size: 24px; font-weight: 700; color: #dc3545; margin-bottom: 8px; font-family: 'Courier New', monospace; line-height: 1.2;">
-                        0j :0h :0min :0s
+            {% else %}
+                    <div style="min-width: 220px;">
+                        <div style="background: linear-gradient(135deg, #2d1a1a 0%, #1a1a1a 100%); border-radius: 10px; padding: 18px; border: 1px solid #5d4040; text-align: center;">
+                            <h3 style="margin: 0 0 10px 0; font-size: 14px; font-weight: 600; color: #dc3545; text-transform: uppercase; letter-spacing: 0.5px;">
+                                <i class="fas fa-flag-checkered" style="margin-right: 6px;"></i>Enchère Terminée
+                            </h3>
+                            <div id="countdown" style="font-size: 24px; font-weight: 700; color: #dc3545; margin-bottom: 8px; font-family: 'Courier New', monospace; line-height: 1.2;">
+                                0j :0h :0min :0s
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-            {% endif %}
+                    {% endif %}
+
 
             <!-- Right: Action Buttons -->
             <div style="display: flex; flex-direction: column; gap: 8px; min-width: 160px;">
@@ -299,7 +300,7 @@
                             
                             <!-- Caractéristiques -->
                             <div class="object-characteristics" style="color: #e0e0e0; font-size: 14px; margin-bottom: 16px;">
-{% if lot.type == 'vehicules' %}
+                                    {% if lot.type == 'vehicules' %}
                                         <div style="display: flex; align-items: center; margin-bottom: 8px;">
                                             <i class="fas fa-car" style="width: 18px; margin-right: 10px; color: #ff6b35;"></i>
                                             <strong style="margin-right: 6px;">Marque:</strong> {{ objet.nom }}
@@ -323,7 +324,7 @@
                                         </div>
                                         <div style="display: flex; align-items: center; margin-bottom: 8px;">
                                             <i class="fas fa-door-open" style="width: 18px; margin-right: 10px; color: #ff6b35;"></i>
-                                            <strong style="margin-right: 6px;">Pièces:</strong> {{ objet.nombre_pieces }}
+                                            <strong style="margin-right: 6px;">Pièces:</strong> {{ objet.pieces|default:"Non spécifié" }}
                                         </div>
                                     {% elif lot.type == 'materiel_pro' %}
                                         <div style="display: flex; align-items: center; margin-bottom: 8px;">
@@ -484,7 +485,7 @@ function startCountdown() {
     if (auctionState === 'active') {
         // Pour les enchères actives, compter jusqu'à la date de fin
         targetDate = new Date("{{ enchaire.date_fin }}").getTime();
-    } else if (auctionState === 'en_attente') {
+    } else if (auctionState === 'upcoming') {
         // Pour les enchères en attente, compter jusqu'à la date de début
         targetDate = new Date("{{ enchaire.date_debut }}").getTime();
     } else {

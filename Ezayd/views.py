@@ -209,7 +209,11 @@ def get_top_3_objets_by_category():
                 
                 # Calculer les jours restants
                 today = timezone.now().date()
+                delta = top_objet.lot.enchaire.date_fin - today
                 jours_restants = (top_objet.lot.enchaire.date_fin - today).days
+                heures_restantes = delta.seconds // 3600
+                minutes_restantes = (delta.seconds % 3600) // 60
+                secondes_restantes = delta.seconds % 60
 
                 # Récupérer les images
                 images = []
@@ -245,6 +249,9 @@ def get_top_3_objets_by_category():
                     'participation_count': top_objet.participation_count,
                     'price_current': top_objet.enchaireObjet.price_reserved if top_objet.enchaireObjet else 0,
                     'jours_restants': max(0, jours_restants),
+                    'heures_restantes': heures_restantes,
+                    'minutes_restantes': minutes_restantes,
+                    'secondes_restantes': secondes_restantes,
                     'images': images,
                     'main_image': random.choice(images) if images else '/static/images/placeholder.jpg',
                     'enchaire': top_objet.lot.enchaire,
@@ -329,6 +336,8 @@ def details_view(request, enchere_id):
                 'ville': immobilier.ville,
                 'adresse': immobilier.adresse,
                 'participation_count': participation_count,
+                'surface': immobilier.surface,  # Si applicable
+                'pieces': immobilier.nombre_pieces,  # Si applicable
             })
 
     # Si le lot est de type "materiel_pro"

@@ -65,26 +65,31 @@
                                               <div class="price-value">{{ objet_data.price_current|floatformat:0 }} DA</div>
                                               
                                                   <div class="time-label">Temps restant</div>
-                                                  <div class="countdown-timer" 
-                                                       data-end-date="{{ objet_data.enchaire.date_fin|date:'Y-m-d' }}"
-                                                       data-jours-restants="{{ objet_data.jours_restants }}">
+                                                <div class="countdown-timer" 
+                                                      data-end-date="{{ objet_data.enchaire.date_fin|date:'Y-m-d' }}"
+                                                      data-jours-restants="{{ objet_data.jours_restants }}"
+                                                      data-heures-restantes="{{ objet_data.heures_restantes }}"
+                                                      data-minutes-restantes="{{ objet_data.minutes_restantes }}"
+                                                      data-secondes-restantes="{{ objet_data.secondes_restantes }}">
+
                                                       <div class="time-block">
                                                           <div class="time-number days">{{ objet_data.jours_restants|stringformat:"02d" }}</div>
                                                           <div class="time-label-small">j</div>
                                                       </div>
                                                       <div class="time-block">
-                                                          <div class="time-number hours">00</div>
+                                                          <div class="time-number hours">{{ objet_data.heures_restantes|stringformat:"02d" }}</div>
                                                           <div class="time-label-small">h</div>
                                                       </div>
                                                       <div class="time-block">
-                                                          <div class="time-number minutes">00</div>
+                                                          <div class="time-number minutes">{{ objet_data.minutes_restantes|stringformat:"02d" }}</div>
                                                           <div class="time-label-small">m</div>
                                                       </div>
                                                       <div class="time-block">
-                                                          <div class="time-number seconds">00</div>
+                                                          <div class="time-number seconds">{{ objet_data.secondes_restantes|stringformat:"02d" }}</div>
                                                           <div class="time-label-small">s</div>
                                                       </div>
                                                   </div>
+
                                               
                                           </div>
                                       </div>
@@ -1203,6 +1208,7 @@ document.addEventListener('DOMContentLoaded', function() {
               const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
               const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
               const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+              
               
               const hoursElement = countdown.querySelector('.hours');
               const minutesElement = countdown.querySelector('.minutes');
