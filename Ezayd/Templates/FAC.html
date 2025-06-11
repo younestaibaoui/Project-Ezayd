@@ -1,0 +1,1404 @@
+{% extends "./base.html" %}
+
+{% load static %}
+
+{% block title %}Ezayd - Profil Utilisateur{% endblock %}
+
+{% block content %}
+
+<!-- Main Content -->
+<main class="main">
+    <!-- Welcome Section -->
+    <section id="welcome" class="welcome-section">
+        <div class="container">
+            <div class="welcome-content">
+                <h1 class="welcome-title">
+                    Bienvenue sur <span class="brand">EZAYD</span>
+                </h1>
+                <div class="welcome-subtitle">
+                    Le prototype de la première plateforme d'enchères en ligne en Algérie
+                </div>
+                <div class="welcome-text">
+                    <p>Notre objectif est de numériser et de moderniser le marché des ventes aux enchères, en le rendant plus accessible, transparent et sécurisé.</p>
+                    <p>EZAYD couvre plusieurs catégories de biens, tels que les véhicules, les équipements, et d'autres articles d'intérêt public, accessibles à tout moment depuis votre smartphone, tablette ou ordinateur, où que vous soyez.</p>
+                    <p>Nous avons conçu EZAYD pour vous offrir une expérience d'achat claire, fluide et fiable. Chaque enchère est accompagnée d'informations détaillées, d'une interface intuitive, et d'un système garantissant la confidentialité et la sécurité de vos transactions.</p>
+                    <p class="tagline"><strong>EZAYD — Les enchères algériennes, à portée de clic.</strong></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="how-it-works-section">
+        <div class="container">
+            <h2 class="section-title">Comment ça marche ?</h2>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3 class="step-title">Parcourez les enchères en cours</h3>
+                    <p class="step-description">
+                        Consultez les biens disponibles (véhicules, équipements, etc.) avec toutes les informations nécessaires : photos, descriptions, état, mise à prix, durée, etc.
+                    </p>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h3 class="step-title">Inscrivez-vous gratuitement</h3>
+                    <p class="step-description">
+                        Créez un compte en quelques clics pour suivre, participer ou réserver votre place aux enchères.
+                    </p>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <h3 class="step-title">Réservez votre place pour une enchère à venir</h3>
+                    <p class="step-description">
+                        Vous pouvez vous inscrire à l'avance à certaines enchères programmées. Cela vous permet de recevoir des rappels, de suivre leur ouverture, et de ne rien rater.
+                    </p>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <div class="step-icon">
+                        <i class="fas fa-gavel"></i>
+                    </div>
+                    <h3 class="step-title">Participez aux enchères en temps réel</h3>
+                    <p class="step-description">
+                        Enchérissez en ligne, en toute transparence, depuis votre ordinateur, tablette ou smartphone. Le montant est mis à jour instantanément à chaque nouvelle offre.
+                    </p>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">5</div>
+                    <div class="step-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <h3 class="step-title">Recevez une notification si vous remportez l'enchère</h3>
+                    <p class="step-description">
+                        Si vous êtes le plus offrant à la fin, vous serez notifié immédiatement avec les instructions à suivre.
+                    </p>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">6</div>
+                    <div class="step-icon">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <h3 class="step-title">Finalisez votre achat</h3>
+                    <p class="step-description">
+                        Suivez les étapes de confirmation, de paiement et de récupération du bien. EZAYD veille à la sécurité et à la clarté de chaque transaction.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Important Note -->
+            <div class="important-note">
+                <div class="note-icon">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <div class="note-content">
+                    <h4>Note importante !</h4>
+                    <p>EZAYD est actuellement une version prototype mise en ligne à des fins de test. Certaines fonctionnalités, telles que la vérification d'identité et l'intégration d'un système de paiement sécurisé, seront ajoutées dans les prochaines versions.</p>
+                    <p>Cette phase permet d'évaluer l'ergonomie, la performance et les retours des utilisateurs avant le lancement officiel.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="faq-section">
+        <div class="container">
+            <h2 class="section-title">
+                <i class="fas fa-question-circle"></i>
+                FAQ – Questions fréquentes
+            </h2>
+            
+            <div class="faq-container">
+                <div class="faq-item" data-faq="1">
+                    <div class="faq-question">
+                        <h3>Qu'est-ce que EZAYD ?</h3>
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>EZAYD est le prototype de la première plateforme d'enchères en ligne en Algérie. Elle permet aux utilisateurs de participer à des ventes aux enchères depuis leur smartphone, tablette ou ordinateur.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-faq="2">
+                    <div class="faq-question">
+                        <h3>Est-ce que la plateforme est déjà opérationnelle ?</h3>
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Actuellement, EZAYD est en phase de test. Certaines fonctionnalités sont limitées, et de nouvelles seront intégrées dans les prochaines versions.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-faq="3">
+                    <div class="faq-question">
+                        <h3>Quels types de biens sont proposés aux enchères ?</h3>
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>La plateforme couvre plusieurs catégories, notamment les véhicules, les équipements professionnels et d'autres biens d'intérêt public.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-faq="4">
+                    <div class="faq-question">
+                        <h3>Comment puis-je participer à une enchère ?</h3>
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Il suffit de créer un compte gratuitement, de parcourir les enchères en cours, puis de placer vos offres en temps réel.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-faq="5">
+                    <div class="faq-question">
+                        <h3>Est-ce que je peux réserver une place pour une enchère à venir ?</h3>
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Oui, vous pouvez réserver votre place à certaines enchères programmées afin de recevoir des rappels et ne rien manquer.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-faq="6">
+                    <div class="faq-question">
+                        <h3>Dois-je payer pour m'inscrire ou participer ?</h3>
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Non, l'inscription et la participation aux enchères sont gratuites pendant la phase de test.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-faq="7">
+                    <div class="faq-question">
+                        <h3>Comment saurai-je si j'ai remporté une enchère ?</h3>
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Si vous êtes le meilleur enchérisseur à la fin de la vente, vous recevrez une notification avec les instructions pour la suite.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-faq="8">
+                    <div class="faq-question">
+                        <h3>Les paiements sont-ils effectués en ligne ?</h3>
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Pas encore. Le système de paiement en ligne est en cours d'intégration et sera disponible dans une prochaine version.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-faq="9">
+                    <div class="faq-question">
+                        <h3>Mes données sont-elles protégées ?</h3>
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Oui. Même en phase de test, EZAYD applique des règles strictes de confidentialité et de protection des données.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-faq="10">
+                    <div class="faq-question">
+                        <h3>Puis-je suivre l'évolution des enchères ?</h3>
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Oui, EZAYD vous permet de suivre trois types d'enchères :</p>
+                        <ul>
+                            <li><strong>En cours :</strong> déjà ouvertes à la participation</li>
+                            <li><strong>À venir :</strong> programmées mais pas encore lancées</li>
+                            <li><strong>Terminées :</strong> clôturées, avec leurs résultats consultables</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script>
+    class AuthManager {
+    constructor() {
+        this.currentForm = "register"
+        this.init()
+    }
+
+    init() {
+        this.bindEvents()
+        this.setupPasswordToggle()
+        this.setupFormValidation()
+    }
+
+    bindEvents() {
+        // Form switching
+        document.querySelectorAll(".link-btn").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+            const target = e.target.dataset.target
+            this.switchForm(target)
+        })
+        })
+
+        // Form submissions
+        document.querySelectorAll(".auth-form").forEach((form) => {
+        form.addEventListener("submit", (e) => {
+            e.preventDefault()
+            this.handleFormSubmit(form)
+        })
+        })
+
+        // Google Sign-in
+        document.querySelectorAll(".btn-google").forEach((btn) => {
+        btn.addEventListener("click", () => {
+            this.handleGoogleSignIn()
+        })
+        })
+    }
+
+    switchForm(targetForm) {
+        const registerContainer = document.querySelector(".form-container-register")
+        const loginContainer = document.querySelector(".form-container-login")
+
+        if (targetForm === "login") {
+        // Hide register form with slide out animation
+        registerContainer.classList.add("slide-out-left")
+
+        // After animation completes, show login form
+        setTimeout(() => {
+            registerContainer.classList.remove("active", "slide-out-left")
+            loginContainer.classList.add("active", "slide-in-right")
+            this.currentForm = "login"
+        }, 250)
+        } else {
+        // Hide login form with slide out animation
+        loginContainer.classList.add("slide-out-right")
+
+        // After animation completes, show register form
+        setTimeout(() => {
+            loginContainer.classList.remove("active", "slide-out-right")
+            registerContainer.classList.add("active", "slide-in-left")
+            this.currentForm = "register"
+        }, 250)
+        }
+
+        // Clean up animation classes after animations complete
+        setTimeout(() => {
+        registerContainer.classList.remove("slide-in-left", "slide-in-right", "slide-out-left", "slide-out-right")
+        loginContainer.classList.remove("slide-in-left", "slide-in-right", "slide-out-left", "slide-out-right")
+        }, 600)
+    }
+
+    setupPasswordToggle() {
+        document.querySelectorAll(".toggle-visibility").forEach((btn) => {
+        btn.addEventListener("click", () => {
+            const input = btn.previousElementSibling
+            const icon = btn.querySelector("i")
+
+            if (input.type === "password") {
+            input.type = "text"
+            icon.classList.remove("fa-eye-slash")
+            icon.classList.add("fa-eye")
+            } else {
+            input.type = "password"
+            icon.classList.remove("fa-eye")
+            icon.classList.add("fa-eye-slash")
+            }
+        })
+        })
+    }
+
+    setupFormValidation() {
+        document.querySelectorAll("input").forEach((input) => {
+        input.addEventListener("blur", () => {
+            this.validateField(input)
+        })
+
+        input.addEventListener("input", () => {
+            this.clearFieldError(input)
+        })
+        })
+    }
+
+    validateField(input) {
+        const container = input.closest(".input-container")
+        const value = input.value.trim()
+        let isValid = true
+        let errorMessage = ""
+
+        // Remove existing error
+        this.clearFieldError(input)
+
+        // Email validation
+        if (input.type === "email") {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        if (!emailRegex.test(value)) {
+            isValid = false
+            errorMessage = "Please enter a valid email address"
+        }
+        }
+
+        // Password validation
+        if (input.name === "password") {
+        if (value.length < 8) {
+            isValid = false
+            errorMessage = "Password must be at least 8 characters long"
+        } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(value)) {
+            isValid = false
+            errorMessage = "Password must contain uppercase, lowercase, and number"
+        }
+        }
+
+        // Confirm password validation
+        if (input.name === "confirmPassword") {
+        const passwordInput = document.querySelector('input[name="password"]')
+        if (value !== passwordInput.value) {
+            isValid = false
+            errorMessage = "Passwords do not match"
+        }
+        }
+
+        // Required field validation
+        if (input.required && !value) {
+        isValid = false
+        errorMessage = "This field is required"
+        }
+
+        // Name validation
+        if ((input.name === "firstName" || input.name === "lastName") && value) {
+        if (!/^[a-zA-Z\s]+$/.test(value)) {
+            isValid = false
+            errorMessage = "Name can only contain letters and spaces"
+        }
+        }
+
+        if (!isValid) {
+        this.showFieldError(input, errorMessage)
+        } else {
+        this.showFieldSuccess(input)
+        }
+
+        return isValid
+    }
+
+    showFieldError(input, message) {
+        const container = input.closest(".input-container")
+        container.classList.add("error")
+        container.classList.remove("success")
+
+        // Remove existing error message
+        const existingError = container.querySelector(".error-message")
+        if (existingError) {
+        existingError.remove()
+        }
+
+        // Add new error message
+        const errorDiv = document.createElement("div")
+        errorDiv.className = "error-message"
+        errorDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`
+        container.appendChild(errorDiv)
+    }
+
+    showFieldSuccess(input) {
+        const container = input.closest(".input-container")
+        container.classList.add("success")
+        container.classList.remove("error")
+
+        // Remove error message
+        const existingError = container.querySelector(".error-message")
+        if (existingError) {
+        existingError.remove()
+        }
+    }
+
+    clearFieldError(input) {
+        const container = input.closest(".input-container")
+        container.classList.remove("error", "success")
+
+        const existingError = container.querySelector(".error-message")
+        if (existingError) {
+        existingError.remove()
+        }
+    }
+
+    async handleFormSubmit(form) {
+        const formData = new FormData(form)
+        const data = Object.fromEntries(formData.entries())
+
+        // Validate all fields
+        const inputs = form.querySelectorAll("input[required]")
+        let isFormValid = true
+
+        inputs.forEach((input) => {
+        if (!this.validateField(input)) {
+            isFormValid = false
+        }
+        })
+
+        if (!isFormValid) {
+        this.showNotification("Please fix the errors above", "error")
+        return
+        }
+
+        // Show loading state
+        const submitBtn = form.querySelector('button[type="submit"]')
+        const originalText = submitBtn.innerHTML
+        submitBtn.innerHTML = '<span class="spinner"></span> Processing...'
+        submitBtn.disabled = true
+
+        try {
+        if (this.currentForm === "register") {
+            await this.handleRegistration(data)
+        } else {
+            await this.handleLogin(data)
+        }
+        } catch (error) {
+        this.showNotification(error.message, "error")
+        } finally {
+        // Restore button state
+        submitBtn.innerHTML = originalText
+        submitBtn.disabled = false
+        }
+    }
+
+    async handleRegistration(data) {
+        // Simulate API call
+        await this.simulateApiCall()
+
+        // Show verification message
+        const verificationMessage = document.querySelector(".verification-message")
+        verificationMessage.classList.remove("hidden")
+
+        // Hide form
+        const form = document.querySelector(".register-form")
+        form.style.display = "none"
+
+        this.showNotification("Registration successful! Please check your email.", "success")
+    }
+
+    async handleLogin(data) {
+        // Simulate API call
+        await this.simulateApiCall()
+
+        this.showNotification("Login successful! Redirecting...", "success")
+
+        // Simulate redirect
+        setTimeout(() => {
+        window.location.href = "/dashboard"
+        }, 2000)
+    }
+
+    async handleGoogleSignIn() {
+        try {
+        // Simulate Google Sign-in
+        await this.simulateApiCall()
+        this.showNotification("Google Sign-in successful!", "success")
+        } catch (error) {
+        this.showNotification("Google Sign-in failed. Please try again.", "error")
+        }
+    }
+
+    simulateApiCall() {
+        return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            // Simulate random success/failure for demo
+            if (Math.random() > 0.1) {
+            resolve()
+            } else {
+            reject(new Error("Network error. Please try again."))
+            }
+        }, 2000)
+        })
+    }
+
+    showNotification(message, type = "info") {
+        // Remove existing notifications
+        const existingNotifications = document.querySelectorAll(".notification")
+        existingNotifications.forEach((notification) => notification.remove())
+
+        // Create notification
+        const notification = document.createElement("div")
+        notification.className = `notification notification-${type}`
+        notification.innerHTML = `
+                <div class="notification-content">
+                    <i class="fas ${this.getNotificationIcon(type)}"></i>
+                    <span>${message}</span>
+                    <button class="notification-close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `
+
+        // Add styles
+        Object.assign(notification.style, {
+        position: "fixed",
+        top: "20px",
+        right: "20px",
+        background: type === "error" ? "#dc3545" : type === "success" ? "#28a745" : "#17a2b8",
+        color: "white",
+        padding: "15px 20px",
+        borderRadius: "8px",
+        boxShadow: "0 4px 8px rgba(0,0,0,0.3)",
+        zIndex: "10000",
+        animation: "slideInRight 0.3s ease-out",
+        maxWidth: "400px",
+        })
+
+        // Add to page
+        document.body.appendChild(notification)
+
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+        if (notification.parentNode) {
+            notification.style.animation = "slideOutRight 0.3s ease-out"
+            setTimeout(() => notification.remove(), 300)
+        }
+        }, 5000)
+
+        // Close button functionality
+        notification.querySelector(".notification-close").addEventListener("click", () => {
+        notification.style.animation = "slideOutRight 0.3s ease-out"
+        setTimeout(() => notification.remove(), 300)
+        })
+    }
+
+    getNotificationIcon(type) {
+        switch (type) {
+        case "success":
+            return "fa-check-circle"
+        case "error":
+            return "fa-exclamation-circle"
+        case "warning":
+            return "fa-exclamation-triangle"
+        default:
+            return "fa-info-circle"
+        }
+    }
+    }
+
+    class FAQManager {
+    constructor() {
+        this.init()
+    }
+
+    init() {
+        this.setupFAQ()
+        this.setupScrollAnimations()
+        this.setupSmoothScrolling()
+        this.setupHeaderScroll()
+    }
+
+    setupFAQ() {
+        const faqItems = document.querySelectorAll(".faq-item")
+
+        faqItems.forEach((item) => {
+        const question = item.querySelector(".faq-question")
+
+        question.addEventListener("click", () => {
+            const isActive = item.classList.contains("active")
+
+            // Close all other FAQ items
+            faqItems.forEach((otherItem) => {
+            if (otherItem !== item) {
+                otherItem.classList.remove("active")
+            }
+            })
+
+            // Toggle current item
+            if (isActive) {
+            item.classList.remove("active")
+            } else {
+            item.classList.add("active")
+            }
+        })
+        })
+    }
+
+    setupScrollAnimations() {
+        const observerOptions = {
+        threshold: 0.1,
+        rootMargin: "0px 0px -50px 0px",
+        }
+
+        const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+            entry.target.classList.add("animate")
+            }
+        })
+        }, observerOptions)
+
+        // Observe step cards
+        const stepCards = document.querySelectorAll(".step-card")
+        stepCards.forEach((card) => {
+        observer.observe(card)
+        })
+
+        // Observe FAQ items
+        const faqItems = document.querySelectorAll(".faq-item")
+        faqItems.forEach((item, index) => {
+        item.style.animationDelay = `${index * 0.1}s`
+        observer.observe(item)
+        })
+    }
+
+    setupSmoothScrolling() {
+        const navLinks = document.querySelectorAll(".nav-link")
+
+        navLinks.forEach((link) => {
+        link.addEventListener("click", (e) => {
+            e.preventDefault()
+            const targetId = link.getAttribute("href")
+            const targetSection = document.querySelector(targetId)
+
+            if (targetSection) {
+            const headerHeight = document.querySelector(".header").offsetHeight
+            const targetPosition = targetSection.offsetTop - headerHeight - 20
+
+            window.scrollTo({
+                top: targetPosition,
+                behavior: "smooth",
+            })
+            }
+        })
+        })
+    }
+
+    setupHeaderScroll() {
+        const header = document.querySelector(".header")
+        let lastScrollY = window.scrollY
+
+        window.addEventListener("scroll", () => {
+        const currentScrollY = window.scrollY
+
+        if (currentScrollY > 100) {
+            header.style.background = "rgba(17, 17, 17, 0.95)"
+            header.style.boxShadow = "0 2px 20px rgba(0, 0, 0, 0.3)"
+        } else {
+            header.style.background = "rgba(34, 34, 34, 0.95)"
+            header.style.boxShadow = "none"
+        }
+
+        lastScrollY = currentScrollY
+        })
+    }
+    }
+
+    // Utility functions
+    const Utils = {
+    debounce(func, wait) {
+        let timeout
+        return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout)
+            func(...args)
+        }
+        clearTimeout(timeout)
+        timeout = setTimeout(later, wait)
+        }
+    },
+
+    throttle(func, limit) {
+        let inThrottle
+        return function () {
+        const args = arguments
+
+        if (!inThrottle) {
+            func.apply(this, args)
+            inThrottle = true
+            setTimeout(() => (inThrottle = false), limit)
+        }
+        }
+    },
+    }
+
+    // Add notification animations to CSS
+    const style = document.createElement("style")
+    style.textContent = `
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        .notification-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 0;
+            margin-left: auto;
+        }
+
+        .notification-close:hover {
+            opacity: 0.7;
+        }
+    `
+    document.head.appendChild(style)
+
+    // Initialize the application
+    document.addEventListener("DOMContentLoaded", () => {
+    new AuthManager()
+    new FAQManager()
+    })
+
+    // Handle page visibility for better UX
+    document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") {
+        // Page became visible, could refresh data or check auth status
+        console.log("Page is now visible")
+    }
+    })
+
+    // Handle online/offline status
+    window.addEventListener("online", () => {
+    console.log("Connection restored")
+    })
+
+    window.addEventListener("offline", () => {
+    console.log("Connection lost")
+    })
+
+    // Add loading animation
+    window.addEventListener("load", () => {
+    document.body.classList.add("loaded")
+    })
+
+    // Add scroll-to-top functionality
+    const scrollToTop = () => {
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+    })
+    }
+
+    // Create scroll-to-top button
+    const createScrollToTopButton = () => {
+    const button = document.createElement("button")
+    button.innerHTML = '<i class="fas fa-chevron-up"></i>'
+    button.className = "scroll-to-top"
+    button.onclick = scrollToTop
+
+    // Add styles
+    Object.assign(button.style, {
+        position: "fixed",
+        bottom: "30px",
+        right: "30px",
+        width: "50px",
+        height: "50px",
+        borderRadius: "50%",
+        background: "var(--primary-color)",
+        color: "white",
+        border: "none",
+        cursor: "pointer",
+        fontSize: "1.2rem",
+        boxShadow: "0 4px 12px rgba(222, 13, 51, 0.3)",
+        transition: "all 0.3s ease",
+        opacity: "0",
+        visibility: "hidden",
+        zIndex: "1000",
+    })
+
+    document.body.appendChild(button)
+
+    // Show/hide button based on scroll position
+    window.addEventListener(
+        "scroll",
+        Utils.throttle(() => {
+        if (window.scrollY > 500) {
+            button.style.opacity = "1"
+            button.style.visibility = "visible"
+        } else {
+            button.style.opacity = "0"
+            button.style.visibility = "hidden"
+        }
+        }, 100),
+    )
+
+    // Hover effects
+    button.addEventListener("mouseenter", () => {
+        button.style.transform = "scale(1.1)"
+        button.style.boxShadow = "0 6px 16px rgba(222, 13, 51, 0.4)"
+    })
+
+    button.addEventListener("mouseleave", () => {
+        button.style.transform = "scale(1)"
+        button.style.boxShadow = "0 4px 12px rgba(222, 13, 51, 0.3)"
+    })
+    }
+
+    // Initialize scroll-to-top button
+    createScrollToTopButton()
+
+</script>
+
+<style>
+
+    /* CSS Variables */
+    :root {
+    --primary-color: #de0d33;
+    --secondary-color: #b9243f;
+    --background-dark: #111;
+    --background-light: #222;
+    --text-light: #eee;
+    --text-muted: #666;
+    --border-color: #333;
+    --success-color: #28a745;
+    --warning-color: #ffc107;
+    --error-color: #dc3545;
+    --font-family: "Outfit", sans-serif;
+    --transition: all 0.3s ease;
+    --border-radius: 6px;
+    --box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Reset and Base Styles */
+    * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    }
+
+    html {
+    scroll-behavior: smooth;
+    }
+
+    body {
+    font-family: var(--font-family);
+    background: linear-gradient(135deg, var(--background-dark) 0%, #1a1a1a 100%);
+    color: var(--text-light);
+    line-height: 1.6;
+    overflow-x: hidden;
+    }
+
+    .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    }
+
+    /* Header */
+    .header {
+    background: rgba(34, 34, 34, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-color);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    transition: var(--transition);
+    }
+
+    .header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 0;
+    }
+
+    .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    }
+
+    .logo img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    }
+
+    .logo-text {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    }
+
+    .nav {
+    display: flex;
+    gap: 30px;
+    }
+
+    .nav-link {
+    color: var(--text-light);
+    text-decoration: none;
+    font-weight: 500;
+    transition: var(--transition);
+    position: relative;
+    }
+
+    .nav-link:hover {
+    color: var(--primary-color);
+    }
+
+    .nav-link::after {
+    content: "";
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--primary-color);
+    transition: var(--transition);
+    }
+
+    .nav-link:hover::after {
+    width: 100%;
+    }
+
+    {% comment %} /* Main Content */
+    .main {
+    margin-top: 80px;
+    } {% endcomment %}
+
+    .main {
+        position: relative;
+        left: 50%;
+        right: 50%;
+        margin-left: -50vw;
+        margin-right: -50vw;
+        width: 100vw;
+    }
+
+    /* Welcome Section */
+    .welcome-section {
+    padding: 80px 0;
+    background: linear-gradient(135deg, rgba(222, 13, 51, 0.1) 0%, transparent 50%);
+    }
+
+    .welcome-content {
+    text-align: center;
+    max-width: 900px;
+    margin: 0 auto;
+    }
+
+    .welcome-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 20px;
+    line-height: 1.2;
+    }
+
+    .brand {
+    color: var(--primary-color);
+    text-shadow: 0 0 20px rgba(222, 13, 51, 0.3);
+    }
+
+    .welcome-subtitle {
+    font-size: 1.3rem;
+    color: var(--primary-color);
+    font-weight: 600;
+    margin-bottom: 40px;
+    }
+
+    .welcome-text {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--text-light);
+    }
+
+    .welcome-text p {
+    margin-bottom: 20px;
+    }
+
+    .tagline {
+    font-size: 1.2rem;
+    color: var(--primary-color);
+    margin-top: 30px;
+    }
+
+    /* How It Works Section */
+    .how-it-works-section {
+    padding: 80px 0;
+    background: var(--background-light);
+    }
+
+    .section-title {
+    text-align: center;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 60px;
+    color: var(--text-light);
+    }
+
+    .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 30px;
+    margin-bottom: 60px;
+    }
+
+    .step-card {
+    background: rgba(34, 34, 34, 0.8);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 30px;
+    text-align: center;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+    }
+
+    .step-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    transform: translateX(-100%);
+    transition: var(--transition);
+    }
+
+    .step-card:hover::before {
+    transform: translateX(0);
+    }
+
+    .step-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(222, 13, 51, 0.2);
+    }
+
+    .step-number {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: var(--primary-color);
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.2rem;
+    }
+
+    .step-icon {
+    font-size: 3rem;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    margin-top: 25px;
+    }
+
+    .step-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: var(--text-light);
+    }
+
+    .step-description {
+    color: var(--text-muted);
+    line-height: 1.6;
+    }
+
+    /* Important Note */
+    .important-note {
+    background: rgba(255, 193, 7, 0.1);
+    border: 1px solid var(--warning-color);
+    border-radius: var(--border-radius);
+    padding: 30px;
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    }
+
+    .note-icon {
+    font-size: 2rem;
+    color: var(--warning-color);
+    flex-shrink: 0;
+    }
+
+    .note-content h4 {
+    color: var(--warning-color);
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    }
+
+    .note-content p {
+    color: var(--text-light);
+    margin-bottom: 10px;
+    }
+
+    /* FAQ Section */
+    .faq-section {
+    padding: 80px 0;
+    background: var(--background-dark);
+    }
+
+    .faq-container {
+    max-width: 800px;
+    margin: 0 auto;
+    }
+
+    .faq-item {
+    background: var(--background-light);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    margin-bottom: 15px;
+    overflow: hidden;
+    transition: var(--transition);
+    }
+
+    .faq-item:hover {
+    border-color: var(--primary-color);
+    }
+
+    .faq-question {
+    padding: 25px 30px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: var(--transition);
+    }
+
+    .faq-question:hover {
+    background: rgba(222, 13, 51, 0.05);
+    }
+
+    .faq-question h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-light);
+    margin: 0;
+    }
+
+    .faq-icon {
+    color: var(--primary-color);
+    font-size: 1.2rem;
+    transition: var(--transition);
+    }
+
+    .faq-item.active .faq-icon {
+    transform: rotate(180deg);
+    }
+
+    .faq-answer {
+    padding: 0 30px;
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    }
+
+    .faq-item.active .faq-answer {
+    padding: 0 30px 25px;
+    max-height: 500px;
+    }
+
+    .faq-answer p {
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 10px;
+    }
+
+    .faq-answer ul {
+    color: var(--text-muted);
+    padding-left: 20px;
+    }
+
+    .faq-answer li {
+    margin-bottom: 8px;
+    }
+
+    .faq-answer strong {
+    color: var(--primary-color);
+    }
+
+    /* Footer */
+    .footer {
+    background: var(--background-light);
+    border-top: 1px solid var(--border-color);
+    padding: 40px 0;
+    margin-top: 80px;
+    }
+
+    .footer-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+    }
+
+    .footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    }
+
+    .footer-logo img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    }
+
+    .footer-text {
+    text-align: right;
+    }
+
+    .footer-text p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .nav {
+        gap: 20px;
+    }
+
+    .welcome-title {
+        font-size: 2.5rem;
+    }
+
+    .welcome-subtitle {
+        font-size: 1.1rem;
+    }
+
+    .steps-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .important-note {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .footer-content {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .footer-text {
+        text-align: center;
+    }
+    }
+
+    @media (max-width: 480px) {
+    .container {
+        padding: 0 15px;
+    }
+
+    .welcome-section {
+        padding: 60px 0;
+    }
+
+    .how-it-works-section {
+        padding: 60px 0;
+    }
+
+    .faq-section {
+        padding: 60px 0;
+    }
+
+    .step-card {
+        padding: 20px;
+    }
+
+    .faq-question {
+        padding: 20px;
+    }
+
+    .faq-item.active .faq-answer {
+        padding: 0 20px 20px;
+    }
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    }
+
+    .step-card {
+    animation: fadeInUp 0.6s ease-out;
+    }
+
+    .step-card:nth-child(1) {
+    animation-delay: 0.1s;
+    }
+    .step-card:nth-child(2) {
+    animation-delay: 0.2s;
+    }
+    .step-card:nth-child(3) {
+    animation-delay: 0.3s;
+    }
+    .step-card:nth-child(4) {
+    animation-delay: 0.4s;
+    }
+    .step-card:nth-child(5) {
+    animation-delay: 0.5s;
+    }
+    .step-card:nth-child(6) {
+    animation-delay: 0.6s;
+    }
+
+    /* Scroll Animations */
+    @media (prefers-reduced-motion: no-preference) {
+    .step-card {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    .step-card.animate {
+        animation: fadeInUp 0.6s ease-out forwards;
+    }
+    }
+
+</style>
+
+{% endblock %}

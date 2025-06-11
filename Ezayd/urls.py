@@ -19,6 +19,8 @@ urlpatterns = [
     path('remove_pfp/',remove_pfp,name='remove_pfp'),
     # API Search
     path('api/search/', search_api, name='search_api'),
+
+    path('FAQ/', faq, name='FAQ'),
 ]
 
 if settings.DEBUG:
