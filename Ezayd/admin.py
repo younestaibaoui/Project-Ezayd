@@ -60,7 +60,6 @@ class LotAdmin(admin.ModelAdmin):
 from django.forms.models import BaseInlineFormSet
 from django.core.exceptions import ValidationError
 
-
 class VoitureImageInlineFormSet(BaseInlineFormSet):
     def clean(self):
         super().clean()
@@ -86,9 +85,20 @@ class VoitureAdmin(admin.ModelAdmin):
 
 
 # ---------- Admin pour Immobilier et Images ----------
+class ImmobilierImageInlineFormSet(BaseInlineFormSet):
+    def clean(self):
+        super().clean()
+        count = 0
+        for form in self.forms:
+            if not form.cleaned_data.get('DELETE', False) and form.cleaned_data:
+                count += 1
+        if count < 3:
+            raise ValidationError("Vous devez ajouter au moins 3 images pour chaque bien immobilier.")
+
 class ImmobilierImageInline(admin.TabularInline):
     model = ImmobilierImage
     extra = 1
+    formset = ImmobilierImageInlineFormSet
 
 @admin.register(Immobilier)
 class ImmobilierAdmin(admin.ModelAdmin):
@@ -99,9 +109,20 @@ class ImmobilierAdmin(admin.ModelAdmin):
 
 
 # ---------- Admin pour MaterielProfessionnel et Images ----------
+class MaterielProfessionnelImageInlineFormSet(BaseInlineFormSet):
+    def clean(self):
+        super().clean()
+        count = 0
+        for form in self.forms:
+            if not form.cleaned_data.get('DELETE', False) and form.cleaned_data:
+                count += 1
+        if count < 3:
+            raise ValidationError("Vous devez ajouter au moins 3 images pour chaque matériel professionnel.")
+
 class MaterielProfessionnelImageInline(admin.TabularInline):
     model = MaterielProfessionnelImage
     extra = 1
+    formset = MaterielProfessionnelImageInlineFormSet
 
 @admin.register(MaterielProfessionnel)
 class MaterielProfessionnelAdmin(admin.ModelAdmin):
@@ -112,9 +133,20 @@ class MaterielProfessionnelAdmin(admin.ModelAdmin):
 
 
 # ---------- Admin pour InformatiqueElectronique et Images ----------
+class InformatiqueImageInlineFormSet(BaseInlineFormSet):
+    def clean(self):
+        super().clean()
+        count = 0
+        for form in self.forms:
+            if not form.cleaned_data.get('DELETE', False) and form.cleaned_data:
+                count += 1
+        if count < 3:
+            raise ValidationError("Vous devez ajouter au moins 3 images pour chaque équipement informatique.")
+
 class InformatiqueImageInline(admin.TabularInline):
     model = InformatiqueImage
     extra = 1
+    formset = InformatiqueImageInlineFormSet
 
 @admin.register(InformatiqueElectronique)
 class InformatiqueElectroniqueAdmin(admin.ModelAdmin):
@@ -129,4 +161,3 @@ class InformatiqueElectroniqueAdmin(admin.ModelAdmin):
 class MobilierEquipementAdmin(admin.ModelAdmin):
     list_display = ('categorie', 'materiau', 'couleur', 'lot')
     search_fields = ('categorie', 'materiau', 'couleur')
-
