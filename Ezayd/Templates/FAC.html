@@ -837,7 +837,7 @@
 
     body {
     font-family: var(--font-family);
-    background: linear-gradient(135deg, var(--background-dark) 0%,rgb(62, 98, 86) 100%);
+  
     color: var(--text-light);
     line-height: 1.6;
     overflow-x: hidden;
@@ -935,7 +935,9 @@
 
     /* Welcome Section */
     .welcome-section {
-    padding: 100px 20px;
+    
+    padding-top: 100px; /* To account for fixed header */
+    padding-bottom: 30px;;
     background: var(--background-light);
     border: solid  red;
     }
