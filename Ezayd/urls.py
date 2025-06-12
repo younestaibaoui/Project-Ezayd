@@ -21,6 +21,7 @@ urlpatterns = [
     path('api/search/', search_api, name='search_api'),
 
     path('FAQ/', faq, name='FAQ'),
+    path('a-propos/', a_propos, name='a_propos'),
 ]
 
 if settings.DEBUG:

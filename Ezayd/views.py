@@ -1360,3 +1360,20 @@ def faq(request):
 
     return render(request,'FAC.html',context)
 
+def a_propos(request):
+
+    context = {}
+
+    if request.user.is_authenticated:
+        notifications = request.user.notifications.all() if request.user.is_authenticated else None
+        if notifications:
+            unread_count = notifications.filter(is_read=False).count()
+        else:
+            unread_count = 0
+
+        # Récupérer les notifications de l'utilisateur connecté
+        notifications = request.user.notifications.all().order_by('-created_at')    
+        context['unread_count'] = unread_count
+        context['notifications'] = notifications
+
+    return render(request,'a_propos.html',context)

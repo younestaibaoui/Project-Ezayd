@@ -199,18 +199,24 @@ class Enchaire(models.Model):
             if old_etat != new_etat:
                 self.etat = new_etat
                 super().save(*args, **kwargs)
-                self.notify_savers(old_etat, new_etat)
+                self.notify_savers(old_etat)
                 return
         self.etat = new_etat
         super().save(*args, **kwargs)
 
     # methode pour notifier les utilisateur de changement d'etat
-    def notify_savers(self, old_etat, new_etat):
+    def notify_savers(self, old_etat):
+
+        if old_etat == 'upcoming':
+            message = "L’enchère vient de commencer — ne manquez pas votre chance de faire la meilleure offre !"
+        else:
+            message = "L’enchère est maintenant terminée !"
+
         for user in self.savers.all():
             NotificationEnchaire.objects.create(
                 user=user,
                 enchaire=self,
-                message=f"L'état de l'enchère a changé de '{old_etat}' à '{new_etat}'."
+                message=message,
             )
 
     def is_active(self):
@@ -261,10 +267,22 @@ class DemandeEnchaire(models.Model):
         super().save(*args, **kwargs)
 
     def notify_user(self, new_etat, user ,enchaire):
+
+        if new_etat == 'Approuvée':
+            if enchaire.is_active():
+                message = "Votre demande de participation a été approuvée, vous pouvez enchérir maintenant !"
+            else:
+                message = "Votre demande de réservation a été approuvée, vous pouvez enchérir dès que l'enchère s’ouvre."
+        else:
+            if enchaire.is_active():
+                message = "Votre demande de participation a été rejetée"
+            else:
+                message = "Votre demande de réservation a été rejetée."
+
         NotificationEnchaire.objects.create(
             user=user,
             enchaire=enchaire,
-            message=f"La demande de l'enchaire {enchaire} a ete {new_etat}."
+            message=message,
         )
     
     def delete_notif(self, user, enchaire):
@@ -318,7 +336,7 @@ class ParticipationEnchaire(models.Model):
         NotificationEnchaire.objects.create(
             user=UserAccount.objects.get(id=user['user']),
             enchaireObjet=enchaireObjet,
-            message=f"L\'utilisateur {self.user.username} a participer a l'enchere {enchaireObjet} avec un montant de {montant}."
+            message=f"Un autre utilisateur a proposé un montant supérieur au vôtre dans l'enchère."
         )
 
     def __str__(self):

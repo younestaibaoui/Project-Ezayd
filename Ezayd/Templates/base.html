@@ -222,9 +222,13 @@
                   onmouseout="this.style.backgroundColor='transparent'">
             
             <!-- Avatar -->
-            <img src="{% if user.pfp %}{{ user.pfp.url }}{% else %}{% static 'img/default-avatar.png' %}{% endif %}" 
-                alt="PDP" style="width: 40px; height: 40px; border-radius: 6px; object-fit: cover; border: 2px solid transparent; transition: border-color 0.2s ease;">
-            
+                {% if user.pfp %}
+                    <img src="{{ user.pfp.url }}" alt="Photo de profil" class="profile-avatar1">
+                {% else %}
+                    <div class="participant-avatar1">
+                        {{ user.username|slice:":1"|upper }}
+                    </div>
+                {% endif %}
             <!-- Nom abrégé -->
             <span style="font-size: 14px; font-weight: 500;">{{ user.first_name }} {{ user.last_name|slice:":1" }}.</span>
             
@@ -272,6 +276,38 @@
 
 
     <script>
+function setupHeaderScroll() {
+    const header = document.querySelector(".header");
+    let lastScrollY = window.scrollY;
+
+    window.addEventListener("scroll", () => {
+        const currentScrollY = window.scrollY;
+
+        if (currentScrollY > 100) {
+            header.style.background = "rgba(17, 17, 17, 0.95)";
+            header.style.boxShadow = "0 2px 20px rgba(0, 0, 0, 0.3)";
+        } else {
+            header.style.background = "#000000";
+            header.style.boxShadow = "none";
+        }
+
+        lastScrollY = currentScrollY;
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize header scroll effect
+    setupHeaderScroll();
+    
+    // Your existing code for user dropdown...
+    const userToggleBtn = document.getElementById('userToggleBtn');
+    const userDropdown  = document.getElementById('userDropdown');
+    const dropdownIcon  = document.getElementById('dropdownIcon');
+    let isDropdownOpen  = false;
+
+    // Rest of your existing code continues here...
+});
+
       document.addEventListener('DOMContentLoaded', function() {
         // Récupération des éléments après que tout le DOM soit chargé
         const userToggleBtn = document.getElementById('userToggleBtn');
@@ -381,7 +417,7 @@
             <div class="footer-column">
                 <h3>Entreprise</h3>
                 <ul>
-                    <li><a href="{% url 'FAQ' %}">À Propos de Nous</a></li>
+                    <li><a href="{% url 'a_propos' %}">À Propos de Nous</a></li>
                     <li><a href="{% url 'FAQ' %}">Nos Services</a></li>
                 </ul>
             </div>
@@ -521,8 +557,64 @@
 </button>
 
 <style>
+
+  .participant-avatar1 {
+        background-color: #ff6b35;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        flex-shrink: 0;
+        font-size: 1.1em;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+    }
+
   /* CSS */
 
+      .profile-avatar-section {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: var(--border-radius);
+        padding: 25px;
+        text-align: center;
+        box-shadow: var(--box-shadow);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    .profile-avatar1 {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        object-fit: cover;
+        box-shadow: var(--box-shadow);
+    }
+
+    .default-avatar i {
+        font-size: 3.5rem;
+        color: var(--text-light);
+    }
+  /* Header */
+.header {
+    background: rgba(34, 34, 34, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-color);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    transition: var(--transition);
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 0;
+}
 
   .footer-copyright
   {
@@ -530,7 +622,7 @@
       padding: 15px;
       font-size: 1.0rem;
       color: #aaa;
-      background-color: #1f1f1f;
+      {% comment %} background-color: #1f1f1f; {% endcomment %}
       border-top: 1px solid #333;
 
   }
