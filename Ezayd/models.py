@@ -187,9 +187,28 @@ class Enchaire(models.Model):
         today = timezone.now().date()
         if today < self.date_debut:
             return 'upcoming'
-        elif self.date_debut <= today <= self.date_fin:
+        elif self.date_debut <= today < self.date_fin:
             return 'active'
         else:
+            type_objet = self.lot.type
+
+            if type_objet == 'vehicules':
+                EnchaireObjet.objects.filter(voiture__lot__enchaire=self).update(reserved=True)
+            elif type_objet == 'immobilier':
+                EnchaireObjet.objects.filter(immobilier__lot__enchaire=self).update(reserved=True)
+            elif type_objet == 'materiel_pro':
+                EnchaireObjet.objects.filter(materielProfessionnel__lot__enchaire=self).update(reserved=True)
+            elif type_objet == 'informatique_electronique':
+                EnchaireObjet.objects.filter(informatiqueElectronique__lot__enchaire=self).update(reserved=True)
+            elif type_objet == 'mobilier_equipements':
+                EnchaireObjet.objects.filter(mobilierEquipement__lot__enchaire=self).update(reserved=True)
+            elif type_objet == 'bijoux_objets_valeur':
+                EnchaireObjet.objects.filter(bijouxObjetValeur__lot__enchaire=self).update(reserved=True)
+            elif type_objet == 'stocks_invendus':
+                EnchaireObjet.objects.filter(stockInvendu__lot__enchaire=self).update(reserved=True)
+            elif type_objet == 'oeuvres_collections':
+                EnchaireObjet.objects.filter(oeuvreCollection__lot__enchaire=self).update(reserved=True)
+        
             return 'finis'
 
     def save(self, *args, **kwargs):
