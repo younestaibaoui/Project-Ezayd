@@ -90,27 +90,27 @@
               <span class="category-text">Matériel professionnel</span>
             </label>
             <label class="category-checkbox-item">
-              <input type="checkbox" name="category" value="informatique" onchange="updateCategorySelection(this)">
+              <input type="checkbox" name="category" value="informatique_electronique" onchange="updateCategorySelection(this)">
               <span class="category-checkmark"></span>
               <span class="category-text">Informatique & électronique</span>
             </label>
             <label class="category-checkbox-item">
-              <input type="checkbox" name="category" value="mobilier" onchange="updateCategorySelection(this)">
+              <input type="checkbox" name="category" value="mobilier_equipements" onchange="updateCategorySelection(this)">
               <span class="category-checkmark"></span>
               <span class="category-text">Mobilier & équipements</span>
             </label>
             <label class="category-checkbox-item">
-              <input type="checkbox" name="category" value="bijoux" onchange="updateCategorySelection(this)">
+              <input type="checkbox" name="category" value="bijoux_objets_valeur" onchange="updateCategorySelection(this)">
               <span class="category-checkmark"></span>
               <span class="category-text">Bijoux & objets de valeur</span>
             </label>
             <label class="category-checkbox-item">
-              <input type="checkbox" name="category" value="stocks" onchange="updateCategorySelection(this)">
+              <input type="checkbox" name="category" value="stocks_invendus" onchange="updateCategorySelection(this)">
               <span class="category-checkmark"></span>
               <span class="category-text">Stocks et invendus</span>
             </label>
             <label class="category-checkbox-item">
-              <input type="checkbox" name="category" value="oeuvres" onchange="updateCategorySelection(this)">
+              <input type="checkbox" name="category" value="oeuvres_collections" onchange="updateCategorySelection(this)">
               <span class="category-checkmark"></span>
               <span class="category-text">Œuvres & collections</span>
             </label>
@@ -434,6 +434,7 @@
       data-wilaya="{{ enchere.lot.wilaya|default:'' }}"
       data-status="{% if enchere.date_fin|timeuntil|slice:':2' == '0 ' %}ending-soon{% elif enchere.etat == 'active' %}active{% elif enchere.etat == 'upcoming' %}upcoming{% else %}ended{% endif %}"
       data-end-time="{{ enchere.date_fin|date:'c' }}"
+      data-start-time="{{ enchere.date_debut|date:'c' }}"
       onclick="window.location.href = this.getAttribute('data-url')"
       style="cursor: pointer;"
     >
@@ -510,7 +511,7 @@
           <div class="time-remaining-inline">
             <span> | </span>
             <i class="fas fa-clock" aria-hidden="true"></i>
-            <span class="countdown-inline" data-end="{{ enchere.date_fin|date:'c' }}">
+            <span class="countdown-inline" data-end="{{ enchere.date_fin|date:'c' }}" data-start="{{ enchere.date_debut|date:'c' }}">
               Calcul en cours...
             </span>
           </div>
@@ -1859,6 +1860,8 @@
   background: var(--border-color);
   border-radius: 2px;
 }
+
+/* JavaScript code starts here */
 </style>
 
 <script>
@@ -1890,34 +1893,52 @@ function updateAllCountdowns() {
   const countdownElements = document.querySelectorAll('.countdown, .countdown-inline');
   
   countdownElements.forEach(element => {
+    const card = element.closest('.auction-card');
+    if (!card) return;
+    
+    const status = card.getAttribute('data-status');
     const endTime = element.getAttribute('data-end');
-    if (endTime) {
-      const timeLeft = calculateTimeLeft(endTime);
-      element.textContent = timeLeft;
+    const startTime = element.getAttribute('data-start');
+    
+    let timeLeft;
+    
+    if (status === 'active' || status === 'ending-soon') {
+      // Pour les enchères actives, compte à rebours jusqu'à la date de fin
+      timeLeft = calculateTimeLeft(endTime);
+    } else if (status === 'upcoming') {
+      // Pour les enchères à venir, compte à rebours jusqu'à la date de début
+      timeLeft = calculateTimeLeft(startTime);
+    } else {
+      // Pour les enchères terminées, afficher "00j:00h:00m:00s"
+      timeLeft = "00j:00h:00m:00s";
     }
+    
+    element.textContent = timeLeft;
   });
 }
 
-function calculateTimeLeft(endTime) {
+function calculateTimeLeft(targetTime) {
+  if (!targetTime) return "Calcul en cours...";
+  
   const now = new Date().getTime();
-  const end = new Date(endTime).getTime();
-  const difference = end - now;
+  const target = new Date(targetTime).getTime();
+  const difference = target - now;
   
   if (difference <= 0) {
-    return "Terminée";
+    return "00j:00h:00m:00s";
   }
   
   const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)) -1;
   const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
   const seconds = Math.floor((difference % (1000 * 60)) / 1000);
   
   if (days > 0) {
-    return `${days}j ${hours}h ${minutes}m`;
+    return `${days}j:${hours.toString().padStart(2, '0')}h:${minutes.toString().padStart(2, '0')}m:${seconds.toString().padStart(2, '0')}s`;
   } else if (hours > 0) {
-    return `${hours}h ${minutes}m ${seconds}s`;
+    return `${hours}h:${minutes.toString().padStart(2, '0')}m:${seconds.toString().padStart(2, '0')}s`;
   } else if (minutes > 0) {
-    return `${minutes}m ${seconds}s`;
+    return `${minutes}m:${seconds.toString().padStart(2, '0')}s`;
   } else {
     return `${seconds}s`;
   }
@@ -2358,4 +2379,3 @@ window.addEventListener('beforeunload', function() {
   }
 });
 </script>
-

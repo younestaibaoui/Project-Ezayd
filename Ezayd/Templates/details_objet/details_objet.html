@@ -1189,7 +1189,14 @@
                 </div>
                 <div class="status-item">
                     <i class="fas fa-clock"></i>
-                    <span>Temps restant: {{ enchaire.date_fin|default:"N/A" }}</span>
+                    <span>Temps restant:
+                        {% comment %} {% if enchaire.etat == 'active' %}
+                             {{ enchaire.date_fin|default:"N/A" }}
+                        {% else %}
+                            {{ enchaire.date_debut|default:"N/A" }}
+                        {% endif %} {% endcomment %}
+
+                        </span>
                 </div>
             </div>
         </div>
@@ -2060,12 +2067,17 @@
     // Countdown timer function
     function tempsRestant() {
     // Get the auction end date from Django template in ISO 8601 format
-    const dateFin = new Date("{{ enchaire.date_fin|date:'c' }}");
+    const dateFin = new Date("{{ enchaire.date_fin }}");
+    const dateDebut = new Date("{{ enchaire.date_debut }}");
+    const etat = "{{ enchaire.etat }}";
+    const date = etat === 'active' ? dateFin : dateDebut;
 
+    
+    
     // Update the countdown every second
     const countdownInterval = setInterval(function() {
         const now = new Date();
-        const diff = dateFin - now;
+        const diff = date - now;
 
         if (diff <= 0) {
             clearInterval(countdownInterval);

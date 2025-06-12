@@ -391,6 +391,8 @@ def details_view(request, enchere_id):
                 'categorie': mobilier.categorie,
                 'get_images': mobilier.get_images(),  # Suppose que ça retourne des URLs ou une liste
                 'participation_count': participation_count,
+                'description': mobilier.description,  # Si applicable
+                'dimensions': mobilier.dimensions,  # Si applicable
             })
     
     # Si le lot est de type "bijoux_objets_valeur"
@@ -407,7 +409,10 @@ def details_view(request, enchere_id):
                 'id': bijou.id,
                 'type_objet': bijou.type_objet,
                 'get_images': bijou.get_images(),  # Suppose que ça retourne des URLs ou une liste
-                'caracteristiques': bijou.caracteristiques,  # Si applicable
+                'carat': bijou.carats,  # Si applicable
+                'description': bijou.description,  # Si applicable
+
+             
                 'participation_count': participation_count,
             })
 
@@ -425,6 +430,7 @@ def details_view(request, enchere_id):
                 'nom_produit': stock.nom_produit,
                 'get_images': stock.get_images(),  # Suppose que ça retourne des URLs ou une liste
                 'quantite': stock.quantite,  # Si applicable
+                'description': stock.description,  # Si applicable
                 'participation_count': participation_count,
             })
     # Si le lot est de type "oeuvres_collections"
