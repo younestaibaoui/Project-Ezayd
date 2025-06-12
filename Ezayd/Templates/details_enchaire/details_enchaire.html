@@ -122,11 +122,11 @@
                         </div>
                     {% else %}
                         {% if enchaire.is_active %}
-                            <form method="post" action="{% url 'demande' %}" style="margin: 0;">
+                            <form method="post" action="{% url 'demande' %}" style="margin: 0;" id="demandeForm">
                                 {% csrf_token %}
                                 <input type="hidden" name="user" value="{{ user.id }}">
                                 <input type="hidden" name="enchaire" value="{{ enchaire.id }}">
-                                <button type="submit" style="width: 100%; height: 36px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: none; border-radius: 8px; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: white; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.3s ease;"
+                                <button type="button" onclick="showConfirmation('demande')" style="width: 100%; height: 36px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: none; border-radius: 8px; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: white; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.3s ease;"
                                         onmouseover="this.style.transform='translateY(-1px)'"
                                         onmouseout="this.style.transform='translateY(0)'">
                                     <i class="fas fa-paper-plane" style="font-size: 14px;"></i>
@@ -134,11 +134,11 @@
                                 </button>
                             </form>
                             {% elif enchaire.etat == 'upcoming' %}
-                            <form method="post" action="{% url 'demande' %}" style="margin: 0;">
+                            <form method="post" action="{% url 'demande' %}" style="margin: 0;" id="reserveForm">
                                 {% csrf_token %}
                                 <input type="hidden" name="user" value="{{ user.id }}">
                                 <input type="hidden" name="enchaire" value="{{ enchaire.id }}">
-                                <button type="submit" style="width: 100%; height: 36px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: none; border-radius: 8px; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: white; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.3s ease;"
+                                <button type="button" onclick="showConfirmation('reserve')" style="width: 100%; height: 36px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: none; border-radius: 8px; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: white; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.3s ease;"
                                         onmouseover="this.style.transform='translateY(-1px)'"
                                         onmouseout="this.style.transform='translateY(0)'">
                                     <i class="fas fa-paper-plane" style="font-size: 14px;"></i>
@@ -458,7 +458,80 @@
     </div>
 </div>
 
+<!-- Confirmation Dialog -->
+<div id="confirmationDialog" class="confirmation-dialog">
+    <div class="confirmation-content">
+        <div class="confirmation-title">
+            <i class="fas fa-gavel"></i>
+            <span id="confirmationTitleText">Confirmer la participation</span>
+        </div>
+        <div class="confirmation-message">
+            <span id="confirmationMessageText">Êtes-vous sûr de vouloir participer à cette enchère ?</span>
+        </div>
+        <div class="confirmation-buttons">
+            <button class="btn-cancel" onclick="hideConfirmation()">Annuler</button>
+            <button class="btn-confirm" onclick="confirmAction()">
+                <i class="fas fa-gavel"></i>
+                <span id="confirmButtonText">Confirmer</span>
+            </button>
+        </div>
+    </div>
+</div>
+
 <script>
+// Global variable to track current action
+let currentAction = null;
+
+// Confirmation dialog functions
+function showConfirmation(action) {
+    currentAction = action;
+    const dialog = document.getElementById('confirmationDialog');
+    const titleText = document.getElementById('confirmationTitleText');
+    const messageText = document.getElementById('confirmationMessageText');
+    const confirmButtonText = document.getElementById('confirmButtonText');
+    
+    if (action === 'demande') {
+        titleText.textContent = 'Confirmer la demande';
+        messageText.textContent = 'Êtes-vous sûr de vouloir faire une demande pour cette enchère ?';
+        confirmButtonText.textContent = 'Demander';
+    } else if (action === 'reserve') {
+        titleText.textContent = 'Confirmer la réservation';
+        messageText.textContent = 'Êtes-vous sûr de vouloir réserver cette enchère ?';
+        confirmButtonText.textContent = 'Réserver';
+    }
+    
+    dialog.classList.add('active');
+    document.body.style.overflow = 'hidden'; // Prevent scrolling
+}
+
+function hideConfirmation() {
+    document.getElementById('confirmationDialog').classList.remove('active');
+    document.body.style.overflow = ''; // Re-enable scrolling
+    currentAction = null;
+}
+
+function confirmAction() {
+    if (currentAction === 'demande') {
+        document.getElementById('demandeForm').submit();
+    } else if (currentAction === 'reserve') {
+        document.getElementById('reserveForm').submit();
+    }
+}
+
+// Close confirmation dialog when clicking outside
+document.getElementById('confirmationDialog').addEventListener('click', function(event) {
+    if (event.target === this) {
+        hideConfirmation();
+    }
+});
+
+// Close confirmation dialog with Escape key
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape' && document.getElementById('confirmationDialog').classList.contains('active')) {
+        hideConfirmation();
+    }
+});
+
 // Variables globales pour le carrousel
 let currentImageIndex = {};
 let allImages = {};
@@ -704,6 +777,111 @@ document.getElementById('objectSearch').addEventListener('input', function() {
 </script>
 
 <style>
+/* Confirmation Dialog Styles */
+.confirmation-dialog {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.confirmation-dialog.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.confirmation-content {
+    background: linear-gradient(135deg, #2d2d2d 0%, #1e1e1e 100%);
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 450px;
+    width: 90%;
+    border: 1px solid #404040;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.confirmation-dialog.active .confirmation-content {
+    transform: scale(1);
+}
+
+.confirmation-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 24px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 16px;
+    text-align: center;
+    justify-content: center;
+}
+
+.confirmation-title i {
+    color: #ff6b35;
+    font-size: 28px;
+}
+
+.confirmation-message {
+    color: #e0e0e0;
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+.confirmation-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.btn-cancel, .btn-confirm {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 120px;
+    justify-content: center;
+}
+
+.btn-cancel {
+    background: #333;
+    color: #fff;
+    border: 1px solid #555;
+}
+
+.btn-cancel:hover {
+    background: #444;
+    transform: translateY(-1px);
+}
+
+.btn-confirm {
+    background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+    color: white;
+}
+
+.btn-confirm:hover {
+    background: linear-gradient(135deg, #f7931e 0%, #ff6b35 100%);
+    transform: translateY(-1px);
+}
+
 /* Responsive design */
 @media (max-width: 1024px) {
     .main-grid {
@@ -721,6 +899,19 @@ document.getElementById('objectSearch').addEventListener('input', function() {
         flex-direction: column !important;
         align-items: flex-start !important;
         gap: 12px !important;
+    }
+    
+    .confirmation-content {
+        padding: 24px;
+        margin: 20px;
+    }
+    
+    .confirmation-buttons {
+        flex-direction: column;
+    }
+    
+    .btn-cancel, .btn-confirm {
+        width: 100%;
     }
 }
 </style>

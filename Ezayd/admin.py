@@ -1,12 +1,15 @@
 from django.contrib import admin
 from .models import (
-    Enchaire, DemandeEnchaire, Lot,
+    Enchaire, DemandeEnchaire, EnchaireObjet, ParticipationEnchaire,
+    Lot,
     Voiture, VoitureImage,
     Immobilier, ImmobilierImage,
     MaterielProfessionnel, MaterielProfessionnelImage,
     InformatiqueElectronique, InformatiqueImage,
-    MobilierEquipement,
-    EnchaireObjet, ParticipationEnchaire,
+    MobilierEquipement, MobilierImage,
+    BijouxObjetValeur, BijouxImage,
+    StockInvendu, StockImage,
+    OeuvreCollection, OeuvreImage
 )
 
 
@@ -16,8 +19,8 @@ class EnchaireAdmin(admin.ModelAdmin):
     list_display = ('id','lot', 'seller', 'etat', 'date_debut', 'date_fin', 'is_active_display')
     list_filter = ('etat', 'date_debut', 'date_fin')
     search_fields = ('lot__nom', 'seller__username')
-    readonly_fields = ('notified_users',)
-    filter_horizontal = ('savers', 'notified_users')
+    readonly_fields = ('etat',)
+    filter_horizontal = ('savers',)
 
     @admin.display(boolean=True, description='Active')
     def is_active_display(self, obj):
@@ -157,7 +160,100 @@ class InformatiqueElectroniqueAdmin(admin.ModelAdmin):
 
 
 # ---------- Admin pour MobilierEquipement ----------
+# --- Formset personnalisé pour valider le nombre d'images ---
+class MobilierImageInlineFormSet(BaseInlineFormSet):
+    def clean(self):
+        super().clean()
+        count = 0
+        for form in self.forms:
+            if not form.cleaned_data.get('DELETE', False) and form.cleaned_data:
+                count += 1
+        if count < 3:
+            raise ValidationError("Vous devez ajouter au moins 3 images pour chaque mobilier.")
+
+# --- Inline admin pour les images ---
+class MobilierImageInline(admin.TabularInline):
+    model = MobilierImage
+    extra = 1
+    formset = MobilierImageInlineFormSet
+
+# --- Admin principal pour MobilierEquipement ---
 @admin.register(MobilierEquipement)
 class MobilierEquipementAdmin(admin.ModelAdmin):
-    list_display = ('categorie', 'materiau', 'couleur', 'lot')
-    search_fields = ('categorie', 'materiau', 'couleur')
+    list_display = ('categorie', 'materiau', 'couleur', 'etat')
+    search_fields = ('categorie', 'description')
+    inlines = [MobilierImageInline]
+
+# ---------- Admin pour BijouxObjetValeur ----------
+
+# --- Formset personnalisé pour valider le nombre d'images ---
+class BijouxImageInlineFormSet(BaseInlineFormSet):
+    def clean(self):
+        super().clean()
+        count = 0
+        for form in self.forms:
+            if not form.cleaned_data.get('DELETE', False) and form.cleaned_data:
+                count += 1
+        if count < 3:
+            raise ValidationError("Vous devez ajouter au moins 3 images pour chaque bijou ou objet de valeur.")
+
+# --- Inline admin pour les images de bijoux ---
+class BijouxImageInline(admin.TabularInline):
+    model = BijouxImage
+    extra = 1
+    formset = BijouxImageInlineFormSet
+
+# --- Admin principal pour BijouxObjetValeur ---
+@admin.register(BijouxObjetValeur)
+class BijouxObjetValeurAdmin(admin.ModelAdmin):
+    list_display = ('type_objet', 'matiere', 'poids', 'carats')
+    search_fields = ('type_objet', 'matiere', 'description')
+    inlines = [BijouxImageInline]
+
+# --- Formset personnalisé pour valider le nombre d'images ---
+class StockImageInlineFormSet(BaseInlineFormSet):
+    def clean(self):
+        super().clean()
+        count = 0
+        for form in self.forms:
+            if not form.cleaned_data.get('DELETE', False) and form.cleaned_data:
+                count += 1
+        if count < 3:
+            raise ValidationError("Vous devez ajouter au moins 3 images pour chaque produit en stock.")
+
+# --- Inline admin pour les images de stock ---
+class StockImageInline(admin.TabularInline):
+    model = StockImage
+    extra = 1
+    formset = StockImageInlineFormSet
+
+# --- Admin principal pour StockInvendu ---
+@admin.register(StockInvendu)
+class StockInvenduAdmin(admin.ModelAdmin):
+    list_display = ('nom_produit', 'quantite', 'unite')
+    search_fields = ('nom_produit', 'description')
+    inlines = [StockImageInline]
+
+# --- Formset personnalisé pour valider le nombre d'images ---
+class OeuvreImageInlineFormSet(BaseInlineFormSet):
+    def clean(self):
+        super().clean()
+        count = 0
+        for form in self.forms:
+            if not form.cleaned_data.get('DELETE', False) and form.cleaned_data:
+                count += 1
+        if count < 3:
+            raise ValidationError("Vous devez ajouter au moins 3 images pour chaque œuvre.")
+
+# --- Inline admin pour les images d'œuvres ---
+class OeuvreImageInline(admin.TabularInline):
+    model = OeuvreImage
+    extra = 1
+    formset = OeuvreImageInlineFormSet
+
+# --- Admin principal pour OeuvreCollection ---
+@admin.register(OeuvreCollection)
+class OeuvreCollectionAdmin(admin.ModelAdmin):
+    list_display = ('titre', 'artiste', 'annee_creation', 'type_oeuvre')
+    search_fields = ('titre', 'artiste', 'description')
+    inlines = [OeuvreImageInline]

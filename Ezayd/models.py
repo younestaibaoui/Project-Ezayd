@@ -170,12 +170,6 @@ class Enchaire(models.Model):
         blank=True
     )
 
-    notified_users = models.ManyToManyField(
-        "perso.UserAccount",
-        related_name='enchaires_notifiées',
-        blank=True
-    )
-
     wilaya = models.CharField(
         max_length=50,
         choices=WILAYAS_ALGERIE,
@@ -275,10 +269,10 @@ class DemandeEnchaire(models.Model):
     
     def delete_notif(self, user, enchaire):
         try:
-            notification = NotificationDemandeEnchaire.objects.get(
+            notification = NotificationDemandeEnchaire.objects.filter(
                 user=user,
                 enchaire=enchaire,  
-            )
+            ).first()
             notification.delete()
         except NotificationDemandeEnchaire.DoesNotExist:
             pass 
@@ -805,3 +799,4 @@ class OeuvreImage(models.Model):
 
     def __str__(self):
         return f"Image de l’œuvre '{self.oeuvre.titre}' - {self.date.strftime('%Y-%m-%d')}"
+

@@ -9,181 +9,188 @@
 
       <!-- Main Content -->
       <main id="main-content" class="main-content">
+    <!-- FAQ Top Bar -->
+    <div class="faq-top-bar">
+      <a href="{% url 'FAQ' %}" class="faq-link">
+        Consultez notre FAQ pour des réponses à vos questions
+        <i class="fas fa-arrow-right ml-2"></i>
+      </a>
+    </div>
           <!-- Hero Carousel Section -->
           <section class="hero-section" aria-label="Top enchères par participation">
               <h1 class="sr-only">Ezayd - Plateforme d'enchères en ligne</h1>
               <div class="carousel-container" role="region" aria-label="Carrousel des top enchères par participation">
                   <div class="carousel-track" aria-live="polite">
                       {% for objet_data in top_objets_by_category %}
-                      <article class="carousel-slide {% if forloop.first %}active{% endif %}" 
-                               aria-label="Enchère {{ objet_data.title }} - {{ objet_data.participation_count }} participants"
-                               data-category="{{ objet_data.type }}">
-                          
-                          <!-- Image Section avec overlay moderne -->
-                          <div class="slide-image-container">
-                              <div class="image-wrapper">
-                                  <img src="{{ objet_data.main_image }}" 
-                                       alt="{{ objet_data.title }} - Image principale" 
-                                       class="main-image" 
-                                       loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
-                                       onerror="this.src='{% static 'images/placeholder.jpg' %}'">
-                                  
-                                  <!-- Overlay moderne avec dégradé -->
-                                  <div class="modern-overlay"></div>
-                                  
-                                  <!-- Header avec titre et badges -->
-                                  <div class="slide-header">
-                                      <div class="title-section">
-                                          <h2 class="slide-title">{{ objet_data.title }}</h2>
-                                          <div class="category-tag {{ objet_data.type }}">
-                                              <i class="{{ objet_data.category_icon }}"></i>
-                                              <span>{{ objet_data.category_name }}</span>
-                                          </div>
-                                      </div>
-                                      
-                                      <div class="badges-section">
-                                          <div class="top-badge">
-                                              <i class="fas fa-crown"></i>
-                                              <span>Top {{ objet_data.category_name }}</span>
-                                          </div>
-                                          <!-- Participants badge moderne - repositionné au-dessus -->
-                                          <div class="participants-badge">
-                                              <div class="participants-content">
-                                                  <div class="participants-number">{{ objet_data.participation_count }}</div>
-                                                  <div class="participants-text">participant{{ objet_data.participation_count|pluralize }}</div>
-                                              </div>
-                                          </div>
-                                      </div>
-                                  </div>
-                                  
-                                  <!-- Footer moderne - section combinée à gauche avec background transparent -->
-                                  <div class="slide-footer">
-                                      <div class="combined-info-section">
-                                          
-                                          <div class="info-row">
-                                            <div class="price-label">Prix actuel</div>
-                                              <div class="price-value">{{ objet_data.price_current|floatformat:0 }} DA</div>
-                                              
-                                                  <div class="time-label">Temps restant</div>
-                                                <div class="countdown-timer" 
-                                                      data-end-date="{{ objet_data.enchaire.date_fin|date:'Y-m-d' }}"
-                                                      data-jours-restants="{{ objet_data.jours_restants }}"
-                                                      data-heures-restantes="{{ objet_data.heures_restantes }}"
-                                                      data-minutes-restantes="{{ objet_data.minutes_restantes }}"
-                                                      data-secondes-restantes="{{ objet_data.secondes_restantes }}">
-
-                                                      <div class="time-block">
-                                                          <div class="time-number days">{{ objet_data.jours_restants|stringformat:"02d" }}</div>
-                                                          <div class="time-label-small">j</div>
-                                                      </div>
-                                                      <div class="time-block">
-                                                          <div class="time-number hours">{{ objet_data.heures_restantes|stringformat:"02d" }}</div>
-                                                          <div class="time-label-small">h</div>
-                                                      </div>
-                                                      <div class="time-block">
-                                                          <div class="time-number minutes">{{ objet_data.minutes_restantes|stringformat:"02d" }}</div>
-                                                          <div class="time-label-small">m</div>
-                                                      </div>
-                                                      <div class="time-block">
-                                                          <div class="time-number seconds">{{ objet_data.secondes_restantes|stringformat:"02d" }}</div>
-                                                          <div class="time-label-small">s</div>
-                                                      </div>
-                                                  </div>
-
-                                              
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                          
-                          <!-- Sidebar moderne avec images optimisées -->
-                          <div class="modern-sidebar">
-                              <!-- Galerie d'images - 1 grande à gauche, 2 petites à droite -->
-                              <div class="image-gallery">
-                                  {% if objet_data.images|length >= 3 %}
+                        <article class="carousel-slide {% if forloop.first %}active{% endif %}" 
+                                aria-label="Enchère {{ objet_data.title }} - {{ objet_data.participation_count }} participants"
+                                data-category="{{ objet_data.type }}">
                             
-                                      <!-- Images secondaires à droite -->
-                                      <div class="gallery-side-images">
-                                          {% for image in objet_data.images|slice:"1:3" %}
-                                          <div class="gallery-side-item">
-                                              <img src="{{ image }}" 
-                                                   alt="{{ objet_data.title }} - Image {{ forloop.counter|add:1 }}" 
-                                                   class="gallery-image-side" 
-                                                   loading="lazy"
-                                                   onerror="this.parentElement.style.display='none'">
-                                              <div class="gallery-overlay">
-                                                  <i class="fas fa-expand-alt"></i>
-                                              </div>
-                                          </div>
-                                          {% endfor %}
-                                      </div>
-                                  {% elif objet_data.images|length == 2 %}
-                                      <!-- Images secondaires à droite -->
-                                      <div class="gallery-side-images">
-                                          <div class="gallery-side-item">
-                                              <img src="{{ objet_data.images.1 }}" 
-                                                   alt="{{ objet_data.title }} - Image 2" 
-                                                   class="gallery-image-side" 
-                                                   loading="lazy"
-                                                   onerror="this.parentElement.style.display='none'">
-                                              <div class="gallery-overlay">
-                                                  <i class="fas fa-expand-alt"></i>
-                                              </div>
-                                          </div>
-                                          <!-- Placeholder pour la 2ème image -->
-                                          <div class="gallery-side-item placeholder">
-                                              <div class="placeholder-content">
-                                                  <i class="fas fa-image"></i>
-                                              </div>
-                                          </div>
-                                      </div>
-                                  {% elif objet_data.images|length == 1 %}
-                                      <!-- Placeholders à droite -->
-                                      <div class="gallery-side-images">
-                                          <div class="gallery-side-item placeholder">
-                                              <div class="placeholder-content">
-                                                  <i class="fas fa-image"></i>
-                                              </div>
-                                          </div>
-                                          <div class="gallery-side-item placeholder">
-                                              <div class="placeholder-content">
-                                                  <i class="fas fa-image"></i>
-                                              </div>
-                                          </div>
-                                      </div>
-                                  {% else %}
-                                      <!-- Cas sans images - placeholders -->
-                                      <div class="gallery-main-image placeholder">
-                                          <div class="placeholder-content">
-                                              <i class="fas fa-image"></i>
-                                          </div>
-                                      </div>
-                                      <div class="gallery-side-images">
-                                          <div class="gallery-side-item placeholder">
-                                              <div class="placeholder-content">
-                                                  <i class="fas fa-image"></i>
-                                              </div>
-                                          </div>
-                                          <div class="gallery-side-item placeholder">
-                                              <div class="placeholder-content">
-                                                  <i class="fas fa-image"></i>
-                                              </div>
-                                          </div>
-                                      </div>
-                                  {% endif %}
-                              </div>
+                            <!-- Image Section avec overlay moderne -->
+                            <div class="slide-image-container">
+                                <div class="image-wrapper">
+                                    <img src="{{ objet_data.main_image }}" 
+                                        alt="{{ objet_data.title }} - Image principale" 
+                                        class="main-image" 
+                                        loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+                                        onerror="this.src='{% static 'images/placeholder.jpg' %}'">
+                                    
+                                    <!-- Overlay moderne avec dégradé -->
+                                    <div class="modern-overlay"></div>
+                                    
+                                    <!-- Header avec titre et badges -->
+                                    <div class="slide-header">
+                                        <div class="title-section">
+                                            <h2 class="slide-title">{{ objet_data.title }}</h2>
+                                            <div class="category-tag {{ objet_data.type }}">
+                                                <i class="{{ objet_data.category_icon }}"></i>
+                                                <span>{{ objet_data.category_name }}</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="badges-section">
+                                            <div class="top-badge">
+                                                <i class="fas fa-crown"></i>
+                                                <span>Top {{ objet_data.category_name }}</span>
+                                            </div>
+                                            <!-- Participants badge moderne - repositionné au-dessus -->
+                                            <div class="participants-badge">
+                                                <div class="participants-content">
+                                                    <div class="participants-number">{{ objet_data.participation_count }}</div>
+                                                    <div class="participants-text">participant{{ objet_data.participation_count|pluralize }}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Footer moderne - section combinée à gauche avec background transparent -->
+                                    <div class="slide-footer">
+                                        <div class="combined-info-section">
+                                            
+                                            <div class="info-row">
+                                              <div class="price-label">Prix actuel</div>
+                                                <div class="price-value">{{ objet_data.price_current|floatformat:0 }} DA</div>
+                                                
+                                                    <div class="time-label">Temps restant</div>
+                                                  <div class="countdown-timer" 
+                                                        data-end-date="{{ objet_data.enchaire.date_fin|date:'Y-m-d' }}"
+                                                        data-jours-restants="{{ objet_data.jours_restants }}"
+                                                        data-heures-restantes="{{ objet_data.heures_restantes }}"
+                                                        data-minutes-restantes="{{ objet_data.minutes_restantes }}"
+                                                        data-secondes-restantes="{{ objet_data.secondes_restantes }}">
+
+                                                        <div class="time-block">
+                                                            <div class="time-number days">{{ objet_data.jours_restants|stringformat:"02d" }}</div>
+                                                            <div class="time-label-small">j</div>
+                                                        </div>
+                                                        <div class="time-block">
+                                                            <div class="time-number hours">{{ objet_data.heures_restantes|stringformat:"02d" }}</div>
+                                                            <div class="time-label-small">h</div>
+                                                        </div>
+                                                        <div class="time-block">
+                                                            <div class="time-number minutes">{{ objet_data.minutes_restantes|stringformat:"02d" }}</div>
+                                                            <div class="time-label-small">m</div>
+                                                        </div>
+                                                        <div class="time-block">
+                                                            <div class="time-number seconds">{{ objet_data.secondes_restantes|stringformat:"02d" }}</div>
+                                                            <div class="time-label-small">s</div>
+                                                        </div>
+                                                    </div>
+
+                                                
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Sidebar moderne avec images optimisées -->
+                            <div class="modern-sidebar">
+                                <!-- Galerie d'images - 1 grande à gauche, 2 petites à droite -->
+                                <div class="image-gallery">
+                                    {% if objet_data.images|length >= 3 %}
                               
-                              <!-- Section d'action simplifiée -->
-                              <div class="action-section">
-                                  <a href="{% url 'details_objet' objet_data.type objet_data.objet.id %}" 
-                                     class="cta-button">
-                                      <span class="cta-text">Voir les détails</span>
-                                      <i class="fas fa-arrow-right cta-icon"></i>
-                                  </a>
-                              </div>
-                          </div>
-                      </article>
+                                        <!-- Images secondaires à droite -->
+                                        <div class="gallery-side-images">
+                                            {% for image in objet_data.images|slice:"1:3" %}
+                                            <div class="gallery-side-item">
+                                                <img src="{{ image }}" 
+                                                    alt="{{ objet_data.title }} - Image {{ forloop.counter|add:1 }}" 
+                                                    class="gallery-image-side" 
+                                                    loading="lazy"
+                                                    onerror="this.parentElement.style.display='none'">
+                                                <div class="gallery-overlay">
+                                                    <i class="fas fa-expand-alt"></i>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    {% elif objet_data.images|length == 2 %}
+                                        <!-- Images secondaires à droite -->
+                                        <div class="gallery-side-images">
+                                            <div class="gallery-side-item">
+                                                <img src="{{ objet_data.images.1 }}" 
+                                                    alt="{{ objet_data.title }} - Image 2" 
+                                                    class="gallery-image-side" 
+                                                    loading="lazy"
+                                                    onerror="this.parentElement.style.display='none'">
+                                                <div class="gallery-overlay">
+                                                    <i class="fas fa-expand-alt"></i>
+                                                </div>
+                                            </div>
+                                            <!-- Placeholder pour la 2ème image -->
+                                            <div class="gallery-side-item placeholder">
+                                                <div class="placeholder-content">
+                                                    <i class="fas fa-image"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% elif objet_data.images|length == 1 %}
+                                        <!-- Placeholders à droite -->
+                                        <div class="gallery-side-images">
+                                            <div class="gallery-side-item placeholder">
+                                                <div class="placeholder-content">
+                                                    <i class="fas fa-image"></i>
+                                                </div>
+                                            </div>
+                                            <div class="gallery-side-item placeholder">
+                                                <div class="placeholder-content">
+                                                    <i class="fas fa-image"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <!-- Cas sans images - placeholders -->
+                                        <div class="gallery-main-image placeholder">
+                                            <div class="placeholder-content">
+                                                <i class="fas fa-image"></i>
+                                            </div>
+                                        </div>
+                                        <div class="gallery-side-images">
+                                            <div class="gallery-side-item placeholder">
+                                                <div class="placeholder-content">
+                                                    <i class="fas fa-image"></i>
+                                                </div>
+                                            </div>
+                                            <div class="gallery-side-item placeholder">
+                                                <div class="placeholder-content">
+                                                    <i class="fas fa-image"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Section d'action simplifiée -->
+                                <div class="action-section">
+                                    <a href="{% url 'details_enchaire' objet_data.enchaire.id %}" 
+                                      class="cta-button">
+                                        <span class="cta-text">Voir les détails</span>
+                                        <i class="fas fa-arrow-right cta-icon"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
                       {% empty %}
                       <!-- Slide par défaut -->
                       <article class="carousel-slide active" aria-label="Aucune enchère disponible">
@@ -271,6 +278,45 @@
 --radius-md: 12px;
 --radius-lg: 16px;
 --radius-xl: 24px;
+}
+
+/* FAQ Top Bar */
+/* FAQ Top Bar - Full width breaking out of container margins */
+.faq-top-bar {
+  background-color: #ff6b35;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 0;
+  font-family: 'Inter', sans-serif;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  transform: translateX(-50%);
+}
+
+.faq-link {
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.faq-link:hover {
+  text-decoration: underline;
+}
+
+.faq-link i {
+  margin-left: 8px;
+  transition: transform 0.3s ease;
+}
+
+.faq-link:hover i {
+  transform: translateX(3px);
 }
 
 /* Hero Section */
@@ -683,14 +729,19 @@
 .gallery-main-image:hover .gallery-image-main {
   transform: scale(1.05);
 }
-
+{% comment %} ------------- {% endcomment %}
+/* Updated gallery side images for consistent sizing */
 .gallery-side-images {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 4px; /* Reduced gap */
+  gap: 4px;
   background: transparent;
+  height: 100%; /* Ensure consistent height */
 }
+
+
+{% comment %} ......................... {% endcomment %}
 
 .gallery-side-item {
   flex: 1;
@@ -700,8 +751,12 @@
   cursor: pointer;
   transition: all 0.3s ease;
   background: transparent;
-  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.15)); /* Add drop shadow */
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.15));
+  height: calc(200px - 2px); /* Fixed height for each side image */
+  max-height: calc(200px - 2px); /* Prevent overflow */
+  min-height: 60px; /* Minimum height to ensure visibility */
 }
+
 
 .gallery-side-item:hover {
   transform: translateY(-1px);
@@ -715,6 +770,7 @@
   object-position: center;
   transition: transform 0.3s ease;
   border-radius: var(--radius-sm);
+  display: block; /* Ensure proper display */
 }
 
 .gallery-side-item:hover .gallery-image-side {

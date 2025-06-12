@@ -1736,6 +1736,12 @@
                 <span class="confirmation-label">Montant de votre enchère:</span>
                 <span class="confirmation-value highlight">{{ next_bid_price|default:enchaireObjet.price_reserved|add:enchaireObjet.pas }} DA</span>
             </div>
+            {% if participation_count == 0 %}
+            <div class="confirmation-detail">
+                <span class="confirmation-label">Prix actuel:</span>
+                <span class="confirmation-value">{{ enchaireObjet.first_price }} DA</span>
+            </div>
+            {% else %}
             <div class="confirmation-detail">
                 <span class="confirmation-label">Prix actuel:</span>
                 <span class="confirmation-value">{{ enchaireObjet.price_reserved }} DA</span>
@@ -1744,6 +1750,7 @@
                 <span class="confirmation-label">Augmentation:</span>
                 <span class="confirmation-value">+{{ enchaireObjet.pas }} DA</span>
             </div>
+            {% endif %}
         </div>
         <div class="confirmation-buttons">
             <button class="btn-cancel" onclick="hideConfirmation()">Annuler</button>
