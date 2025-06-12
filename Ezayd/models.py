@@ -502,8 +502,7 @@ class Immobilier(models.Model):
         
     def save(self, *args, **kwargs):
         self.full_clean()  # Appelle clean() et lève une exception si invalide
-        if not self.pk:  # object already exists
-            self.update_enchaireObjet()
+        self.update_enchaireObjet()
         super().save(*args, **kwargs)
 
 
@@ -568,8 +567,7 @@ class MaterielProfessionnel(models.Model):
         
     def save(self, *args, **kwargs):
         self.full_clean()  # Appelle clean() et lève une exception si invalide
-        if not self.pk:  # object already exists
-            self.update_enchaireObjet()
+        self.update_enchaireObjet()
         super().save(*args, **kwargs)
 
 
@@ -632,8 +630,7 @@ class InformatiqueElectronique(models.Model):
         
     def save(self, *args, **kwargs):
         self.full_clean()  # Appelle clean() et lève une exception si invalide
-        if not self.pk:  # object already exists
-            self.update_enchaireObjet()
+        self.update_enchaireObjet()
         super().save(*args, **kwargs)
 
 
@@ -688,8 +685,7 @@ class MobilierEquipement(models.Model):
         
     def save(self, *args, **kwargs):
         self.full_clean()  # Appelle clean() et lève une exception si invalide
-        if not self.pk:  # object already exists
-            self.update_enchaireObjet()
+        self.update_enchaireObjet()
         super().save(*args, **kwargs)
 
 
@@ -733,8 +729,7 @@ class BijouxObjetValeur(models.Model):
         
     def save(self, *args, **kwargs):
         self.full_clean()  # Appelle clean() et lève une exception si invalide
-        if not self.pk:  # object already exists
-            self.update_enchaireObjet()
+        self.update_enchaireObjet()
         super().save(*args, **kwargs)
 
 
@@ -777,9 +772,11 @@ class StockInvendu(models.Model):
         
     def save(self, *args, **kwargs):
         self.full_clean()  # Appelle clean() et lève une exception si invalide
-        if not self.pk:  # object already exists
-            self.update_enchaireObjet()
+        self.update_enchaireObjet()
         super().save(*args, **kwargs)
+    
+    def __str__(self):
+        return self.nom_produit
 
 
 class StockImage(models.Model):
@@ -823,8 +820,7 @@ class OeuvreCollection(models.Model):
         
     def save(self, *args, **kwargs):
         self.full_clean()  # Appelle clean() et lève une exception si invalide
-        if not self.pk:  # object already exists
-            self.update_enchaireObjet()
+        self.update_enchaireObjet()
         super().save(*args, **kwargs)
 
 
