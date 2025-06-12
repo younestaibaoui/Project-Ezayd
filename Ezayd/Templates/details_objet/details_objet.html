@@ -1070,11 +1070,12 @@
                                 {% endif %}
                             </div>
                         {% else %}
-                            <form method="post" action="{% url 'demande' %}" style="margin: 0;">
+                            <!-- Replace the existing "Demander" button form with this: -->
+                            <form method="post" action="{% url 'demande' %}" id="demanderForm" style="margin: 0;">
                                 {% csrf_token %}
                                 <input type="hidden" name="user" value="{{ user.id }}">
                                 <input type="hidden" name="enchaire" value="{{ enchaire.id }}">
-                                <button type="submit"
+                                <button type="button" onclick="showDemanderConfirmation()"
                                     style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; border: none; border-radius: 8px; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: white; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 3px 12px rgba(255, 107, 53, 0.3);"
                                     onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 15px rgba(255, 107, 53, 0.4)'"
                                     onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 3px 12px rgba(255, 107, 53, 0.3)'">
@@ -1126,12 +1127,13 @@
                             {% endif %}
                         </div>
                     {% else %}
-                        <form method="post" action="{% url 'demande' %}" style="margin: 0;">
+                        <!-- Replace the existing "Reserver" button form with this: -->
+                        <form method="post" action="{% url 'demande' %}" id="reserverForm" style="margin: 0;">
                             {% csrf_token %}
                             <input type="hidden" name="user" value="{{ user.id }}">
                             <input type="hidden" name="enchaire" value="{{ enchaire.id }}">
-                            <button type="submit"
-                                class= "participate-btn upcoming"
+                            <button type="button" onclick="showReserverConfirmation()"
+                                class="participate-btn upcoming"
                                 style="margin-top: 2%; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); box-shadow: 0 3px 12px rgba(255, 107, 53, 0.3);"
                                 onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 15px rgba(255, 107, 53, 0.4)'"
                                 onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 3px 12px rgba(255, 107, 53, 0.3)'">
@@ -1760,9 +1762,81 @@
             </button>
         </div>
     </div>
-</div>
+    <!-- Add these confirmation dialogs after the existing confirmationDialog -->
 
+   
+
+</div>
+ <!-- Demander Confirmation Dialog -->
+    <div id="demanderConfirmationDialog" class="confirmation-dialog">
+        <div class="confirmation-content">
+            <div class="confirmation-title">
+                <i class="fas fa-paper-plane"></i>
+                Confirmer la demande
+            </div>
+            <div class="confirmation-message">
+                Êtes-vous sûr de vouloir faire une demande pour participer à cette enchère ?
+            </div>
+            <div class="confirmation-buttons">
+                <button class="btn-cancel" onclick="hideDemanderConfirmation()">Annuler</button>
+                <button class="btn-confirm" onclick="confirmDemander()">
+                    <i class="fas fa-paper-plane"></i>
+                    Confirmer
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reserver Confirmation Dialog -->
+    <div id="reserverConfirmationDialog" class="confirmation-dialog">
+        <div class="confirmation-content">
+            <div class="confirmation-title">
+                <i class="fas fa-bookmark"></i>
+                Confirmer la réservation
+            </div>
+            <div class="confirmation-message">
+                Êtes-vous sûr de vouloir réserver cet objet pour l'enchère à venir ?
+            </div>
+            <div class="confirmation-buttons">
+                <button class="btn-cancel" onclick="hideReserverConfirmation()">Annuler</button>
+                <button class="btn-confirm" onclick="confirmReserver()">
+                    <i class="fas fa-bookmark"></i>
+                    Confirmer
+                </button>
+            </div>
+        </div>
+    </div>
 <script>
+
+    // Add these JavaScript functions to your existing script section:
+
+    // Demander confirmation functions
+    function showDemanderConfirmation() {
+    document.getElementById("demanderConfirmationDialog").classList.add("active")
+    document.body.style.overflow = "hidden"
+    }
+
+    function hideDemanderConfirmation() {
+    document.getElementById("demanderConfirmationDialog").classList.remove("active")
+    document.body.style.overflow = ""
+    }
+
+    function confirmDemander() {
+    document.getElementById("demanderForm").submit()
+    }
+
+    // Reserver confirmation functions
+    function showReserverConfirmation() {
+    document.getElementById("reserverConfirmationDialog").classList.add("active")
+    document.body.style.overflow = "hidden"
+    }
+
+    function hideReserverConfirmation() {
+    document.getElementById("reserverConfirmationDialog").classList.remove("active")
+    document.body.style.overflow = ""
+    }
+
+
     // Images array for modal navigation
     const images = [
         {% for image in objet.get_images %}
