@@ -137,7 +137,13 @@
         <!-- Icônes à droite -->
         <div style="display: flex; align-items: center; gap: 20px; flex-shrink: 0;">
           
-    
+        
+        <!-- Mes Favoris -->
+        <a href="{% url 'a_propos' %}" style="color: #fff; transition: color 0.2s ease;"
+          onmouseover="this.style.color='#ccc'" onmouseout="this.style.color='#fff'">
+          <i class="fa-solid fa-circle-info" style="font-size: 20px;"></i>
+        </a>
+
         <!-- Notification -->
         {% if user.is_authenticated %}
         <div style="position: relative;">
